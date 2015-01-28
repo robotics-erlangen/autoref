@@ -1,0 +1,3 @@
+[submodule "src/framework"]
+	path = src/framework
+	url = git@github.com:robotics-erlangen/framework.git
