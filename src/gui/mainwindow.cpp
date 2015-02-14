@@ -21,7 +21,6 @@
 #include "robotselectionwidget.h"
 #include "configdialog.h"
 #include "mainwindow.h"
-#include "internalreferee.h"
 #include "plotter/plotter.h"
 #include "refereestatuswidget.h"
 #include "ui_mainwindow.h"
@@ -50,8 +49,6 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     // setup icons
     ui->actionFlipSides->setIcon(QIcon("icon:32/change-ends.png"));
     ui->actionRecord->setIcon(QIcon("icon:32/media-record.png"));
-    ui->actionSimulator->setIcon(QIcon("icon:32/computer.png"));
-    ui->actionInternalReferee->setIcon(QIcon("icon:32/whistle.png"));
     ui->actionPlotter->setIcon(QIcon("icon:32/plotter.png"));
     ui->actionConfiguration->setIcon(QIcon("icon:32/preferences-system.png"));
 
@@ -62,13 +59,6 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     statusBar()->addPermanentWidget(m_refereeStatus);
 
     // setup ui parts that send commands
-    m_internalReferee = new InternalReferee(this);
-    connect(m_internalReferee, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
-    connect(ui->referee, SIGNAL(changeCommand(SSL_Referee::Command)), m_internalReferee, SLOT(changeCommand(SSL_Referee::Command)));
-    connect(ui->referee, SIGNAL(changeStage(SSL_Referee::Stage)), m_internalReferee, SLOT(changeStage(SSL_Referee::Stage)));
-    connect(ui->referee, SIGNAL(changeYellowKeeper(uint)), m_internalReferee, SLOT(changeYellowKeeper(uint)));
-    connect(ui->referee, SIGNAL(changeBlueKeeper(uint)), m_internalReferee, SLOT(changeBlueKeeper(uint)));
-
     connect(ui->autoref, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
     ui->autoref->init();
 
@@ -88,9 +78,6 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     // connect the menu actions
     connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));
 
-    connect(ui->actionSimulator, SIGNAL(toggled(bool)), SLOT(setSimulatorEnabled(bool)));
-    connect(ui->actionInternalReferee, SIGNAL(toggled(bool)), SLOT(setInternalRefereeEnabled(bool)));
-
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
     connect(ui->actionPlotter, SIGNAL(triggered()), m_plotter, SLOT(show()));
     connect(ui->actionRecord, SIGNAL(toggled(bool)), SLOT(setRecording(bool)));
@@ -100,8 +87,6 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     connect(this, SIGNAL(gotStatus(Status)), m_plotter, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->visualization, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->debugTree, SLOT(handleStatus(Status)));
-    connect(this, SIGNAL(gotStatus(Status)), m_internalReferee, SLOT(handleStatus(Status)));
-    connect(this, SIGNAL(gotStatus(Status)), ui->referee, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->timing, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), m_refereeStatus, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->log, SLOT(handleStatus(Status)));
@@ -112,7 +97,6 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     m_amun.start(visionPort);
 
     // restore configuration and initialize everything
-    sendTeams();
     ui->autoref->load();
     ui->visualization->load();
     m_configDialog->load();
@@ -126,12 +110,13 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     ui->splitterH->restoreState(s.value("SplitterH").toByteArray());
     s.endGroup();
 
-    ui->actionSimulator->setChecked(s.value("Simulator/Enabled").toBool());
-    ui->actionInternalReferee->setChecked(s.value("Referee/Internal").toBool());
-    if (!ui->actionInternalReferee->isChecked()) {
-        // correctly handle disabled referee
-        setInternalRefereeEnabled(false);
-    }
+    // disable internal referee
+    Command command(new amun::Command);
+    amun::CommandReferee *referee = command->mutable_referee();
+    referee->set_active(false);
+    sendCommand(command);
+    // force auto reload of strategies if external referee is used
+    ui->autoref->forceAutoReload(true);
 
     m_flip = s.value("Flip").toBool();
     sendFlip();
@@ -158,9 +143,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
     s.setValue("SplitterH", ui->splitterH->saveState());
     s.setValue("SplitterV", ui->splitterV->saveState());
     s.endGroup();
-
-    s.setValue("Simulator/Enabled", ui->actionSimulator->isChecked());
-    s.setValue("Referee/Internal", ui->actionInternalReferee->isChecked());
 
     // make sure the plotter is closed along with the mainwindow
     // this also ensure that a closeEvent is triggered
@@ -194,81 +176,9 @@ void MainWindow::handleStatus(const Status &status)
     emit gotStatus(status);
 }
 
-robot::Specs MainWindow::getRobot(int id)
-{
-    robot::Specs specs;
-    specs.set_generation(3);
-    specs.set_year(2014);
-    specs.set_id(id);
-    specs.set_radius(0.089f);
-    specs.set_height(0.138f);
-    specs.set_mass(1.5f);
-    specs.set_angle(0.98291);
-    specs.set_v_max(3.f);
-    specs.set_omega_max(6.f);
-    specs.set_shot_linear_max(5.5f);
-    specs.set_shot_chip_max(3.f);
-    specs.set_dribbler_width(0.08f);
-    robot::LimitParameters *accel = specs.mutable_acceleration();
-    accel->set_a_speedup_f_max(3.6f);
-    accel->set_a_speedup_s_max(2.5f);
-    accel->set_a_speedup_phi_max(60);
-    accel->set_a_brake_f_max(4.5f);
-    accel->set_a_brake_s_max(5.5f);
-    accel->set_a_brake_phi_max(60.f);
-    robot::ControllerParameters *ctrl = specs.mutable_controller();
-    ctrl->set_k_xy(0);
-    ctrl->set_k_phi(0);
-    ctrl->set_k_i_xy(0);
-    ctrl->set_k_i_phi(0);
-    ctrl->set_i_max_xy(0.002f);
-    ctrl->set_i_max_phi(0.002f);
-    ctrl->set_k_v_xy(10);
-    ctrl->set_k_omega(10);
-    ctrl->set_t_v_xy(0.1f);
-    ctrl->set_t_omega(0.1f);
-    ctrl->set_use_ff(1);
-
-    return specs;
-}
-
-void MainWindow::sendTeams()
-{
-    Command command(new amun::Command);
-    for (int i = 0; i < 3; ++i) {
-        command->mutable_set_team_blue()->add_robot()->CopyFrom(getRobot(i));
-    }
-    for (int i = 3; i < 6; ++i) {
-        command->mutable_set_team_yellow()->add_robot()->CopyFrom(getRobot(i));
-    }
-    emit sendCommand(command);
-}
-
 void MainWindow::sendCommand(const Command &command)
 {
     m_amun.sendCommand(command);
-}
-
-void MainWindow::setSimulatorEnabled(bool enabled)
-{
-    Command command(new amun::Command);
-    amun::CommandSimulator *sim = command->mutable_simulator();
-    sim->set_enable(enabled);
-    sendCommand(command);
-}
-
-void MainWindow::setInternalRefereeEnabled(bool enabled)
-{
-    Command command(new amun::Command);
-    amun::CommandReferee *referee = command->mutable_referee();
-    referee->set_active(enabled);
-    sendCommand(command);
-    // show internal referee when it's activated
-    if (enabled) {
-        ui->dockReferee->setVisible(true);
-    }
-    // force auto reload of strategies if external referee is used
-    ui->autoref->forceAutoReload(!enabled);
 }
 
 void MainWindow::toggleFlip()

@@ -18,7 +18,7 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-if(TARGET processor AND TARGET simulator AND TARGET strategy)
+if(TARGET processor AND TARGET strategy)
 
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/amun)
@@ -31,7 +31,7 @@ set(SOURCES
 )
 
 add_library(amun ${SOURCES})
-target_link_libraries(amun processor simulator strategy)
+target_link_libraries(amun processor strategy)
 qt5_use_modules(amun Core Network)
 
 if(WIN32)

@@ -24,7 +24,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(framework/src/core)
 add_subdirectory(framework/src/protobuf)
 add_subdirectory(framework/src/amun/processor)
-add_subdirectory(framework/src/amun/simulator)
 add_subdirectory(framework/src/amun/strategy)
 add_subdirectory(backend)
 

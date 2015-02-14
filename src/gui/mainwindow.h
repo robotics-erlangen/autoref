@@ -27,7 +27,6 @@
 #include <QSet>
 
 class ConfigDialog;
-class InternalReferee;
 class LogFileWriter;
 class Plotter;
 class RefereeStatusWidget;
@@ -55,23 +54,18 @@ protected:
 private slots:
     void handleStatus(const Status &status);
     void sendCommand(const Command &command);
-    void setSimulatorEnabled(bool enabled);
-    void setInternalRefereeEnabled(bool enabled);
     void toggleFlip();
     void setRecording(bool record);
     void showConfigDialog();
 
 private:
     void sendFlip();
-    void sendTeams();
-    robot::Specs getRobot(int id);
 
 private:
     Ui::MainWindow *ui;
     AmunClient m_amun;
     Plotter *m_plotter;
     RefereeStatusWidget *m_refereeStatus;
-    InternalReferee *m_internalReferee;
     ConfigDialog *m_configDialog;
     bool m_flip;
 

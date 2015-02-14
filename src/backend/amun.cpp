@@ -42,23 +42,15 @@
  */
 
 /*!
- * \fn void Amun::setScaling(float scaling)
- * \brief Passes scaling parameter
- */
-
-/*!
  * \brief Creates an Amun instance
  * \param parent Parent object
  */
 Amun::Amun(QObject *parent) :
     QObject(parent),
     m_processor(NULL),
-    m_simulator(NULL),
     m_referee(NULL),
     m_vision(NULL),
     m_autoref(NULL),
-    m_simulatorEnabled(false),
-    m_scaling(1.0f),
     m_visionPort(10002)
 {
     qRegisterMetaType<Command>("Command");
@@ -72,7 +64,6 @@ Amun::Amun(QObject *parent) :
     // using the signal-slot mechanism the objects in these can be called
     m_processorThread = new QThread(this);
     m_networkThread = new QThread(this);
-    m_simulatorThread = new QThread(this);
     m_autorefThread = new QThread(this);
 }
 
@@ -100,8 +91,6 @@ void Amun::start()
     connect(this, SIGNAL(gotCommand(Command)), m_processor, SLOT(handleCommand(Command)));
     // relay tracking, geometry, referee, controller and accelerator information
     connect(m_processor, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
-    // propagate time scaling
-    connect(this, SIGNAL(setScaling(float)), m_processor, SLOT(setScaling(float)));
 
     // start strategy threads
     Q_ASSERT(m_autoref == NULL);
@@ -134,26 +123,13 @@ void Amun::start()
     m_vision->moveToThread(m_networkThread);
     connect(m_networkThread, SIGNAL(started()), m_vision, SLOT(startListen()));
     connect(m_networkThread, SIGNAL(finished()), m_vision, SLOT(stopListen()));
-    // vision is connected in setSimulatorEnabled
-
-    // create simulator
-    Q_ASSERT(m_simulator == NULL);
-    m_simulator = new Simulator(m_timer);
-    m_simulator->moveToThread(m_simulatorThread);
-    // pass on simulator and team settings
-    connect(this, SIGNAL(gotCommand(Command)), m_simulator, SLOT(handleCommand(Command)));
-    // pass simulator timing
-    connect(m_simulator, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
-    // propagate time scaling
-    connect(this, SIGNAL(setScaling(float)), m_simulator, SLOT(setScaling(float)));
-
-    // connect simulator
-    setSimulatorEnabled(false);
+    // connect
+    connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64)),
+            m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
 
     // start threads
     m_processorThread->start();
     m_networkThread->start();
-    m_simulatorThread->start();
     m_autorefThread->start();
 }
 
@@ -167,17 +143,12 @@ void Amun::stop()
     // stop threads
     m_processorThread->quit();
     m_networkThread->quit();
-    m_simulatorThread->quit();
     m_autorefThread->quit();
 
     // wait for threads
     m_processorThread->wait();
     m_networkThread->wait();
-    m_simulatorThread->wait();
     m_autorefThread->wait();
-
-    delete m_simulator;
-    m_simulator = NULL;
 
     delete m_vision;
     m_vision = NULL;
@@ -203,39 +174,7 @@ void Amun::setVisionPort(quint16 port)
  */
 void Amun::handleCommand(const Command &command)
 {
-    if (command->has_simulator()) {
-        if (command->simulator().has_enable()) {
-            setSimulatorEnabled(command->simulator().enable());
-
-            // time scaling can only be used with the simulator
-            if (m_simulatorEnabled) {
-                updateScaling(m_scaling);
-            } else {
-                // reset timer to realtime
-                m_timer->reset();
-                updateScaling(1.0);
-            }
-        }
-    }
-
-    if (command->has_speed()) {
-        m_scaling = command->speed();
-        if (m_simulatorEnabled) {
-            updateScaling(m_scaling);
-        }
-    }
-
     emit gotCommand(command);
-}
-
-/*!
- * \brief Set time scaling and notify listeners of setScaling
- * \param scaling Scaling factor for time
- */
-void Amun::updateScaling(float scaling)
-{
-    m_timer->setScaling(scaling);
-    emit setScaling(scaling);
 }
 
 /*!
@@ -246,28 +185,4 @@ void Amun::handleStatus(const Status &status)
 {
     status->set_time(m_timer->currentTime());
     emit sendStatus(status);
-}
-
-/*!
- * \brief Toggle simulator mode
- *
- * Switches vision input of \ref Processor to either SSLVision or
- * \ref Simulator.
- *
- * \param enabled Whether to enable or disable the simulator
- */
-void Amun::setSimulatorEnabled(bool enabled)
-{
-    m_simulatorEnabled = enabled;
-    // remove vision connections
-    m_simulator->disconnect(m_processor);
-    m_vision->disconnect(m_processor);
-
-    if (enabled) {
-        connect(m_simulator, SIGNAL(gotPacket(QByteArray, qint64)),
-                m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
-    } else {
-        connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64)),
-                m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
-    }
 }

@@ -40,14 +40,10 @@ set(SOURCES
     ../framework/src/ra/debugtreewidget.h
     ../framework/src/ra/fieldwidget.cpp
     ../framework/src/ra/fieldwidget.h
-    ../framework/src/ra/internalreferee.cpp
-    ../framework/src/ra/internalreferee.h
     ../framework/src/ra/logwidget.cpp
     ../framework/src/ra/logwidget.h
     ../framework/src/ra/refereestatuswidget.cpp
     ../framework/src/ra/refereestatuswidget.h
-    ../framework/src/ra/refereewidget.cpp
-    ../framework/src/ra/refereewidget.h
     ../framework/src/ra/timingwidget.cpp
     ../framework/src/ra/timingwidget.h
     ../framework/src/ra/visualizationwidget.cpp
@@ -58,7 +54,6 @@ set(UI_SOURCES
     configdialog.ui
     mainwindow.ui
     ../framework/src/ra/refereestatuswidget.ui
-    ../framework/src/ra/refereewidget.ui
     ../framework/src/ra/timingwidget.ui
     ../framework/src/ra/visualizationwidget.ui
 )

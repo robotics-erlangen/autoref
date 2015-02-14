@@ -50,33 +50,6 @@ set(QT_FOUND TRUE)
 find_package(LuaJIT2)
 
 include(ExternalProject)
-ExternalProject_Add(bullet
-    URL http://www.robotics-erlangen.de/downloads/libraries/bullet-2.82-r2704.tgz
-    URL_MD5 70b3c8d202dee91a0854b4cbc88173e8
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-        -DBUILD_CPU_DEMOS:BOOL=OFF
-        -DBUILD_DEMOS:BOOL=OFF
-        -DBUILD_EXTRAS:BOOL=OFF
-        -DBUILD_AMD_OPENCL_DEMOS:BOOL=OFF
-        -DBUILD_INTEL_OPENCL_DEMOS:BOOL=OFF
-        -DBUILD_MINICL_OPENCL_DEMOS:BOOL=OFF
-        -DBUILD_NVIDIA_OPENCL_DEMOS:BOOL=OFF
-        -DUSE_GLUT:BOOL=OFF
-        -DUSE_GRAPHICAL_BENCHMARK:BOOL=OFF
-        -DINSTALL_LIBS:BOOL=ON
-)
-
-externalproject_get_property(bullet install_dir)
-set_target_properties(bullet PROPERTIES EXCLUDE_FROM_ALL true)
-set(BULLET_FOUND TRUE)
-set(BULLET_INCLUDE_DIRS "${install_dir}/include/bullet")
-set(BULLET_LIBRARIES
-    "${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}BulletDynamics${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}BulletCollision${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    "${install_dir}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}LinearMath${CMAKE_STATIC_LIBRARY_SUFFIX}"
-)
-
 ExternalProject_Add(eigen
     URL http://www.robotics-erlangen.de/downloads/libraries/eigen-3.1.4.tar.bz2
     URL_MD5 15a7914c3768d51a3637fb3d64556a28

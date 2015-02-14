@@ -24,8 +24,6 @@
 #include <QSettings>
 
 const uint DEFAULT_SYSTEM_DELAY = 30; // in ms
-const uint DEFAULT_SIM_VISION_DELAY = 35; // in ms
-const uint DEFAULT_SIM_PROCESSING_TIME = 5; // in ms
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
     QDialog(parent),
@@ -47,8 +45,6 @@ void ConfigDialog::sendConfiguration()
     // from ms to ns
     command->mutable_tracking()->set_system_delay(ui->systemDelayBox->value() * 1000 * 1000);
 
-    command->mutable_simulator()->set_vision_delay(ui->simVisionDelay->value() * 1000 * 1000);
-    command->mutable_simulator()->set_vision_processing_time(ui->simProcessingTime->value() * 1000 * 1000);
     emit sendCommand(command);
 }
 
@@ -57,26 +53,18 @@ void ConfigDialog::load()
     QSettings s;
     ui->systemDelayBox->setValue(s.value("Tracking/SystemDelay", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
 
-    ui->simVisionDelay->setValue(s.value("Simulator/VisionDelay", DEFAULT_SIM_VISION_DELAY).toUInt());
-    ui->simProcessingTime->setValue(s.value("Simulator/ProcessingTime", DEFAULT_SIM_PROCESSING_TIME).toUInt());
-
     sendConfiguration();
 }
 
 void ConfigDialog::reset()
 {
     ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
-    ui->simVisionDelay->setValue(DEFAULT_SIM_VISION_DELAY);
-    ui->simProcessingTime->setValue(DEFAULT_SIM_PROCESSING_TIME);
 }
 
 void ConfigDialog::apply()
 {
     QSettings s;
     s.setValue("Tracking/SystemDelay", ui->systemDelayBox->value());
-
-    s.setValue("Simulator/VisionDelay", ui->simVisionDelay->value());
-    s.setValue("Simulator/ProcessingTime", ui->simProcessingTime->value());
 
     sendConfiguration();
 }

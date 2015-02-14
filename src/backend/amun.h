@@ -41,7 +41,6 @@ public:
 signals:
     void sendStatus(const Status &status);
     void gotCommand(const Command &command);
-    void setScaling(float scaling);
 
 public:
     void start();
@@ -56,24 +55,16 @@ private slots:
     void handleStatus(const Status &status);
 
 private:
-    void setSimulatorEnabled(bool enabled);
-    void updateScaling(float scaling);
-
-private:
     QThread *m_processorThread;
     QThread *m_networkThread;
-    QThread *m_simulatorThread;
     QThread *m_autorefThread;
 
     Processor *m_processor;
-    Simulator *m_simulator;
     Receiver *m_referee;
     Receiver *m_vision;
     Strategy *m_autoref;
     qint64 m_lastTime;
     Timer *m_timer;
-    bool m_simulatorEnabled;
-    float m_scaling;
 
     quint16 m_visionPort;
 };
