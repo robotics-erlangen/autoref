@@ -26,7 +26,6 @@ module "World"
 
 local Ball = require "../base/ball"
 local Robot = require "../base/robot"
-local Generation = require "../base/generation"
 local amun = amun
 local Constants = require "../base/constants"
 
@@ -108,9 +107,10 @@ World.Geometry = {}
 
 -- initializes Team and Geometry data
 function World._init()
-	World.TeamIsBlue = amun.isBlue()
+	assert(not amun.isBlue(), "Must be run as yellow strategy or autoref!")
+	World.TeamIsBlue = false
 	World._updateGeometry(amun.getGeometry())
-	World._updateTeam(amun.getTeam())
+	World._updateTeam()
 end
 
 --- Update world state.
@@ -125,10 +125,10 @@ function World.update()
 end
 
 -- Creates generation specific robot object for own team
-function World._updateTeam(state)
+function World._updateTeam()
 	local friendlyRobotsById = {}
-	for _, rdata in pairs(state.robot) do
-		friendlyRobotsById[rdata.id] = Generation.factory(rdata, World.Geometry)
+	for id = 0, 11 do
+		friendlyRobotsById[id] = Robot(id, true, World.Geometry)
 	end
 	World.FriendlyRobotsById = friendlyRobotsById
 end

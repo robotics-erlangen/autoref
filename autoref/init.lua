@@ -55,7 +55,7 @@ local function wrapper(func)
 end
 
 local function main()
-    debug.set("last touch", (World.TeamIsBlue and Referee.friendlyTouchedLast()) and "blue" or "yellow")
+    debug.set("last touch", (World.TeamIsBlue == Referee.friendlyTouchedLast()) and "blue" or "yellow")
     for _, foul in ipairs(fouls) do
         if foul.occuring() and (not foulTimes[foul] or World.Time - foulTimes[foul] > timeout) then
             foulTimes[foul] = World.Time

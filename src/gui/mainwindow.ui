@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>842</width>
+    <height>407</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Autoref</string>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks|QMainWindow::VerticalTabs</set>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QSplitter" name="splitterH">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="DebugTreeWidget" name="debugTree">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+      </widget>
+      <widget class="QSplitter" name="splitterV">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="FieldWidget" name="field"/>
+       <widget class="LogWidget" name="log"/>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>842</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_Game">
+    <property name="title">
+     <string>&amp;Game</string>
+    </property>
+    <addaction name="actionFlipSides"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuVideo">
+    <property name="title">
+     <string>Logging</string>
+    </property>
+    <addaction name="actionRecord"/>
+   </widget>
+   <widget class="QMenu" name="menuTesting">
+    <property name="title">
+     <string>Demo</string>
+    </property>
+    <addaction name="actionSimulator"/>
+    <addaction name="actionInternalReferee"/>
+   </widget>
+   <addaction name="menu_Game"/>
+   <addaction name="menuTesting"/>
+   <addaction name="menuVideo"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolCommands">
+   <property name="windowTitle">
+    <string>Commands</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFlipSides"/>
+  </widget>
+  <widget class="QDockWidget" name="dockReferee">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Internal RefBox</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="RefereeWidget" name="referee"/>
+  </widget>
+  <widget class="QDockWidget" name="dockVisualization">
+   <property name="windowTitle">
+    <string>Visualizations</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="VisualizationWidget" name="visualization"/>
+  </widget>
+  <widget class="QToolBar" name="toolTesting">
+   <property name="windowTitle">
+    <string>Testing</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionSimulator"/>
+   <addaction name="actionInternalReferee"/>
+  </widget>
+  <widget class="QToolBar" name="toolConfig">
+   <property name="windowTitle">
+    <string>Configuration</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionConfiguration"/>
+   <addaction name="actionPlotter"/>
+   <addaction name="actionRecord"/>
+  </widget>
+  <widget class="QDockWidget" name="dockTiming">
+   <property name="windowTitle">
+    <string>Timing</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="TimingWidget" name="timing"/>
+  </widget>
+  <widget class="QDockWidget" name="dockAutoref">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="windowTitle">
+    <string>Autoref</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="TeamWidget" name="autoref"/>
+  </widget>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+  </action>
+  <action name="actionPlotter">
+   <property name="text">
+    <string>&amp;Plotter</string>
+   </property>
+  </action>
+  <action name="actionFlipSides">
+   <property name="text">
+    <string>&amp;Flip sides</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Record file</string>
+   </property>
+   <property name="toolTip">
+    <string>Record File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionSimulator">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Simulator</string>
+   </property>
+   <property name="toolTip">
+    <string>Simulator</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionInternalReferee">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Internal Referee</string>
+   </property>
+   <property name="toolTip">
+    <string>Internal Referee</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionConfiguration">
+   <property name="text">
+    <string>Configuration</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TeamWidget</class>
+   <extends>QWidget</extends>
+   <header>gui/teamwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RefereeWidget</class>
+   <extends>QWidget</extends>
+   <header>ra/refereewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>VisualizationWidget</class>
+   <extends>QWidget</extends>
+   <header>ra/visualizationwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TimingWidget</class>
+   <extends>QWidget</extends>
+   <header>ra/timingwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FieldWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>ra/fieldwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LogWidget</class>
+   <extends>QPlainTextEdit</extends>
+   <header>ra/logwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DebugTreeWidget</class>
+   <extends>QTreeView</extends>
+   <header>ra/debugtreewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>145</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionInternalReferee</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>dockReferee</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>39</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
