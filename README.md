@@ -1,8 +1,10 @@
 # Autoref
 ## Checkout code
 Initialize the git submodules using
+> ```
 > git submodule init
 > git submodule update --recursive
+> ```
 
 ## Compilation
 Follow the instructions in [COMPILE.md](COMPILE.md). Building the framework
