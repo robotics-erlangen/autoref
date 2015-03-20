@@ -71,24 +71,24 @@ endif(APPLE)
 
 qt5_wrap_ui(UIC_SOURCES ${UI_SOURCES})
 
-add_executable(ra WIN32 MACOSX_BUNDLE ${SOURCES} ${UIC_SOURCES})
-target_link_libraries(ra amun logfile plotter protobuf ${OPENGL_LIBRARIES})
-qt5_use_modules(ra Widgets OpenGL)
+add_executable(autoref WIN32 MACOSX_BUNDLE ${SOURCES} ${UIC_SOURCES})
+target_link_libraries(autoref amun logfile plotter protobuf ${OPENGL_LIBRARIES})
+qt5_use_modules(autoref Widgets OpenGL)
 
 # add plist file
 if(APPLE)
-    set_target_properties(ra PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/framework/data/pkg/MacBundleInfo.plist.in)
-    set_target_properties(ra PROPERTIES MACOSX_BUNDLE_ICON_FILE ra.icns)
-    set_target_properties(ra PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.er-force.Autoref)
-    set_target_properties(ra PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME Autoref)
+    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/framework/data/pkg/MacBundleInfo.plist.in)
+    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_ICON_FILE ra.icns)
+    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.er-force.Autoref)
+    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME Autoref)
 
     # required by LuaJIT for 64bit
     set(EXTRA_LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
-    get_target_property(RA_LINK_FLAGS ra LINK_FLAGS)
+    get_target_property(RA_LINK_FLAGS autoref LINK_FLAGS)
     if(NOT RA_LINK_FLAGS)
-        set_target_properties(ra PROPERTIES LINK_FLAGS ${EXTRA_LINK_FLAGS})
+        set_target_properties(autoref PROPERTIES LINK_FLAGS ${EXTRA_LINK_FLAGS})
     else()
-        set_target_properties(ra PROPERTIES LINK_FLAGS "${RA_LINK_FLAGS} ${EXTRA_LINK_FLAGS}")
+        set_target_properties(autoref PROPERTIES LINK_FLAGS "${RA_LINK_FLAGS} ${EXTRA_LINK_FLAGS}")
     endif()
 endif(APPLE)
 
