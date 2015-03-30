@@ -27,7 +27,6 @@ local debug = require "../base/debug"
 local Referee = require "../base/referee"
 
 local fouls = {
-    require "chipovermiddle",
     require "collision",
     require "fastshot",
     require "outoffield",
