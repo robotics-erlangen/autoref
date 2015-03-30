@@ -20,7 +20,6 @@
 
 local OutOfField = {}
 
-local World = require "../base/world"
 local Referee = require "../base/referee"
 local rightLine = World.Geometry.FieldWidthHalf
 local leftLine = -rightLine

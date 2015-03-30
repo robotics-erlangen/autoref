@@ -20,7 +20,6 @@
 
 local FastShot = {}
 
-local World = require "../base/world"
 local Referee = require "../base/referee"
 
 local possibleRefStates = {

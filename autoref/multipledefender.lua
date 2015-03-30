@@ -20,7 +20,6 @@
 
 local MultipleDefender = {}
 
-local World = require "../base/world"
 local Field = require "../base/field"
 
 local possibleRefStates = {

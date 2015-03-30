@@ -22,9 +22,9 @@ require("../base/globalschecker").enable()
 require "../base/base"
 
 local Entrypoints = require "../base/entrypoints"
-local World = require "../base/world"
 local debug = require "../base/debug"
 local Referee = require "../base/referee"
+World = require "../base/world"
 
 local fouls = {
     require "collision",

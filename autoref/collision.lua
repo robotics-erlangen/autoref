@@ -20,8 +20,6 @@
 
 local Collision = {}
 
-local World = require "../base/world"
-
 local blue = "<font color=\"blue\">blue</font>"
 local yellow  ="<font color=\"#C9C60D\">yellow</font>"
 local foulingTeam = World.TeamIsBlue and blue or yellow
