@@ -30,7 +30,6 @@ local fouls = {
     require "collision",
     require "fastshot",
     require "outoffield",
-    require "pushing",
     require "multipledefender"
 }
 local foulTimes = {}
