@@ -44,12 +44,7 @@ function OutOfField.occuring()
 end
 
 function OutOfField.print()
-    local faulingTeam = "<font color=\"#C9C60D\">Yellow</font>"
-    if (World.TeamIsBlue and Referee.friendlyTouchedLast()) or
-            not World.TeamIsBlue and not Referee.friendlyTouchedLast() then
-        faulingTeam = "<font color=\"blue\">Blue</font>"
-    end
-    log("Ball out field. Last touch: " .. faulingTeam)
+    log("Ball out field. Last touch: " .. Referee.teamWhichTouchedBallLast())
 end
 
 return OutOfField

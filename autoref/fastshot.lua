@@ -35,8 +35,7 @@ function FastShot.occuring()
 end
 
 function FastShot.print()
-    local offending = (World.TeamIsBlue and Referee.friendlyTouchedLast()) and
-        "<font color=\"blue\">blue</font>" or "<font color=\"#C9C60D\">yellow</font>"
+    local offending = Referee.teamWhichTouchedBallLast()
     log("Shot over 8m/s by " .. offending .. " team")
     log("Speed: " .. World.Ball.speed:length() .. "m/s")
 end

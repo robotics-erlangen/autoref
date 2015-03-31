@@ -33,13 +33,13 @@ local Constants = require "../base/constants"
 -- @class table
 -- @name World
 -- @field Ball Ball - current Ball
--- @field FriendlyRobots Robot[] - List of own robots in an arbitary order
--- @field FriendlyInvisibleRobots Robot[] - Own robots which currently aren't tracked
--- @field FriendlyRobotsById Robot[] - List of own robots with robot id as index
--- @field FriendlyKeeper Robot - Own keeper if on field or nil
--- @field OpponentRobots Robot[] - List of opponent robots in an arbitary order
--- @field OpponentRobotsById Robot[] - List of opponent robots with robot id as index
--- @field OpponentKeeper Robot - Opponent keeper if on field or nil
+-- @field YellowRobots Robot[] - List of own robots in an arbitary order
+-- @field YellowInvisibleRobots Robot[] - Own robots which currently aren't tracked
+-- @field YellowRobotsById Robot[] - List of own robots with robot id as index
+-- @field YellowKeeper Robot - Own keeper if on field or nil
+-- @field BlueRobots Robot[] - List of opponent robots in an arbitary order
+-- @field BlueRobotsById Robot[] - List of opponent robots with robot id as index
+-- @field BlueKeeper Robot - Opponent keeper if on field or nil
 -- @field Robots Robot[] - Every visible robot in an arbitary order
 -- @field TeamIsBlue bool - True if we are the blue team, otherwise we're yellow
 -- @field IsSimulated bool - True if the world is simulated
@@ -60,13 +60,15 @@ local Constants = require "../base/constants"
 local World = {}
 
 World.Ball = Ball()
-World.FriendlyRobots = {}
-World.FriendlyInvisibleRobots = {}
-World.FriendlyRobotsById = {}
-World.FriendlyKeeper = nil
-World.OpponentRobots = {}
-World.OpponentRobotsById = {}
-World.OpponentKeeper = nil
+World.YellowRobots = {}
+World.YellowInvisibleRobots = {}
+World.YellowRobotsById = {}
+World.YellowKeeper = nil
+World.YellowColorStr = "<font color=\"#C9C60D\">yellow</font>"
+World.BlueRobots = {}
+World.BlueRobotsById = {}
+World.BlueKeeper = nil
+World.BlueColorStr = "<font color=\"blue\">blue</font>"
 World.Robots = {}
 World.TeamIsBlue = false
 World.IsSimulated = false
@@ -92,16 +94,16 @@ World.Geometry = {}
 -- @field FreeKickDefenseDist number - Distance to keep to opponent defense area during a freekick
 -- @field DefenseRadius number - Radius of the defense area corners
 -- @field DefenseStretch number - Distance between the defense areas quarter circles
--- @field FriendlyPenaltySpot Vector - Position of our own penalty spot
--- @field OpponentPenaltySpot Vector - Position of the opponent's penalty spot
--- @field PenaltyLine number - Maximal distance from centerline during an offensive penalty
--- @field OwnPenaltyLine number - Maximal distance from centerline during an defensive penalty
--- @field FriendlyGoal Vector - Center point of the goal on the line
--- @field FriendlyGoalLeft Vector
--- @field FriendlyGoalRight Vector
--- @field OpponentGoal Vector - Center point of the goal on the line
--- @field OpponentGoalLeft Vector
--- @field OpponentGoalRight Vector
+-- @field YellowPenaltySpot Vector - Position of our own penalty spot
+-- @field BluePenaltySpot Vector - Position of the opponent's penalty spot
+-- @field BluePenaltyLine number - Maximal distance from centerline during an offensive penalty
+-- @field YellowPenaltyLine number - Maximal distance from centerline during an defensive penalty
+-- @field YellowGoal Vector - Center point of the goal on the line
+-- @field YellowGoalLeft Vector
+-- @field YellowGoalRight Vector
+-- @field BlueGoal Vector - Center point of the goal on the line
+-- @field BlueGoalLeft Vector
+-- @field BlueGoalRight Vector
 -- @field BoundaryWidth number - Free distance around the playing field
 -- @field RefereeWidth number - Width of area reserved for referee
 
@@ -130,7 +132,7 @@ function World._updateTeam()
 	for id = 0, 11 do
 		friendlyRobotsById[id] = Robot(id, true, World.Geometry)
 	end
-	World.FriendlyRobotsById = friendlyRobotsById
+	World.YellowRobotsById = friendlyRobotsById
 end
 
 -- Setup field geometry
@@ -155,19 +157,19 @@ function World._updateGeometry(geom)
 	wgeom.DefenseRadius = geom.defense_radius
 	wgeom.DefenseStretch = geom.defense_stretch
 
-	wgeom.FriendlyPenaltySpot = Vector(0, - wgeom.FieldHeightHalf + geom.penalty_spot_from_field_line_dist)
-	wgeom.OpponentPenaltySpot = Vector(0, wgeom.FieldHeightHalf - geom.penalty_spot_from_field_line_dist)
-	wgeom.PenaltyLine = wgeom.OpponentPenaltySpot.y - geom.penalty_line_from_spot_dist
-	wgeom.OwnPenaltyLine = wgeom.FriendlyPenaltySpot.y + geom.penalty_line_from_spot_dist
+	wgeom.YellowPenaltySpot = Vector(0, - wgeom.FieldHeightHalf + geom.penalty_spot_from_field_line_dist)
+	wgeom.BluePenaltySpot = Vector(0, wgeom.FieldHeightHalf - geom.penalty_spot_from_field_line_dist)
+	wgeom.BluePenaltyLine = wgeom.BluePenaltySpot.y - geom.penalty_line_from_spot_dist
+	wgeom.YellowPenaltyLine = wgeom.YellowPenaltySpot.y + geom.penalty_line_from_spot_dist
 
 	-- The goal posts are on the field lines
-	wgeom.FriendlyGoal = Vector(0, - wgeom.FieldHeightHalf + wgeom.LineWidth)
-	wgeom.FriendlyGoalLeft = Vector(- wgeom.GoalWidth / 2, wgeom.FriendlyGoal.y)
-	wgeom.FriendlyGoalRight = Vector(wgeom.GoalWidth / 2, wgeom.FriendlyGoal.y)
+	wgeom.YellowGoal = Vector(0, - wgeom.FieldHeightHalf + wgeom.LineWidth)
+	wgeom.YellowGoalLeft = Vector(- wgeom.GoalWidth / 2, wgeom.YellowGoal.y)
+	wgeom.YellowGoalRight = Vector(wgeom.GoalWidth / 2, wgeom.YellowGoal.y)
 
-	wgeom.OpponentGoal = Vector(0, wgeom.FieldHeightHalf - wgeom.LineWidth)
-	wgeom.OpponentGoalLeft = Vector(- wgeom.GoalWidth / 2, wgeom.OpponentGoal.y)
-	wgeom.OpponentGoalRight = Vector(wgeom.GoalWidth / 2, wgeom.OpponentGoal.y)
+	wgeom.BlueGoal = Vector(0, wgeom.FieldHeightHalf - wgeom.LineWidth)
+	wgeom.BlueGoalLeft = Vector(- wgeom.GoalWidth / 2, wgeom.BlueGoal.y)
+	wgeom.BlueGoalRight = Vector(wgeom.GoalWidth / 2, wgeom.BlueGoal.y)
 
 	wgeom.BoundaryWidth = geom.boundary_width
 	wgeom.RefereeWidth = geom.referee_width
@@ -205,9 +207,9 @@ function World._updateWorld(state)
 		end
 
 		-- Update data of every own robot
-		World.FriendlyRobots = {}
-		World.FriendlyInvisibleRobots = {}
-		for id, robot in pairs(World.FriendlyRobotsById) do
+		World.YellowRobots = {}
+		World.YellowInvisibleRobots = {}
+		for id, robot in pairs(World.YellowRobotsById) do
 			-- get responses for the current robot
 			-- these are identified by the robot generation and id
 			local robotResponses = {}
@@ -221,9 +223,9 @@ function World._updateWorld(state)
 			robot:_update(dataById[id], World.Time, robotResponses)
 			-- sort robot into visible / not visible
 			if robot.isVisible then
-				table.insert(World.FriendlyRobots, robot)
+				table.insert(World.YellowRobots, robot)
 			else
-				table.insert(World.FriendlyInvisibleRobots, robot)
+				table.insert(World.YellowInvisibleRobots, robot)
 			end
 		end
 	end
@@ -231,9 +233,9 @@ function World._updateWorld(state)
 	local dataOpponent = World.TeamIsBlue and state.yellow or state.blue
 	if dataOpponent then
 		-- only keep robots that are still existent
-		local opponentRobotsById = World.OpponentRobotsById
-		World.OpponentRobots = {}
-		World.OpponentRobotsById = {}
+		local opponentRobotsById = World.BlueRobotsById
+		World.BlueRobots = {}
+		World.BlueRobotsById = {}
 		-- just update every opponent robot
 		-- robots that are invisible for more than one second are dropped by amun
 		for _,rdata in pairs(dataOpponent) do
@@ -243,8 +245,8 @@ function World._updateWorld(state)
 				robot = Robot(rdata.id, false)
 			end
 			robot:_update(rdata, World.Time)
-			table.insert(World.OpponentRobots, robot)
-			World.OpponentRobotsById[rdata.id] = robot
+			table.insert(World.BlueRobots, robot)
+			World.BlueRobotsById[rdata.id] = robot
 		end
 		-- mark dropped robots as invisible
 		for _,robot in pairs(opponentRobotsById) do
@@ -252,8 +254,8 @@ function World._updateWorld(state)
 		end
 	end
 
-	World.Robots = table.copy(World.FriendlyRobots)
-	table.append(World.Robots, World.OpponentRobots)
+	World.Robots = table.copy(World.YellowRobots)
+	table.append(World.Robots, World.BlueRobots)
 
 	-- no vision data only if the parameter is false
 	return state.has_vision_data ~= false
@@ -308,18 +310,18 @@ function World._updateGameState(state)
 	local friendlyKeeperId = friendlyTeamInfo.goalie
 	local opponentKeeperId = opponentTeamInfo.goalie
 
-	local friendlyKeeper = World.FriendlyRobotsById[friendlyKeeperId]
+	local friendlyKeeper = World.YellowRobotsById[friendlyKeeperId]
 	if friendlyKeeper and not friendlyKeeper.isVisible then
 		friendlyKeeper = nil
 	end
 
-	local opponentKeeper = World.OpponentRobotsById[opponentKeeperId]
+	local opponentKeeper = World.BlueRobotsById[opponentKeeperId]
 	if opponentKeeper and not opponentKeeper.isVisible then
 		opponentKeeper = nil
 	end
 
-	World.FriendlyKeeper = friendlyKeeper
-	World.OpponentKeeper = opponentKeeper
+	World.YellowKeeper = friendlyKeeper
+	World.BlueKeeper = opponentKeeper
 
 	--[[
     optional sint32 stage_time_left = 2;
@@ -347,11 +349,11 @@ end
 -- update and handle user inputs set for own robots
 function World._updateUserInput(input)
 	if input.radio_command then
-		for _, robot in pairs(World.FriendlyRobotsById) do
+		for _, robot in pairs(World.YellowRobotsById) do
 			robot:_updateUserControl(nil) -- clear
 		end
 		for _, cmd in ipairs(input.radio_command) do
-			local robot = World.FriendlyRobotsById[cmd.id]
+			local robot = World.YellowRobotsById[cmd.id]
 			if robot then
 				robot:_updateUserControl(cmd.command)
 			end
@@ -363,7 +365,7 @@ end
 --- Stops own robots and enables standby
 -- @name haltOwnRobots
 function World.haltOwnRobots()
-	for _, robot in pairs(World.FriendlyRobotsById) do
+	for _, robot in pairs(World.YellowRobotsById) do
 		robot:setStandby(true)
 		robot:halt()
 	end
@@ -373,7 +375,7 @@ end
 -- Robots without a command stop by default
 -- @name setRobotCommands
 function World.setRobotCommands()
-	for _, robot in pairs(World.FriendlyRobotsById) do
+	for _, robot in pairs(World.YellowRobotsById) do
 		robot:_setCommand()
 	end
 end

@@ -109,22 +109,22 @@ function Referee.illustrateRefereeStates()
 	end
 end
 
-local lastTeam = true -- true for the friendly team, false for the opponent
+local lastTeam = World.YellowColorStr
 local touchDist = World.Ball.radius+robotRadius
 --- Update the status of which team touched the ball last
 -- @name checkTouching
 function Referee.checkTouching()
 	local ballPos = World.Ball.pos
 	-- pessimistic approach: when we are at the ball, our team is considered touching
-	for _, robot in ipairs(World.FriendlyRobots) do
+	for _, robot in ipairs(World.YellowRobots) do
 		if robot.pos:distanceTo(ballPos) <= touchDist then
-			lastTeam = true
+			lastTeam = World.YellowColorStr
 			return
 		end
 	end
-	for _, robot in ipairs(World.OpponentRobots) do
+	for _, robot in ipairs(World.BlueRobots) do
 		if robot.pos:distanceTo(ballPos) <= touchDist then
-			lastTeam = false
+			lastTeam = World.BlueColorStr
 			return
 		end
 	end
@@ -133,7 +133,7 @@ end
 --- Get whether we touched to ball last
 -- @name friendlyTouchedLast
 -- @return boolean - True if we touched last, false if the opponent did
-function Referee.friendlyTouchedLast()
+function Referee.teamWhichTouchedBallLast()
 	return lastTeam
 end
 

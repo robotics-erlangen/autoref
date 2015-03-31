@@ -61,7 +61,7 @@ function Field.limitToAllowedField(pos, extraLimit, blockOpponentDefenseArea)
 	if Referee.isStopState() then
 		oppExtraLimit = oppExtraLimit + World.Geometry.FreeKickDefenseDist + 0.10
 	end
-	if Field.isInFriendlyDefenseArea(pos, extraLimit) then
+	if Field.isInYellowDefenseArea(pos, extraLimit) then
 		if math.abs(pos.x) <= World.Geometry.DefenseStretch/2 then
 			pos = Vector(pos.x, -World.Geometry.FieldHeightHalf+World.Geometry.DefenseRadius+extraLimit)
 		else
@@ -70,7 +70,7 @@ function Field.limitToAllowedField(pos, extraLimit, blockOpponentDefenseArea)
 			pos = circleMidpoint + (pos - circleMidpoint):setLength(World.Geometry.DefenseRadius+extraLimit)
 		end
 		return pos
-	elseif blockOpponentDefenseArea and Field.isInOpponentDefenseArea(pos, oppExtraLimit) then
+	elseif blockOpponentDefenseArea and Field.isInBlueDefenseArea(pos, oppExtraLimit) then
 		if math.abs(pos.x) <= World.Geometry.DefenseStretch/2 then
 			pos = Vector(pos.x, World.Geometry.FieldHeightHalf-World.Geometry.DefenseRadius-oppExtraLimit)
 		else
@@ -150,21 +150,21 @@ local function isInDefenseArea(pos, radius, friendly)
 		or p1:distanceTo(pos) < defRadius + radius or p2:distanceTo(pos) < defRadius + radius -- if robot is inside defense radius
 end
 
---- Returns true if the position is inside/touching the friendly defense area
--- @name isInFriendlyDefenseArea
+--- Returns true if the position is inside/touching the yellow defense area
+-- @name isInYellowDefenseArea
 -- @param pos Vector - the position to check
 -- @param radius number - Radius of object to check
 -- @return bool
-function Field.isInFriendlyDefenseArea(pos, radius)
+function Field.isInYellowDefenseArea(pos, radius)
 	return isInDefenseArea(pos, radius, true)
 end
 
---- Returns true if the position is inside/touching the opponent defense area
--- @name isInOpponentDefenseArea
+--- Returns true if the position is inside/touching the blue defense area
+-- @name isInBlueDefenseArea
 -- @param pos Vector - the position to check
 -- @param radius number - Radius of object to check
 -- @return bool
-function Field.isInOpponentDefenseArea(pos, radius)
+function Field.isInBlueDefenseArea(pos, radius)
 	return isInDefenseArea(pos, radius, false)
 end
 
@@ -200,27 +200,27 @@ local function distanceToDefenseArea(pos, radius, friendly)
 		distance = corner:distanceTo(pos) - defRadius - radius
 	end
 	if distance < -0.00001 then
-		error("base/field: distanceToFriendlyDefenseArea() becomes negative ("..distance..
+		error("base/field: distanceToYellowDefenseArea() becomes negative ("..distance..
 			") for pos = ("..pos.x..", "..pos.y..") and radius = "..radius)
 	end
 	return (distance < 0) and 0 or distance
 end
 
---- Calculates the distance (between robot hull and field line) to the friendly defense area
--- @name distanceToFriendlyDefenseArea
+--- Calculates the distance (between robot hull and field line) to the yellow defense area
+-- @name distanceToYellowDefenseArea
 -- @param pos Vector - the position to check
 -- @param radius number - Radius of object to check
 -- @return number - distance
-function Field.distanceToFriendlyDefenseArea(pos, radius)
+function Field.distanceToYellowDefenseArea(pos, radius)
 	return distanceToDefenseArea(pos, radius, true)
 end
 
---- Calculates the distance (between robot hull and field line) to the opponent defense area
--- @name distanceToOpponentDefenseArea
+--- Calculates the distance (between robot hull and field line) to the blue defense area
+-- @name distanceToBlueDefenseArea
 -- @param pos Vector - the position to check
 -- @param radius number - Radius of object to check
 -- @return number - distance
-function Field.distanceToOpponentDefenseArea(pos, radius)
+function Field.distanceToBlueDefenseArea(pos, radius)
 	return distanceToDefenseArea(pos, radius, false)
 end
 
@@ -413,11 +413,11 @@ function Field.intersectCircleDefenseArea(pos, radius, extraDistance, opp)
 end
 
 --- Calculates the distance (between robot hull and field line) to the own goal line
--- @name distanceToFriendlyGoalLine
+-- @name distanceToYellowGoalLine
 -- @param pos Vector - the position to check
 -- @param radius number - Radius of object to check
 -- @return number - distance
-function Field.distanceToFriendlyGoalLine(pos, radius)
+function Field.distanceToYellowGoalLine(pos, radius)
 	if math.abs(pos.x) < G.GoalWidth/2 then
 		return math.max(G.FieldHeightHalf + pos.y - radius, 0)
 	end

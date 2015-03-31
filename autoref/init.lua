@@ -53,7 +53,8 @@ local function wrapper(func)
 end
 
 local function main()
-    debug.set("last touch", (World.TeamIsBlue == Referee.friendlyTouchedLast()) and "blue" or "yellow")
+    -- match string to remove the font-tags
+    debug.set("last touch", Referee.teamWhichTouchedBallLast():match(">(%a+)<"))
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter
         -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'

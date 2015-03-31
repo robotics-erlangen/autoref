@@ -37,12 +37,10 @@ local function robotIsOffending(robot, team, testOccupation)
     if Field["isIn"..team.."DefenseArea"](robot.pos, defAreaDistThreshold) then
         local touchDistance = World.Ball.radius + robot.radius
         if robot.pos:distanceTo(World.Ball.pos) < touchDistance then
-            if (World.TeamIsBlue and team == "Opponent")
-                or (not World.TeamIsBlue and team == "Friendly")
-            then
-                offendingTeam = "<font color=\"#C9C60D\">yellow</font>"
+            if team == "Blue" then
+                offendingTeam = World.BlueColorStr
             else
-                offendingTeam = "<font color=\"blue\">blue</font>"
+                offendingTeam = World.YellowColorStr
             end
             occupation = testOccupation
             return true
@@ -60,7 +58,7 @@ local function checkTeam(team)
 end
 
 function MultipleDefender:occuring()
-    if checkTeam("Opponent") or checkTeam("Friendly") then
+    if checkTeam("Yellow") or checkTeam("Blue") then
         return true
     end
 
