@@ -23,17 +23,8 @@ local OutOfField = {}
 local Referee = require "../base/referee"
 local Field = require "../base/field"
 
-local possibleRefStates = {
-    Game = true,
-    GameForce = true,
-    KickoffOffensive = true,
-    KickoffDefensive = true,
-    PenaltyOffensive = true,
-    PenaltyDefensive = true,
-    DirectOffensive = true,
-    DirectDefensive = true,
-    IndirectOffensive = true,
-    IndirectDefensive = true,
+OutOfField.possibleRefStates = {
+    Game = true
 }
 
 local function isInField()
@@ -42,8 +33,6 @@ end
 
 local wasInFieldBefore = false
 function OutOfField.occuring()
-    if not possibleRefStates[World.RefereeState] then return false end
-
     if Field.isInField(World.Ball.pos, World.Ball.radius) then
         wasInFieldBefore = true
     elseif wasInFieldBefore then -- we detected the ball going out of field

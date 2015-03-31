@@ -55,7 +55,12 @@ end
 local function main()
     debug.set("last touch", (World.TeamIsBlue == Referee.friendlyTouchedLast()) and "blue" or "yellow")
     for _, foul in ipairs(fouls) do
-        if foul.occuring() and (not foulTimes[foul] or World.Time - foulTimes[foul] > timeout) then
+        -- take the referee state until the second upper case letter
+        -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
+        local simpleRefState = World.RefereeState:match("%u%l+")
+        if foul.possibleRefStates[simpleRefState] and foul.occuring() and
+            (not foulTimes[foul] or World.Time - foulTimes[foul] > timeout)
+        then
             foulTimes[foul] = World.Time
             foul.print()
         end

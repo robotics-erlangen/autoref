@@ -18,25 +18,19 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local FastShot = {}
-
 local Referee = require "../base/referee"
 
-local possibleRefStates = {
+local FastShot = {}
+
+FastShot.possibleRefStates = {
     Game = true,
-    GameForce = true,
-    KickoffOffensive = true,
-    KickoffDefensive = true,
-    PenaltyOffensive = true,
-    PenaltyDefensive = true,
-    DirectOffensive = true,
-    DirectDefensive = true,
-    IndirectOffensive = true,
-    IndirectDefensive = true,
+    Kickoff = true,
+    Penalty = true,
+    Direct = true,
+    Indirect = true,
 }
 
 function FastShot.occuring()
-    if not possibleRefStates[World.RefereeState] then return false end
     return World.Ball.speed:length() > 8
 end
 

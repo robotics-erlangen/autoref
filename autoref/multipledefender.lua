@@ -22,17 +22,11 @@ local MultipleDefender = {}
 
 local Field = require "../base/field"
 
-local possibleRefStates = {
+MultipleDefender.possibleRefStates = {
     Game = true,
-    GameForce = true,
-    KickoffOffensive = true,
-    KickoffDefensive = true,
-    PenaltyOffensive = true,
-    PenaltyDefensive = true,
-    DirectOffensive = true,
-    DirectDefensive = true,
-    IndirectOffensive = true,
-    IndirectDefensive = true,
+    Kickoff = true,
+    Direct = true,
+    Indirect = true,
 }
 
 local offendingTeam =""
@@ -66,7 +60,6 @@ local function checkTeam(team)
 end
 
 function MultipleDefender:occuring()
-    if not possibleRefStates[World.RefereeState] then return false end
     if checkTeam("Opponent") or checkTeam("Friendly") then
         return true
     end

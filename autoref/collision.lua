@@ -24,6 +24,15 @@ local blue = "<font color=\"blue\">blue</font>"
 local yellow  ="<font color=\"#C9C60D\">yellow</font>"
 local foulingTeam = World.TeamIsBlue and blue or yellow
 local angleDiffSpeed = 0
+Collision.possibleRefStates = {
+    Halt = true,
+    Stop = true,
+    Game = true,
+    Kickoff = true,
+    Penalty = true,
+    Direct = true,
+    Indirect = true,
+}
 
 function Collision.occuring()
     for _, opp in ipairs(World.OpponentRobots) do
