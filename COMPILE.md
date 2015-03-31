@@ -1,6 +1,11 @@
 # Compiling Autoref
 
-All should work on GNU/Linux (tested on Ubuntu 14.04), Mac OS X 10.10 and Windows >= 7.
+All should work on GNU/Linux (tested on Ubuntu 14.04 and Arch Linux), Mac OS X 10.10 and Windows >= 7.
+
+## Obtain the framework
+```
+git submodule update --init
+```
 
 In order to build Autoref you will need:
  * cmake >= 2.8.9
@@ -9,34 +14,24 @@ In order to build Autoref you will need:
  * protobuf >= 2.0.0
  * luajit >= 2.0
 
-Certain features require additional libraries:
- * liblua5.1-socket2 - Lua remote debugger (see strategy/test/debug/enable.lua) (version >= 2.1!, https://github.com/diegonehab/luasocket)
+Package names for Ubuntu 14.04: `cmake protobuf-compiler qtbase5-dev libluajit-5.1-dev g++`
 
-Package names for Ubuntu 14.04:
-* cmake
-* protobuf-compiler
-* qtbase5-dev
-* libluajit-5.1-dev
-(and you need g++, since it's not included in the default instalation)
-
-## Unix
+## Linux
 The recommended way of building a project with CMake is by doing an
 out-of-source build. This can be done like this:
 
-> mkdir build
-> cd build
-> cmake ..
-> make
+```
+mkdir build
+cd build
+cmake ..
+make
+```
 
 Autoref can be started from the build/bin/ directory.
 
-In order to select which Qt-Installation to use specify it using a similar command line:
-> cmake -DCMAKE_PREFIX_PATH=~/Qt/5.2.1/gcc_64/lib/cmake ..
+Further details on how to select a specific Qt-Installation or use the
+debugger can be found in the [framework repository](https://github.com/robotics-erlangen/framework/blob/master/COMPILE.md#unix).
 
-To use the remote debugger download, compile and install the luasocket library (version >= 2.1!). The libraries must be installed to `/usr/local/lib` to be recognised by LuaJIT
-Compile instructions: (for Ubuntu 12.04)
-> make LUAINC_linux=/usr/include/lua5.1
-> sudo make install
 
 ## Windows
 Get dependencies (tested using the given versions):
@@ -63,20 +58,28 @@ use `msys.bat` in `msys\1.0` to open msys console
 **!!! USE MSYS TO COMPILE EVERYTHING !!!**
 
 #### compile protobuf
-> mkdir build && cd build
-> ../configure --prefix=/usr/local --without-zlib && make && make install
+```
+mkdir build && cd build
+../configure --prefix=/usr/local --without-zlib && make && make install
+```
 
 #### compile luajit
-> make && make install PREFIX=/usr/local && cp src/lua51.dll /usr/local/bin
+```
+make && make install PREFIX=/usr/local && cp src/lua51.dll /usr/local/bin
+```
 
 #### compile luasocket2
-> make PLAT=mingw LUAINC_mingw=/usr/local/include/luajit-2.0 LUALIB_mingw=/usr/local/bin/lua51.dll
-> make install PLAT=mingw INSTALL_TOP_LDIR=../build/share INSTALL_TOP_CDIR=../build/lib
+```
+make PLAT=mingw LUAINC_mingw=/usr/local/include/luajit-2.0 LUALIB_mingw=/usr/local/bin/lua51.dll
+make install PLAT=mingw INSTALL_TOP_LDIR=../build/share INSTALL_TOP_CDIR=../build/lib
+```
 
 #### compile ra
-> mkdir build-win && cd build-win
-> cmake -G "MSYS Makefiles" -DCMAKE_PREFIX_PATH=/c/Qt/Qt5.3.2/5.3/mingw482_32/lib/cmake -DCMAKE_BUILD_TYPE=Release -DLUA_INCLUDE_DIR=C:/MinGW/msys/1.0/local/include/luajit-2.0 -DLUA_LIBRARIES=C:/MinGW/msys/1.0/local/bin/lua51.dll -DPROTOBUF_INCLUDE_DIR=C:/MinGW/msys/1.0/local/include -DPROTOBUF_LIBRARY=C:/MinGW/msys/1.0/local/lib/libprotobuf.dll.a ..
-> make
+```
+mkdir build-win && cd build-win
+cmake -G "MSYS Makefiles" -DCMAKE_PREFIX_PATH=/c/Qt/Qt5.3.2/5.3/mingw482_32/lib/cmake -DCMAKE_BUILD_TYPE=Release -DLUA_INCLUDE_DIR=C:/MinGW/msys/1.0/local/include/luajit-2.0 -DLUA_LIBRARIES=C:/MinGW/msys/1.0/local/bin/lua51.dll -DPROTOBUF_INCLUDE_DIR=C:/MinGW/msys/1.0/local/include -DPROTOBUF_LIBRARY=C:/MinGW/msys/1.0/local/lib/libprotobuf.dll.a ..
+make
+```
 
 * copy config + data directory to `"builddir"/bin`
 * copy libprotobuf-9.dll, lua51.dll from `C:\MinGW\msys\1.0\local\bin` to `"builddir"/bin`
@@ -90,14 +93,18 @@ Finished!
 
 ## Mac OS X
 Get dependencies using [Homebrew](http://brew.sh):
-> brew install git luajit protobuf
+```
+brew install git luajit protobuf
+```
 
 Download Qt 5 from http://qt-project.org and install
 
 Build using:
-> cd path/to/framework
-> mkdir build-mac && cd build-mac
-> cmake -DCMAKE_PREFIX_PATH=~/Qt/5.3/clang_64/lib/cmake -DCMAKE_BUILD_TYPE=Release ..
-> make
+```
+cd path/to/framework
+mkdir build-mac && cd build-mac
+cmake -DCMAKE_PREFIX_PATH=~/Qt/5.3/clang_64/lib/cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+```
 
 (If starting autoref.app the normal way doesn't work launch it from Qt Creator)
