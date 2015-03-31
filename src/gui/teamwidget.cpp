@@ -118,6 +118,12 @@ void TeamWidget::load()
 
     if (QFileInfo(m_filename).exists()) {
         selectEntryPoint(m_entryPoint);
+    } else {
+        QString autoref_init_file = QString(AUTOREF_DIR)+"/autoref/init.lua";
+        if (QFileInfo(autoref_init_file).exists()) {
+            m_filename = autoref_init_file;
+            selectEntryPoint(m_entryPoint);
+        }
     }
 }
 

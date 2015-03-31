@@ -92,4 +92,6 @@ if(APPLE)
     endif()
 endif(APPLE)
 
+add_definitions(-DAUTOREF_DIR=\"${CMAKE_SOURCE_DIR}\")
+
 endif()
