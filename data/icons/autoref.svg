@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:cc="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:ns1="http://sozi.baierouge.fr"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    id="svg2"
+    viewBox="0 0 274.67 172.04"
+    version="1.0"
+  >
+  <g
+      id="layer1"
+      transform="translate(17.625 -282.25)"
+    >
+    <g
+        id="g3462"
+      >
+      <path
+          id="path3415"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#c8c8c8"
+          d="m152.44 284.75c-10.53 0.02-21.52 2.44-32 7.37l-0.03-0.03-1.47 0.79c-1.16 0.57-2.33 1.17-3.47 1.81-0.32 0.18-0.65 0.34-0.97 0.53l-129.62 68.16-0.005 39.5 43.437 46.18 78.808-43.72 27 28.63c0.2 0.21 0.4 0.42 0.6 0.62l0.59 0.63 0.03-0.03c19.21 19.24 52.99 22.44 81.63 5.93 33.24-19.15 47.01-57.62 30.75-85.84-2.3-3.98-5.09-7.52-8.25-10.66l0.03-0.03-46.09-44.65c-10.57-9.96-25.26-15.22-40.97-15.19z"
+      />
+      <path
+          id="path3407"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#646464"
+          d="m223.12 88.193a69.5 59 0 1 1 -67.62 32.147"
+          transform="matrix(.86640 -.49935 .49935 .86640 -74.347 371.25)"
+      />
+      <path
+          id="path3409"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:none"
+          d="m28.295 409.98l-43.411-46.62"
+      />
+      <path
+          id="path3411"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#646464"
+          d="m165 335.22l-136.7 74.76 0.008 39.07 94.182-53.2"
+      />
+      <path
+          id="path3413"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#323232"
+          d="m154.24 327.16s-16.05 8.43-16.05 8.43l-27.25-28.2 16.04-8.44s27.26 28.21 27.26 28.21z"
+      />
+      <path
+          id="path3417"
+          style="stroke-linejoin:round;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#000000"
+          d="m-14.981 402.68l24.148-13"
+      />
+      <path
+          id="path3419"
+          style="fill-opacity:.69020;stroke:#000000;stroke-linecap:round;stroke-width:5;fill:#000000"
+          d="m-13.351 366.76l39.873 42.93v35.99l-39.873-42.54v-36.38z"
+      />
+      <path
+          id="path3442"
+          style="fill-opacity:.69020;fill:#000000"
+          d="m120.5 397.94l-13.38 7.4 27 28.63c-2.58-2.78-4.89-5.86-6.84-9.25-4.78-8.29-6.92-17.48-6.78-26.78z"
+      />
+    </g
+    >
+  </g
+  >
+  <metadata
+    >
+    <rdf:RDF
+      >
+      <cc:Work
+        >
+        <dc:format
+          >image/svg+xml</dc:format
+        >
+        <dc:type
+            rdf:resource="http://purl.org/dc/dcmitype/StillImage"
+        />
+        <cc:license
+            rdf:resource="http://creativecommons.org/licenses/publicdomain/"
+        />
+        <dc:publisher
+          >
+          <cc:Agent
+              rdf:about="http://openclipart.org/"
+            >
+            <dc:title
+              >Openclipart</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:publisher
+        >
+        <dc:title
+          >whistle</dc:title
+        >
+        <dc:date
+          >2007-09-11T13:22:09</dc:date
+        >
+        <dc:description
+          >Whistle, colored to look metal.</dc:description
+        >
+        <dc:source
+          >https://openclipart.org/detail/5370/whistle-by-kelan</dc:source
+        >
+        <dc:creator
+          >
+          <cc:Agent
+            >
+            <dc:title
+              >kelan</dc:title
+            >
+          </cc:Agent
+          >
+        </dc:creator
+        >
+        <dc:subject
+          >
+          <rdf:Bag
+            >
+            <rdf:li
+              >tool</rdf:li
+            >
+            <rdf:li
+              >whistle</rdf:li
+            >
+          </rdf:Bag
+          >
+        </dc:subject
+        >
+      </cc:Work
+      >
+      <cc:License
+          rdf:about="http://creativecommons.org/licenses/publicdomain/"
+        >
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Reproduction"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#Distribution"
+        />
+        <cc:permits
+            rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
+        />
+      </cc:License
+      >
+    </rdf:RDF
+    >
+  </metadata
+  >
+</svg
+>

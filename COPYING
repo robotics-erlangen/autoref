@@ -1,0 +1,38 @@
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+See LICENSE for the full license text.
+
+See src/framework/COPYING for everything contained in the framework.
+
+
+Additional licenses:
+
+data/icons/autoref.svg:
+ * Public Domain 2007 kelan <https://openclipart.org/detail/5370/whistle-by-kelan>
+
+data/pkg/:
+ * Icons are derived from data/icons/autoref.svg
+ * Everything else:
+ * Public Domain 2015 Robotics Erlangen e.V.
+
+
+Used libraries by license:
+
+Lesser General Public License 2.1 (LGPL 2.1) (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+    libusb (http://libusb.org/) - LGPL 2.1 or higher
+    Qt 5 (http://qt-project.org/)
+
+
+Mozilla Public License 2.0 (MPL 2.0) (https://www.mozilla.org/MPL/2.0/)
+    Eigen (http://eigen.tuxfamily.org/)
+
+
+BSD 3-Clause License (BSD New) (http://opensource.org/licenses/BSD-3-Clause)
+    protobuf (https://code.google.com/p/protobuf/)
+
+
+MIT License (MIT) (http://opensource.org/licenses/mit-license.php)
+    LuaJIT (http://luajit.org/luajit.html)

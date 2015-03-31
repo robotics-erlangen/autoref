@@ -35,6 +35,9 @@ int main(int argc, char* argv[])
 #endif
 
     QDir::addSearchPath("icon", QString(ERFORCE_DATADIR) + "/icons");
+#ifdef AUTOREF_DATADIR
+    QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
+#endif
 
     QStringList args = QCoreApplication::arguments();
     quint16 visionPort = 0;

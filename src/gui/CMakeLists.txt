@@ -59,12 +59,12 @@ set(UI_SOURCES
 )
 
 if(MINGW)
-    set(SOURCES ${SOURCES} ${CMAKE_SOURCE_DIR}/src/framework/data/pkg/ra.rc)
+    set(SOURCES ${SOURCES} ${CMAKE_SOURCE_DIR}/data/pkg/autoref.rc)
 endif(MINGW)
 
 # add ra icon
 if(APPLE)
-    set(RA_ICON ${CMAKE_SOURCE_DIR}/src/framework/data/pkg/ra.icns)
+    set(RA_ICON ${CMAKE_SOURCE_DIR}/data/pkg/autoref.icns)
     set_source_files_properties(${RA_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     set(SOURCES ${SOURCES} ${RA_ICON})
 endif(APPLE)
@@ -78,17 +78,17 @@ qt5_use_modules(autoref Widgets OpenGL)
 # add plist file
 if(APPLE)
     set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/framework/data/pkg/MacBundleInfo.plist.in)
-    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_ICON_FILE ra.icns)
+    set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_ICON_FILE autoref.icns)
     set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER com.er-force.Autoref)
     set_target_properties(autoref PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME Autoref)
 
     # required by LuaJIT for 64bit
     set(EXTRA_LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
-    get_target_property(RA_LINK_FLAGS autoref LINK_FLAGS)
-    if(NOT RA_LINK_FLAGS)
+    get_target_property(AUTOREF_LINK_FLAGS autoref LINK_FLAGS)
+    if(NOT AUTOREF_LINK_FLAGS)
         set_target_properties(autoref PROPERTIES LINK_FLAGS ${EXTRA_LINK_FLAGS})
     else()
-        set_target_properties(autoref PROPERTIES LINK_FLAGS "${RA_LINK_FLAGS} ${EXTRA_LINK_FLAGS}")
+        set_target_properties(autoref PROPERTIES LINK_FLAGS "${AUTOREF_LINK_FLAGS} ${EXTRA_LINK_FLAGS}")
     endif()
 endif(APPLE)
 

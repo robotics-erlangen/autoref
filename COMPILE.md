@@ -81,7 +81,7 @@ cmake -G "MSYS Makefiles" -DCMAKE_PREFIX_PATH=/c/Qt/Qt5.3.2/5.3/mingw482_32/lib/
 make
 ```
 
-* copy config + data directory to `"builddir"/bin`
+* copy contents of data + src/framework/data directory to `"builddir"/bin/data`
 * copy libprotobuf-9.dll, lua51.dll from `C:\MinGW\msys\1.0\local\bin` to `"builddir"/bin`
 * copy icudt52.dll, icuin52.dll, icuuc52.dll, libgcc_s_dw2-1.dll, libstdc++-6.dll, libwinpthread-1.dll,
 	Qt5Core.dll, Qt5Gui.dll, Qt5Network.dll, Qt5OpenGL.dll, Qt5Widgets.dll from `C:/Qt/Qt5.3.2/5.3/mingw482_32/bin` to `"builddir"/bin`

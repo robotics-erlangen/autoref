@@ -43,7 +43,7 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
     qRegisterMetaType<SSL_Referee::Command>("SSL_Referee::Command");
     qRegisterMetaType<SSL_Referee::Stage>("SSL_Referee::Stage");
 
-    setWindowIcon(QIcon("icon:32/whistle.png"));
+    setWindowIcon(QIcon("icon:autoref.svg"));
     ui->setupUi(this);
 
     // setup icons

@@ -23,10 +23,9 @@
 
 #ifdef _WIN32
 static const char* const ERFORCE_DATADIR = "./data/";
-static const char* const ERFORCE_CONFDIR = "./config/";
 #else // _WIN32
 static const char* const ERFORCE_DATADIR = "${CMAKE_SOURCE_DIR}/src/framework/data/";
-static const char* const ERFORCE_CONFDIR = "${CMAKE_SOURCE_DIR}/src/framework/config/";
+static const char* const AUTOREF_DATADIR = "${CMAKE_SOURCE_DIR}/data/";
 #endif // _WIN32
 
 #endif // CONFIG_H

@@ -76,3 +76,11 @@ include_directories(${CMAKE_SOURCE_DIR}/src/framework/src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(src)
+
+if(UNIX AND NOT APPLE)
+    configure_file(data/pkg/autoref.desktop.in autoref.desktop)
+    add_custom_target(install-menu
+        COMMAND xdg-desktop-menu install --novendor ${CMAKE_BINARY_DIR}/autoref.desktop
+        COMMENT "Installing menu entries" VERBATIM
+    )
+endif()
