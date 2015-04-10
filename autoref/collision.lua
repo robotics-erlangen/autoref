@@ -55,7 +55,7 @@ end
 
 function Collision.print()
     log("Collision foul by " .. foulingTeam .. " team")
-    log("with " .. speedDiff .. " m/s, while driving at " .. " m/s")
+    log("with " .. speedDiff .. " m/s, while driving at " .. offenderSpeed .. " m/s")
 end
 
 return Collision
