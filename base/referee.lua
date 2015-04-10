@@ -101,7 +101,8 @@ end
 -- @name illustrateRefereeStates
 function Referee.illustrateRefereeStates()
 	if World.RefereeState == "PenaltyDefensivePrepare" or World.RefereeState == "PenaltyDefensive" then
-		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.OwnPenaltyLine), Vector(2,World.Geometry.OwnPenaltyLine)}, vis.colors.red)
+		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.YellowPenaltyLine), Vector(2,World.Geometry.YellowPenaltyLine)}, vis.colors.red)
+		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.BluePenaltyLine), Vector(2,World.Geometry.BluePenaltyLine)}, vis.colors.red)
 	elseif World.RefereeState == "PenaltyOffensivePrepare" or World.RefereeState == "PenaltyOffensive" then
 		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.PenaltyLine), Vector(2,World.Geometry.PenaltyLine)}, vis.colors.red)
 	elseif Referee.isStopState() then
