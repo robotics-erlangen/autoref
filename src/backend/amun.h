@@ -24,9 +24,9 @@
 #include "protobuf/command.h"
 #include "protobuf/status.h"
 
+class NetworkInterfaceWatcher;
 class Processor;
 class Receiver;
-class Simulator;
 class Strategy;
 class Timer;
 
@@ -41,12 +41,11 @@ public:
 signals:
     void sendStatus(const Status &status);
     void gotCommand(const Command &command);
+    void updateVisionPort(quint16 port);
 
 public:
     void start();
     void stop();
-
-    void setVisionPort(quint16 port);
 
 public slots:
     void handleCommand(const Command &command);
@@ -66,7 +65,7 @@ private:
     qint64 m_lastTime;
     Timer *m_timer;
 
-    quint16 m_visionPort;
+    NetworkInterfaceWatcher *m_networkInterfaceWatcher;
 };
 
 #endif // AMUN_H

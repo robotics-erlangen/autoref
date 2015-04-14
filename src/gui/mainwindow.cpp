@@ -34,7 +34,7 @@
 #include <QSettings>
 #include <QThread>
 
-MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_logFile(NULL),
@@ -94,7 +94,7 @@ MainWindow::MainWindow(quint16 visionPort, QWidget *parent) :
 
     // start amun
     connect(&m_amun, SIGNAL(gotStatus(Status)), SLOT(handleStatus(Status)));
-    m_amun.start(visionPort);
+    m_amun.start();
 
     // restore configuration and initialize everything
     ui->autoref->load();

@@ -22,8 +22,8 @@
 #include "receiver.h"
 #include "core/timer.h"
 #include "processor/processor.h"
-#include "simulator/simulator.h"
 #include "strategy/strategy.h"
+#include "networkinterfacewatcher.h"
 #include <QMetaType>
 #include <QThread>
 
@@ -50,9 +50,9 @@ Amun::Amun(QObject *parent) :
     m_processor(NULL),
     m_referee(NULL),
     m_vision(NULL),
-    m_autoref(NULL),
-    m_visionPort(10002)
+    m_autoref(NULL)
 {
+    qRegisterMetaType<QNetworkInterface>("QNetworkInterface");
     qRegisterMetaType<Command>("Command");
     qRegisterMetaType< QList<robot::RadioCommand> >("QList<robot::RadioCommand>");
     qRegisterMetaType< QList<robot::RadioResponse> >("QList<robot::RadioResponse>");
@@ -65,6 +65,8 @@ Amun::Amun(QObject *parent) :
     m_processorThread = new QThread(this);
     m_networkThread = new QThread(this);
     m_autorefThread = new QThread(this);
+
+    m_networkInterfaceWatcher = new NetworkInterfaceWatcher(this);
 }
 
 /*!
@@ -116,16 +118,21 @@ void Amun::start()
     connect(m_networkThread, SIGNAL(finished()), m_referee, SLOT(stopListen()));
     // move referee packets to processor
     connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
+    connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, m_referee, &Receiver::updateInterface);
 
     // create vision
     Q_ASSERT(m_vision == NULL);
-    m_vision = new Receiver(QHostAddress("224.5.23.2"), m_visionPort);
+    m_vision = new Receiver(QHostAddress("224.5.23.2"), 10002);
     m_vision->moveToThread(m_networkThread);
     connect(m_networkThread, SIGNAL(started()), m_vision, SLOT(startListen()));
     connect(m_networkThread, SIGNAL(finished()), m_vision, SLOT(stopListen()));
+    // allow updating the port used to listen for ssl vision
+    connect(this, &Amun::updateVisionPort, m_vision, &Receiver::updatePort);
     // connect
     connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64)),
             m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
+    connect(m_vision, &Receiver::sendStatus, this, &Amun::handleStatus);
+    connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, m_vision, &Receiver::updateInterface);
 
     // start threads
     m_processorThread->start();
@@ -163,17 +170,18 @@ void Amun::stop()
     m_processor = NULL;
 }
 
-void Amun::setVisionPort(quint16 port)
-{
-    m_visionPort = port;
-}
-
 /*!
  * \brief Process a command
  * \param command Command to process
  */
 void Amun::handleCommand(const Command &command)
 {
+    if (command->has_amun()) {
+        if (command->amun().has_vision_port()) {
+            emit updateVisionPort(command->amun().vision_port());
+        }
+    }
+
     emit gotCommand(command);
 }
 

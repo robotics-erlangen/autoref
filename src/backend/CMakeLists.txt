@@ -26,6 +26,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/amun)
 set(SOURCES
     amun.cpp
     amun.h
+    ../framework/src/amun/networkinterfacewatcher.cpp
+    ../framework/src/amun/networkinterfacewatcher.h
     ../framework/src/amun/receiver.cpp
     ../framework/src/amun/receiver.h
 )

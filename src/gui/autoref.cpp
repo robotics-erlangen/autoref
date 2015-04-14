@@ -39,13 +39,7 @@ int main(int argc, char* argv[])
     QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
 #endif
 
-    QStringList args = QCoreApplication::arguments();
-    quint16 visionPort = 0;
-    if (args.size() >= 2) {
-        visionPort = args.at(1).toInt();
-    }
-
-    MainWindow window(visionPort);
+    MainWindow window;
     window.show();
 
     return app.exec();
