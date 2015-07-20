@@ -30,14 +30,37 @@ FastShot.possibleRefStates = {
     Indirect = true,
 }
 
+local lastSpeeds = {}
+local maxSpeed = 0
 function FastShot.occuring()
-    return World.Ball.speed:length() > 8
+    local speed = World.Ball.speed:length()
+    if speed > 8 then
+        table.insert(lastSpeeds, speed)
+        local maxVal = 0
+        -- we take the maximum from the 5 last frames above 8m/s
+        if #lastSpeeds > 4 then
+            for _, val in ipairs(lastSpeeds) do
+                if val > maxVal then
+                    maxVal = val
+                end
+            end
+        end
+        if maxVal ~= 0 then
+            maxSpeed = maxVal
+            lastSpeeds = {}
+            return true
+        end
+    else -- don't keep single values from flickering
+        lastSpeeds = {}
+    end
+    return false
 end
 
 function FastShot.print()
     local offending = Referee.teamWhichTouchedBallLast()
     log("Shot over 8m/s by " .. offending .. " team")
-    log("Speed: " .. World.Ball.speed:length() .. "m/s")
+    log("Speed: " .. maxSpeed .. "m/s")
+    maxSpeed = 0
 end
 
 return FastShot
