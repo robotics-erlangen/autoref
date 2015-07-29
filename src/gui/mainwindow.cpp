@@ -77,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));
 
     m_plotter = new Plotter();
+    m_plotter->setScaling(0.f, 10.f, 60.f);
 
     ui->log->hideLogToggles();
 
