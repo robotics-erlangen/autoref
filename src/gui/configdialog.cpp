@@ -24,7 +24,7 @@
 #include <QSettings>
 
 const uint DEFAULT_SYSTEM_DELAY = 30; // in ms
-const uint DEFAULT_VISION_PORT = 10002;
+const uint DEFAULT_VISION_PORT = 10005;
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
     QDialog(parent),

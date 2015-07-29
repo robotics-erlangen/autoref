@@ -29,6 +29,7 @@ class Processor;
 class Receiver;
 class Strategy;
 class Timer;
+class QHostAddress;
 
 class Amun : public QObject
 {
@@ -54,6 +55,7 @@ private slots:
     void handleStatus(const Status &status);
 
 private:
+    void setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port);
     QThread *m_processorThread;
     QThread *m_networkThread;
     QThread *m_autorefThread;

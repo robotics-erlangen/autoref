@@ -110,29 +110,18 @@ void Amun::start()
     connect(m_autoref, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
 
     // create referee
-    Q_ASSERT(m_referee == NULL);
-    m_referee = new Receiver(QHostAddress("224.5.23.1"), 10003);
-    m_referee->moveToThread(m_networkThread);
-    // start and stop socket
-    connect(m_networkThread, SIGNAL(started()), m_referee, SLOT(startListen()));
-    connect(m_networkThread, SIGNAL(finished()), m_referee, SLOT(stopListen()));
+    setupReceiver(m_referee, QHostAddress("224.5.23.1"), 10003);
     // move referee packets to processor
     connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
-    connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, m_referee, &Receiver::updateInterface);
 
     // create vision
-    Q_ASSERT(m_vision == NULL);
-    m_vision = new Receiver(QHostAddress("224.5.23.2"), 10002);
-    m_vision->moveToThread(m_networkThread);
-    connect(m_networkThread, SIGNAL(started()), m_vision, SLOT(startListen()));
-    connect(m_networkThread, SIGNAL(finished()), m_vision, SLOT(stopListen()));
+    setupReceiver(m_vision, QHostAddress("224.5.23.2"), 10002);
     // allow updating the port used to listen for ssl vision
     connect(this, &Amun::updateVisionPort, m_vision, &Receiver::updatePort);
     // connect
     connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64)),
             m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
     connect(m_vision, &Receiver::sendStatus, this, &Amun::handleStatus);
-    connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, m_vision, &Receiver::updateInterface);
 
     // start threads
     m_processorThread->start();
@@ -168,6 +157,18 @@ void Amun::stop()
 
     delete m_processor;
     m_processor = NULL;
+}
+
+void Amun::setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port)
+{
+    Q_ASSERT(receiver == NULL);
+    receiver = new Receiver(address, port);
+    receiver->moveToThread(m_networkThread);
+    // start and stop socket
+    connect(m_networkThread, SIGNAL(started()), receiver, SLOT(startListen()));
+    connect(m_networkThread, SIGNAL(finished()), receiver, SLOT(stopListen()));
+    // pass packets to processor
+    connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, receiver, &Receiver::updateInterface);
 }
 
 /*!

@@ -72,6 +72,8 @@ private:
     LogFileWriter *m_logFile;
     QThread *m_logFileThread;
     qint64 m_lastTime;
+    QLabel *m_logTimeLabel;
+    qint64 m_logStartTime;
     robot::Team m_yellowTeam;
     robot::Team m_blueTeam;
     QString m_yellowTeamName;
