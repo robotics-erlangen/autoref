@@ -48,9 +48,9 @@ local Constants = require "../base/constants"
 -- @field TimeDiff number - Time since last update
 -- @field RefereeState string - current refereestate, can be one of these:
 -- Halt, Stop, Game, GameForce,
--- KickoffOffensivePrepare, KickoffDefensivePrepare, KickoffOffensive, KickoffDefensive,
--- PenaltyOffensivePrepare, PenaltyDefensivePrepare, PenaltyOffensive, PenaltyDefensive,
--- DirectOffensive, DirectDefensive, IndirectOffensive, IndirectDefensive,
+-- KickoffYellowPrepare, KickoffBluePrepare, KickoffYellow, KickoffBlue,
+-- PenaltyYellowPrepare, PenaltyBluePrepare, PenaltyYellow, PenaltyBlue,
+-- DirectYellow, DirectBlue, IndirectYellow, IndirectBlue,
 -- TimeoutOffensive, TimeoutDefensive
 -- @field GameStage string - current game stage, can be one of these:
 -- FirstHalfPre, FirstHalf, HalfTime, SecondHalfPre, SecondHalf,
@@ -290,13 +290,7 @@ end
 -- updates referee command and keeper information
 function World._updateGameState(state)
 	fullRefereeState = state
-	local refState = state.state
-	-- map referee command to own team
-	if World.TeamIsBlue then
-		World.RefereeState = refState:gsub("Blue", "Offensive"):gsub("Yellow", "Defensive")
-	else
-		World.RefereeState = refState:gsub("Yellow", "Offensive"):gsub("Blue", "Defensive")
-	end
+	World.RefereeState = state.state
 
 	if World.RefereeState == "TimeoutOffensive" or World.RefereeState == "TimeoutDefensive" then
 		World.RefereeState = "Halt"
