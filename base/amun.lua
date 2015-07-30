@@ -176,10 +176,8 @@ function amun._hideFunctions()
 	}
 	if isDebug then
 		amun.sendCommand = sendCommand
-		amun.situationtestGetBeamIndicator = situationtestGetBeamIndicator
-		amun.situationtestSetBeamIndicator = situationtestSetBeamIndicator
 	end
-
+	
 	-- prevent reloading original api
 	package.preload["amun"] = nil
 	-- update reference used by require

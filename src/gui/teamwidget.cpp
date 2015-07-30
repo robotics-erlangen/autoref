@@ -88,9 +88,9 @@ void TeamWidget::init()
     m_reloadAction->setCheckable(true);
     connect(m_reloadAction, SIGNAL(toggled(bool)), SLOT(sendAutoReload()));
 
-    QAction *debugAction = reload_menu->addAction("Enable debugging");
-    debugAction->setCheckable(true);
-    connect(debugAction, SIGNAL(toggled(bool)), SLOT(sendEnableDebug(bool)));
+    m_debugAction = reload_menu->addAction("Enable debugging");
+    m_debugAction->setCheckable(true);
+    connect(m_debugAction, SIGNAL(toggled(bool)), SLOT(sendEnableDebug(bool)));
 
     m_btnReload = new QToolButton;
     m_btnReload->setToolTip("Reload script");
@@ -114,6 +114,8 @@ void TeamWidget::load()
     m_filename = s.value("Script").toString();
     m_entryPoint = s.value("EntryPoint").toString();
     m_reloadAction->setChecked(s.value("AutoReload").toBool());
+    m_debugAction->setDisabled(true);
+    m_debugAction->setChecked(true);
     s.endGroup();
 
     if (QFileInfo(m_filename).exists()) {

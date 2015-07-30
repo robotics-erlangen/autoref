@@ -76,6 +76,7 @@ private:
     QString m_entryPoint;
     QAction *m_actionDisable;
     QAction *m_reloadAction;
+    QAction *m_debugAction;
     bool m_userAutoReload;
     bool m_notification;
     QStringList m_recentScripts;

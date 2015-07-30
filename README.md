@@ -11,9 +11,6 @@ The program receives the Protobuf data via network from SSL-Vision and the
 Refbox.
 
 Referee decisions will be printed on the log textbox below the playing field.
-Make sure to select the right team sides by clicking the 'Flip sides'-button in
-the upper left corner.
-This cannot be automated because this information is not provided by SSL-Vision.
 
 In case you see "Autoref disabled" inside the green box, you probably moved the
 autorefs directory after building. You then have to select the file
