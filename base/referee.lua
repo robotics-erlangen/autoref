@@ -100,11 +100,10 @@ end
 --- Draw areas forbidden by the current referee command
 -- @name illustrateRefereeStates
 function Referee.illustrateRefereeStates()
-	if World.RefereeState == "PenaltyDefensivePrepare" or World.RefereeState == "PenaltyDefensive" then
-		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.YellowPenaltyLine), Vector(2,World.Geometry.YellowPenaltyLine)}, vis.colors.red)
-		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.BluePenaltyLine), Vector(2,World.Geometry.BluePenaltyLine)}, vis.colors.red)
-	elseif World.RefereeState == "PenaltyOffensivePrepare" or World.RefereeState == "PenaltyOffensive" then
-		vis.addPath("penaltyDistanceAllowed", {Vector(-2,World.Geometry.PenaltyLine), Vector(2,World.Geometry.PenaltyLine)}, vis.colors.red)
+	if World.RefereeState == "PenaltyYellowPrepare" or World.RefereeState == "PenaltyYellow" then
+		vis.addPath("penaltyDistanceAllowed", {Vector(rightLine,World.Geometry.BluePenaltyLine), Vector(leftLine,World.Geometry.BluePenaltyLine)}, vis.colors.red)
+	elseif World.RefereeState == "PenaltyBluePrepare" or World.RefereeState == "PenaltyBlue" then
+		vis.addPath("penaltyDistanceAllowed", {Vector(rightLine,World.Geometry.YellowPenaltyLine), Vector(leftLine,World.Geometry.YellowPenaltyLine)}, vis.colors.red)
 	elseif Referee.isStopState() then
 		vis.addCircle("stopstateBallDist", World.Ball.pos, 0.5, vis.colors.redHalf, true)
 	end
