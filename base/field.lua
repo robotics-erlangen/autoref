@@ -130,6 +130,7 @@ end
 local defStretchHalf = G.DefenseStretch / 2
 local defRadius = G.DefenseRadius
 local function isInDefenseArea(pos, radius, friendly)
+	local radius = radius or 0
 	local goalLine = G.FieldHeightHalf
 	if friendly then
 		goalLine = -G.FieldHeightHalf
