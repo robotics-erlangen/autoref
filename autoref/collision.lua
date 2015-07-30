@@ -20,6 +20,8 @@
 
 local Collision = {}
 
+local MINIMUM_COLLISION_SPEED_DIFF = 4.5
+
 local speedDiff = 0
 local offenderSpeed = 0
 
@@ -36,7 +38,8 @@ Collision.possibleRefStates = {
 function Collision.occuring()
     for _, blue in ipairs(World.BlueRobots) do
         for _, yellow in ipairs(World.YellowRobots) do
-            if blue.pos:distanceTo(yellow.pos) < 2*yellow.radius and (yellow.speed-blue.speed):length() > 4.5 then
+            if blue.pos:distanceTo(yellow.pos) < 2*yellow.radius and
+                (yellow.speed-blue.speed):length() > MINIMUM_COLLISION_SPEED_DIFF then
                 if blue.speed:length() > yellow.speed:length() then
                     foulingTeam = World.BlueColorStr
                     speedDiff = (blue.speed - yellow.speed):length()
