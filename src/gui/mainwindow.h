@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Copyright 2015 Michael Eischer, Philipp Nordhus, Alexander Danzer     *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -28,7 +28,6 @@
 
 class ConfigDialog;
 class LogFileWriter;
-class Plotter;
 class RefereeStatusWidget;
 class QLabel;
 class QModelIndex;
@@ -48,9 +47,6 @@ public:
 signals:
     void gotStatus(const Status &status);
 
-protected:
-    void closeEvent(QCloseEvent *e);
-
 private slots:
     void handleStatus(const Status &status);
     void sendCommand(const Command &command);
@@ -64,7 +60,6 @@ private:
 private:
     Ui::MainWindow *ui;
     AmunClient m_amun;
-    Plotter *m_plotter;
     RefereeStatusWidget *m_refereeStatus;
     ConfigDialog *m_configDialog;
     bool m_flip;

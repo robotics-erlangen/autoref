@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Copyright 2015 Michael Eischer, Philipp Nordhus, Alexander Danzer     *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -21,7 +21,6 @@
 #include "robotselectionwidget.h"
 #include "configdialog.h"
 #include "mainwindow.h"
-#include "plotter/plotter.h"
 #include "refereestatuswidget.h"
 #include "ui_mainwindow.h"
 #include "logfile/logfilewriter.h"
@@ -31,7 +30,6 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QMetaType>
-#include <QSettings>
 #include <QThread>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -50,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // setup icons
     ui->actionFlipSides->setIcon(QIcon("icon:32/change-ends.png"));
     ui->actionRecord->setIcon(QIcon("icon:32/media-record.png"));
-    ui->actionPlotter->setIcon(QIcon("icon:32/plotter.png"));
     ui->actionConfiguration->setIcon(QIcon("icon:32/preferences-system.png"));
 
     ui->actionQuit->setShortcut(QKeySequence::Quit);
@@ -76,21 +73,16 @@ MainWindow::MainWindow(QWidget *parent) :
     // setup visualization only parts of the ui
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));
 
-    m_plotter = new Plotter();
-    m_plotter->setScaling(0.f, 10.f, 60.f);
-
     ui->log->hideLogToggles();
 
     // connect the menu actions
     connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));
-
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
-    connect(ui->actionPlotter, SIGNAL(triggered()), m_plotter, SLOT(show()));
     connect(ui->actionRecord, SIGNAL(toggled(bool)), SLOT(setRecording(bool)));
 
     // setup data distribution
     connect(this, SIGNAL(gotStatus(Status)), ui->field, SLOT(handleStatus(Status)));
-    connect(this, SIGNAL(gotStatus(Status)), m_plotter, SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotStatus(Status)), ui->plotter, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->visualization, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->debugTree, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->timing, SLOT(handleStatus(Status)));
@@ -107,14 +99,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->visualization->load();
     m_configDialog->load();
 
-    QSettings s;
+    // hide dock widgets by default
+    ui->dockAutoref->hide();
+    ui->dockVisualization->hide();
+    ui->dockTiming->hide();
 
-    s.beginGroup("MainWindow");
-    restoreGeometry(s.value("Geometry").toByteArray());
-    restoreState(s.value("State").toByteArray());
-    ui->splitterV->restoreState(s.value("SplitterV").toByteArray());
-    ui->splitterH->restoreState(s.value("SplitterH").toByteArray());
-    s.endGroup();
+    ui->splitterV->setSizes({(int)(size().height()*0.3), (int)(size().height()*0.7)});
+    ui->splitterTop->setSizes({(int)(size().width()*0.25), (int)(size().width()*0.75)});
+    ui->splitterBottom->setSizes({(int)(size().width()*0.4), (int)(size().width()*0.6)});
 
     // disable internal referee
     Command command(new amun::Command);
@@ -124,7 +116,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // force auto reload of strategies if external referee is used
     ui->autoref->forceAutoReload(true);
 
-    m_flip = s.value("Flip").toBool();
     sendFlip();
 }
 
@@ -137,24 +128,6 @@ MainWindow::~MainWindow()
     }
     delete m_logFile;
     delete ui;
-}
-
-void MainWindow::closeEvent(QCloseEvent *e)
-{
-    QSettings s;
-
-    s.beginGroup("MainWindow");
-    s.setValue("Geometry", saveGeometry());
-    s.setValue("State", saveState());
-    s.setValue("SplitterH", ui->splitterH->saveState());
-    s.setValue("SplitterV", ui->splitterV->saveState());
-    s.endGroup();
-
-    // make sure the plotter is closed along with the mainwindow
-    // this also ensure that a closeEvent is triggered
-    m_plotter->close();
-
-    QMainWindow::closeEvent(e);
 }
 
 void MainWindow::handleStatus(const Status &status)
@@ -206,8 +179,6 @@ void MainWindow::sendCommand(const Command &command)
 void MainWindow::toggleFlip()
 {
     m_flip = !m_flip;
-    QSettings s;
-    s.setValue("Flip", m_flip);
     sendFlip();
 }
 

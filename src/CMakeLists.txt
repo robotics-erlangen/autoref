@@ -29,5 +29,4 @@ add_subdirectory(backend)
 
 # apps
 add_subdirectory(framework/src/ra/logfile)
-add_subdirectory(framework/src/ra/plotter)
 add_subdirectory(gui)

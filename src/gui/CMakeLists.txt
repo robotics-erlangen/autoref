@@ -18,11 +18,12 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-if(TARGET amun AND TARGET logfile AND TARGET plotter)
+if(TARGET amun AND TARGET logfile)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra/plotter)
 
 set(SOURCES
     autoref.cpp
@@ -32,6 +33,8 @@ set(SOURCES
     mainwindow.h
     teamwidget.cpp
     teamwidget.h
+    ballspeedplotter.cpp
+    ballspeedplotter.h
     ../framework/src/ra/amunclient.cpp
     ../framework/src/ra/amunclient.h
     ../framework/src/ra/debugmodel.cpp
@@ -48,11 +51,20 @@ set(SOURCES
     ../framework/src/ra/timingwidget.h
     ../framework/src/ra/visualizationwidget.cpp
     ../framework/src/ra/visualizationwidget.h
+    ../framework/src/ra/plotter/plotterwidget.cpp
+    ../framework/src/ra/plotter/plotterwidget.h
+    ../framework/src/ra/plotter/plot.cpp
+    ../framework/src/ra/plotter/plot.h
+    ../framework/src/ra/plotter/leaffilterproxymodel.cpp
+    ../framework/src/ra/plotter/leaffilterproxymodel.h
+    ../framework/src/ra/plotter/texturecache.cpp
+    ../framework/src/ra/plotter/texturecache.h
 )
 
 set(UI_SOURCES
     configdialog.ui
     mainwindow.ui
+    ballspeedplotter.ui
     ../framework/src/ra/refereestatuswidget.ui
     ../framework/src/ra/timingwidget.ui
     ../framework/src/ra/visualizationwidget.ui
@@ -72,7 +84,7 @@ endif(APPLE)
 qt5_wrap_ui(UIC_SOURCES ${UI_SOURCES})
 
 add_executable(autoref WIN32 MACOSX_BUNDLE ${SOURCES} ${UIC_SOURCES})
-target_link_libraries(autoref amun logfile plotter protobuf ${OPENGL_LIBRARIES})
+target_link_libraries(autoref amun logfile protobuf ${OPENGL_LIBRARIES})
 qt5_use_modules(autoref Widgets OpenGL)
 
 # add plist file
