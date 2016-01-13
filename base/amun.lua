@@ -163,8 +163,7 @@ function amun._hideFunctions()
 	local strategyPath = amun.getStrategyPath()
 	local getCurrentTime = amun.getCurrentTime
 	local sendCommand = amun.sendCommand
-	local situationtestGetBeamIndicator = amun.situationtestGetBeamIndicator
-	local situationtestSetBeamIndicator = amun.situationtestSetBeamIndicator
+	local sendNetworkRefereeCommand = amun.sendNetworkRefereeCommand
 
 	-- overwrite global amun
 	amun = {
@@ -176,8 +175,9 @@ function amun._hideFunctions()
 	}
 	if isDebug then
 		amun.sendCommand = sendCommand
+		amun.sendNetworkRefereeCommand = sendNetworkRefereeCommand
 	end
-	
+
 	-- prevent reloading original api
 	package.preload["amun"] = nil
 	-- update reference used by require
