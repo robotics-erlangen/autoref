@@ -176,6 +176,10 @@ function amun._hideFunctions()
 	if isDebug then
 		amun.sendCommand = sendCommand
 		amun.sendNetworkRefereeCommand = sendNetworkRefereeCommand
+	else
+		amun.sendNetworkRefereeCommand = function()
+			error "you must enable debug in order to send referee commands"
+		end
 	end
 
 	-- prevent reloading original api
