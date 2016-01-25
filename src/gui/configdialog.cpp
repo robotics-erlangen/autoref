@@ -25,6 +25,7 @@
 
 const uint DEFAULT_SYSTEM_DELAY = 30; // in ms
 const uint DEFAULT_VISION_PORT = 10005;
+const bool DEFAULT_ENABLE_REFBOX_CONTROL = true;
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
     QDialog(parent),
@@ -47,6 +48,9 @@ void ConfigDialog::sendConfiguration()
     command->mutable_tracking()->set_system_delay(ui->systemDelayBox->value() * 1000 * 1000);
 
     command->mutable_amun()->set_vision_port(ui->visionPort->value());
+
+    command->mutable_strategy_autoref()->set_enable_refbox_control(ui->refboxControlUse->isChecked());
+
     emit sendCommand(command);
 }
 
@@ -56,6 +60,7 @@ void ConfigDialog::load()
     ui->systemDelayBox->setValue(s.value("Tracking/SystemDelay", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
 
     ui->visionPort->setValue(s.value("Amun/VisionPort", DEFAULT_VISION_PORT).toUInt());
+    ui->refboxControlUse->setChecked(s.value("Amun/EnableRefboxControl", DEFAULT_ENABLE_REFBOX_CONTROL).toBool());
     sendConfiguration();
 }
 
@@ -63,6 +68,7 @@ void ConfigDialog::reset()
 {
     ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
     ui->visionPort->setValue(DEFAULT_VISION_PORT);
+    ui->refboxControlUse->setChecked(DEFAULT_ENABLE_REFBOX_CONTROL);
 }
 
 void ConfigDialog::apply()
@@ -71,6 +77,7 @@ void ConfigDialog::apply()
     s.setValue("Tracking/SystemDelay", ui->systemDelayBox->value());
 
     s.setValue("Amun/VisionPort", ui->visionPort->value());
+    s.setValue("Amun/EnableRefboxControl", ui->refboxControlUse->isChecked());
 
     sendConfiguration();
 }
