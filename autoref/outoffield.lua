@@ -33,10 +33,37 @@ end
 
 local wasInFieldBefore = false
 function OutOfField.occuring()
-    if Field.isInField(World.Ball.pos, World.Ball.radius) then
+    local ballPos = World.Ball.pos
+
+    if Field.isInField(ballPos, World.Ball.radius) then
         wasInFieldBefore = true
     elseif wasInFieldBefore then -- we detected the ball going out of field
         wasInFieldBefore = false -- reset
+
+        OutOfField.executingTeam = World.YellowColorStr
+        if Referee.teamWhichTouchedBallLast() == World.YellowColorStr then
+             OutOfField.executingTeam = World.BlueColorStr
+        end
+
+        local freekickType = "INDIRECT_FREE"
+        if math.abs(ballPos.y) > World.Geometry.FieldHeightHalf then
+            if math.abs(ballPos.x) < World.Geometry.GoalWidth/2 then
+                log("(probably) goal!")
+                return false
+            end
+            freekickType = "DIRECT_FREE"
+        end
+
+        OutOfField.consequence = freekickType .. "_" .. OutOfField.executingTeam:match(">(%a+)<"):upper()
+
+        OutOfField.freekickPosition = Vector(
+            (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
+            ballPos.y
+        )
+        if freekickType == "DIRECT_FREE" then
+            OutOfField.freekickPosition.y = (World.Geometry.FieldHeightHalf - 0.1) * math.sign(ballPos.y)
+        end
+
         return true
     end
 

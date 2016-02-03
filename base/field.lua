@@ -84,7 +84,7 @@ function Field.limitToAllowedField(pos, extraLimit, blockOpponentDefenseArea)
 	end
 end
 
---- check if pos is inside the field (extended by boundaryWidth)
+--- check if pos is inside the field, extended by boundaryWidth, goals are not considered inside the field
 -- @name isInField
 -- @param pos Vector - the position to limit
 -- @param boundaryWidth number - how much the field should be extended beyond the borders
@@ -93,17 +93,9 @@ function Field.isInField(pos, boundaryWidth)
 	boundaryWidth = boundaryWidth or 0
 
 	local allowedHeight = World.Geometry.FieldHeightHalf + boundaryWidth -- limit height to field
-	if math.abs(pos.x) > World.Geometry.GoalWidth / 2 and math.abs(pos.y) > allowedHeight -- check whether robot is inside the goal
-			or math.abs(pos.y) > allowedHeight + World.Geometry.GoalDepth then -- handle area behind goal
-		return false
-	end
-
 	local allowedWidth = World.Geometry.FieldWidthHalf + boundaryWidth -- limit width to field
-	if math.abs(pos.x) > allowedWidth then
-		return false
-	end
 
-	return true
+	return math.abs(pos.y) < allowedHeight and math.abs(pos.x) < allowedWidth
 end
 
 

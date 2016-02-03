@@ -21,7 +21,7 @@ function ChooseTeamSides.occuring()
     frameNumber = frameNumber + 1
     -- ssl vision does not provide information about team sides.
     -- Therefore, we switch team sides if both goalies are located in the
-    -- opponents defense are.
+    -- opponents defense area.
     if World.BlueKeeper and Field.isInYellowDefenseArea(World.BlueKeeper.pos) and
             World.YellowKeeper and Field.isInBlueDefenseArea(World.YellowKeeper.pos)
             and frameNumber > frameNumberOfLastFlipAttempt+5 then

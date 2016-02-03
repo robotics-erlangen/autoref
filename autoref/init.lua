@@ -25,52 +25,55 @@ local Entrypoints = require "../base/entrypoints"
 local debug = require "../base/debug"
 local Referee = require "../base/referee"
 World = require "../base/world"
+local ballPlacement = require "ballplacement"
 
 local fouls = {
-    require "collision",
-    require "fastshot",
+    -- require "collision",
+    -- require "fastshot",
     require "outoffield",
-    require "multipledefender",
+    -- require "multipledefender",
     require "chooseteamsides"
 }
 local foulTimes = {}
-local timeout = 3 -- minimum time between subsequent fouls of the same kind
-
-local function wrapper(func)
-    return function()
-    	-- require "../test/debug/enable"
-        if not World.update() then
-            return -- skip processing if no vision data is available yet
-        end
-        Referee.checkTouching()
-        Referee.illustrateRefereeStates()
-		--Processor.pre()
-        func()
-		--World.setRobotCommands()
-		--Processor.post()
-        debug.resetStack()
-		--Cache.resetFrame()
-    end
-end
+local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
 local function main()
-    -- match string to remove the font-tags
+    -- "match" string to remove the font-tags
     debug.set("last touch", Referee.teamWhichTouchedBallLast():match(">(%a+)<"))
+    if ballPlacement.active() then
+        ballPlacement.run()
+    end
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter
         -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
         local simpleRefState = World.RefereeState:match("%u%l+")
         if foul.possibleRefStates[simpleRefState] and foul.occuring() and
-            (not foulTimes[foul] or World.Time - foulTimes[foul] > timeout)
+            (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT)
         then
             foulTimes[foul] = World.Time
+            assert(foul.executingTeam, "an occuring foul must define an executing team")
+            assert(foul.freekickPosition, "an occuring foul must define a freekick position")
+            assert(foul.consequence, "an occuring foul must define a consequence")
             foul.print()
+            ballPlacement.start(foul)
         end
     end
+
 end
 
+local function mainLoopWrapper(func)
+    return function()
+        if not World.update() then
+            return -- skip processing if no vision data is available yet
+        end
+        Referee.checkTouching()
+        Referee.illustrateRefereeStates()
+        func()
+        debug.resetStack()
+    end
+end
 Entrypoints.add("main", function()
     main()
 end)
 
-return {name = "AutoRef", entrypoints = Entrypoints.get(wrapper)}
+return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper)}

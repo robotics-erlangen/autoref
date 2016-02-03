@@ -130,9 +130,9 @@ function Referee.checkTouching()
 	end
 end
 
---- Get whether we touched to ball last
--- @name friendlyTouchedLast
--- @return boolean - True if we touched last, false if the opponent did
+--- Get team which touched the ball last
+-- @name teamWhichTouchedBallLast
+-- @return string - team which touched the ball last
 function Referee.teamWhichTouchedBallLast()
 	return lastTeam
 end
