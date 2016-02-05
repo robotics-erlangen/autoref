@@ -41,7 +41,7 @@ local Robot, RobotMt = (require "../base/class")("Robot")
 -- @field year number - year robot was built in *
 -- @field pos Vector - current position
 -- @field dir number - current direction faced
--- @field isFriendly bool - true if own robot
+-- @field isYellow bool - true if own robot
 -- @field speed Vector - current speed (movement direction doesn't have to match with dir)
 -- @field angularSpeed number - rotation speed of the robot
 -- @field isVisible bool - True if robot is tracked
@@ -64,9 +64,9 @@ Robot.constants = {
 --- Creates a new robot object.
 -- Init function must be called for EVERY robot.
 -- @param data table/number - data from amun.getTeam or robot id for opponents
--- @param isFriendly boolean - true if own robot
+-- @param isYellow boolean - true if own robot
 -- @param geometry World.Geometry - used to setup path object and avoid a circular dependency with world, only required for own robots
-function Robot:init(data, isFriendly, geometry)
+function Robot:init(data, isYellow, geometry)
 	if type(data) == "table" then
 		self:_setSpecs(data)
 	else
@@ -80,17 +80,9 @@ function Robot:init(data, isFriendly, geometry)
 	end
 	self.lostSince = 0
 	self.lastResponseTime = 0
-	self.isFriendly = isFriendly
+	self.isYellow = isYellow
 	self._hasBall = {}
-	if self.isFriendly then -- setup trajectory and path objects
-		self.trajectory = Trajectory(self)
-		self.path = path.create()
-		self.path:setBoundary(
-			-geometry.FieldWidthHalf  - geometry.BoundaryWidth - 0.02,
-			-geometry.FieldHeightHalf - geometry.BoundaryWidth - 0.02,
-			 geometry.FieldWidthHalf  + geometry.BoundaryWidth + 0.02,
-			 geometry.FieldHeightHalf + geometry.BoundaryWidth + 0.02)
-	end
+
 	self._currentTime = 0
 	self._controllerInput = nil
 	self._kickStyle = nil

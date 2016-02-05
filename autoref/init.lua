@@ -29,7 +29,7 @@ local ballPlacement = require "ballplacement"
 
 local fouls = {
     -- require "collision",
-    -- require "fastshot",
+    require "fastshot",
     require "outoffield",
     -- require "multipledefender",
     require "chooseteamsides"

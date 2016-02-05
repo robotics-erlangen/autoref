@@ -19,6 +19,7 @@
 *************************************************************************]]
 
 local Referee = require "../base/referee"
+local BallOwner = require "../base/ballowner"
 
 local FastShot = {}
 
@@ -32,7 +33,9 @@ FastShot.possibleRefStates = {
 
 local lastSpeeds = {}
 local maxSpeed = 0
+local lastMaxSpeed = 0
 function FastShot.occuring()
+    local lastBallOwner = BallOwner.lastRobot() -- should be called every frame for accuracy reasons
     local speed = World.Ball.speed:length()
     if speed > 8 then
         table.insert(lastSpeeds, speed)
@@ -48,7 +51,14 @@ function FastShot.occuring()
         if maxVal ~= 0 then
             maxSpeed = maxVal
             lastSpeeds = {}
-            return true
+            if lastBallOwner then
+                FastShot.freekickPosition = lastBallOwner.pos
+                FastShot.executingTeam = lastBallOwner.isYellow and World.BlueColorStr or World.YellowColorStr
+                FastShot.consequence = lastBallOwner.isYellow and "INDIRECT_FREE_BLUE" or "INDIRECT_FREE_YELLOW"
+                lastMaxSpeed = maxSpeed
+                maxSpeed = 0
+                return true
+            end
         end
     else -- don't keep single values from flickering
         lastSpeeds = {}
@@ -57,10 +67,14 @@ function FastShot.occuring()
 end
 
 function FastShot.print()
-    local offending = Referee.teamWhichTouchedBallLast()
-    log("Shot over 8m/s by " .. offending .. " team")
-    log("Speed: " .. maxSpeed .. "m/s")
-    maxSpeed = 0
+    local lastBallOwner = BallOwner.lastRobot()
+    if lastBallOwner then
+        local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
+        log("Shot over 8m/s by " .. color .. " robot with id " .. lastBallOwner.id)
+    else
+        log("Shot over 8m/s, but could not determine offender")
+    end
+    log("Speed: " .. lastMaxSpeed .. "m/s")
 end
 
 return FastShot
