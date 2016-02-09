@@ -24,6 +24,7 @@ require "../base/base"
 local Entrypoints = require "../base/entrypoints"
 local debug = require "../base/debug"
 local Referee = require "../base/referee"
+local BallOwner = require "../base/ballowner"
 World = require "../base/world"
 local ballPlacement = require "ballplacement"
 
@@ -38,8 +39,6 @@ local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
 local function main()
-    -- "match" string to remove the font-tags
-    debug.set("last touch", Referee.teamWhichTouchedBallLast():match(">(%a+)<"))
     if ballPlacement.active() then
         ballPlacement.run()
     end
@@ -55,10 +54,11 @@ local function main()
             assert(foul.freekickPosition, "an occuring foul must define a freekick position")
             assert(foul.consequence, "an occuring foul must define a consequence")
             foul.print()
+            log("")
             ballPlacement.start(foul)
         end
     end
-
+    Referee.illustrateRefereeStates()
 end
 
 local function mainLoopWrapper(func)
@@ -66,14 +66,14 @@ local function mainLoopWrapper(func)
         if not World.update() then
             return -- skip processing if no vision data is available yet
         end
-        Referee.checkTouching()
-        Referee.illustrateRefereeStates()
         func()
-        debug.resetStack()
     end
 end
 Entrypoints.add("main", function()
     main()
+    debug.resetStack()
+    Referee.checkTouching()
+    BallOwner.lastRobot()
 end)
 
 return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper)}

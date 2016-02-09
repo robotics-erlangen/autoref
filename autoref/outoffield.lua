@@ -22,22 +22,29 @@ local OutOfField = {}
 
 local Referee = require "../base/referee"
 local Field = require "../base/field"
+local debug = require "../base/debug"
+local vis = require "../base/vis"
 
 OutOfField.possibleRefStates = {
     Game = true
 }
 
-local function isInField()
-    return Field.isInField(World.Ball.pos, World.Ball.radius)
-end
-
+local outOfFieldEvent -- for print messages only
 local wasInFieldBefore = false
 function OutOfField.occuring()
     local ballPos = World.Ball.pos
 
+    local lastTeam = Referee.teamWhichTouchedBallLast()
+    local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
+    if lastTeam then
+        -- "match" string to remove the font-tags
+        debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
+        vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
+    end
+
     if Field.isInField(ballPos, World.Ball.radius) then
         wasInFieldBefore = true
-    elseif wasInFieldBefore then -- we detected the ball going out of field
+    elseif wasInFieldBefore and lastRobot then -- we detected the ball going out of field
         wasInFieldBefore = false -- reset
 
         OutOfField.executingTeam = World.YellowColorStr
@@ -46,23 +53,42 @@ function OutOfField.occuring()
         end
 
         local freekickType = "INDIRECT_FREE"
-        if math.abs(ballPos.y) > World.Geometry.FieldHeightHalf then
+        outOfFieldEvent = "Throw-In"
+        if math.abs(ballPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
+
+            OutOfField.freekickPosition = Vector( -- 10cm from the corner
+                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
+                (World.Geometry.FieldHeightHalf - 0.1) * math.sign(ballPos.y)
+            )
+            freekickType = "DIRECT_FREE"
+            if (lastRobot.isYellow and ballPos.y>0) or (not lastRobot.isYellow and ballPos.y<0) then
+                outOfFieldEvent = "Goal Kick"
+            else
+                outOfFieldEvent = "Corner Kick"
+            end
+
+            -- positive y position means blue side of field, negative yellow
+            local icing = ((ballPos.y > 0 and lastTeam == World.YellowColorStr)
+                or (ballPos.y < 0 and lastTeam == World.BlueColorStr))
+                and lastPos.y * ballPos.y < 0 -- last touch was on other side of field
+
             if math.abs(ballPos.x) < World.Geometry.GoalWidth/2 then
                 log("(probably) goal!")
                 return false
+            elseif icing then
+                OutOfField.executingTeam = lastRobot.isYellow and World.BlueColorStr or World.YellowColorStr
+                OutOfField.freekickPosition = lastPos
+                freekickType = "INDIRECT_FREE"
+                outOfFieldEvent = "Indirect because of Icing"
             end
-            freekickType = "DIRECT_FREE"
+        else -- out off field line
+            OutOfField.freekickPosition = Vector( -- 10cm from field line
+                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
+                ballPos.y
+            )
         end
 
         OutOfField.consequence = freekickType .. "_" .. OutOfField.executingTeam:match(">(%a+)<"):upper()
-
-        OutOfField.freekickPosition = Vector(
-            (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
-            ballPos.y
-        )
-        if freekickType == "DIRECT_FREE" then
-            OutOfField.freekickPosition.y = (World.Geometry.FieldHeightHalf - 0.1) * math.sign(ballPos.y)
-        end
 
         return true
     end
@@ -72,6 +98,7 @@ end
 
 function OutOfField.print()
     log("Ball out field. Last touch: " .. Referee.teamWhichTouchedBallLast())
+    log(outOfFieldEvent .. " for " .. OutOfField.executingTeam)
 end
 
 return OutOfField

@@ -35,7 +35,6 @@ local lastSpeeds = {}
 local maxSpeed = 0
 local lastMaxSpeed = 0
 function FastShot.occuring()
-    local lastBallOwner = BallOwner.lastRobot() -- should be called every frame for accuracy reasons
     local speed = World.Ball.speed:length()
     if speed > 8 then
         table.insert(lastSpeeds, speed)
@@ -51,6 +50,7 @@ function FastShot.occuring()
         if maxVal ~= 0 then
             maxSpeed = maxVal
             lastSpeeds = {}
+            local lastBallOwner = BallOwner.lastRobot()
             if lastBallOwner then
                 FastShot.freekickPosition = lastBallOwner.pos
                 FastShot.executingTeam = lastBallOwner.isYellow and World.BlueColorStr or World.YellowColorStr
