@@ -110,6 +110,7 @@ function Referee.illustrateRefereeStates()
 end
 
 local touchDist = World.Ball.radius+robotRadius
+Referee.touchDist = touchDist
 local lastTeam, lastRobot, lastTouchPos
 --- Update the status of which team touched the ball last
 -- @name checkTouching
