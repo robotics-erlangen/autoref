@@ -38,6 +38,7 @@ local fouls = {
     require "dribbling",
     require "attackerindefensearea",
     require "stopspeed",
+    require "numberofplayers",
     require "attackerdefareadist",
 }
 local foulTimes = {}
