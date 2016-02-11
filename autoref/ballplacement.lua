@@ -3,6 +3,7 @@ local BallPlacement = {}
 local debug = require "../base/debug"
 local vis = require "../base/vis"
 local Refbox = require "../base/refbox"
+local Field = require "../base/field"
 
 local BALL_PLACEMENT_TIMEOUT = 15
 local BALL_PLACEMENT_PRECISION = 0.05
@@ -21,7 +22,8 @@ local undefinedStateTime
 local startTime = 0
 local placementTimer = 0
 function BallPlacement.start(foul_)
-    foul = foul_
+    foul = table.copy(foul_) -- preserve attributes
+    foul.freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, foul.executingTeam)
     waitingForBallToSlowDown = true
     startTime = World.Time
     undefinedStateTime = 0

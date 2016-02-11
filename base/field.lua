@@ -161,29 +161,29 @@ function Field.isInBlueDefenseArea(pos, radius)
 	return isInDefenseArea(pos, radius, false)
 end
 
-local function distanceToDefenseArea(pos, radius, friendly)
+local function distanceToDefenseArea(pos, radius, yellow)
 	local goalLine = G.FieldHeightHalf
-	if friendly then
+	if yellow then
 		goalLine = - G.FieldHeightHalf
 	end
-	if friendly and pos.y + radius < goalLine then
+	if yellow and pos.y + radius < goalLine then
 		local distx = math.max(math.abs(pos.x) - radius - defRadius - defStretchHalf, 0)
 		local disty = goalLine - pos.y - radius
 		return math.sqrt(distx^2, disty^2)
-	elseif not friendly and pos.y + radius > G.FieldHeightHalf then
+	elseif not yellow and pos.y + radius > G.FieldHeightHalf then
 		local distx = math.max(math.abs(pos.x) - radius - defRadius - defStretchHalf, 0)
 		local disty = pos.y + radius - goalLine
 		return math.sqrt(distx^2, disty^2)
 	end
-	if isInDefenseArea(pos, radius, friendly) then
+	if isInDefenseArea(pos, radius, yellow) then
 		return 0
 	end
 	local distance
 	if math.abs(pos.x) <= defStretchHalf then
-		if friendly then
+		if yellow then
 			distance = pos.y - (goalLine + defRadius) - radius
 		else
-			distance = goalLine - defRadius - pos.y + radius
+			distance = goalLine - defRadius - pos.y - radius
 		end
 	elseif pos.x > defStretchHalf then
 		local corner = Vector(defStretchHalf, goalLine)
@@ -215,6 +215,32 @@ end
 -- @return number - distance
 function Field.distanceToBlueDefenseArea(pos, radius)
 	return distanceToDefenseArea(pos, radius, false)
+end
+
+function Field.limitToFreekickPosition(pos, executingTeam)
+	pos = Field.limitToField(pos)
+	local ballSide = pos.y > 0 and "Blue" or "Yellow"
+	local attackColor = executingTeam == World.BlueColorStr and "Blue" or "Yellow"
+
+	if Field["isIn"..ballSide.."DefenseArea"](pos) then
+		-- closest point 600mm from the goal line and 100mm from the touch line
+		pos = Vector(
+			math.sign(pos.x) * World.Geometry.FieldWidthHalf - math.sign(pos.x)*0.1,
+			math.sign(pos.y) * World.Geometry.FieldHeightHalf - math.sign(pos.y)*0.6
+		)
+	elseif Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) < 0.7 and ballSide ~= attackColor then
+		-- closest point 700mm from the defense area
+		local origin = World.Geometry[ballSide.."Goal"]
+		if math.abs(pos.x) > World.Geometry.DefenseStretch/2 then
+			origin = Vector(
+				math.sign(pos.x) * World.Geometry.DefenseStretch/2,
+				math.sign(pos.y) * World.Geometry.FieldHeightHalf
+			)
+		end
+		pos = origin + (pos-origin):setLength(World.Geometry.DefenseRadius+0.7)
+	end
+
+	return pos
 end
 
 local normalize = function(angle)
@@ -252,7 +278,7 @@ end
 -- @param pos Vector - starting point of the line
 -- @param dir Vector - the direction of the line
 -- @param extraDistance number - gets added to G.DefenseRadius
--- @param opp bool - whether the opponent or the friendly defense area is considered
+-- @param opp bool - whether the opponent or the yellow defense area is considered
 -- @return Vector - the intersection position
 -- @return number - the length of the way from the very left of the defense area to the
 -- intersection point, when moving along its border
@@ -356,11 +382,11 @@ end
 -- @param pos Vector - center point of the circle
 -- @param radius number - radius of the circle
 -- @param extraDistance number - gets added to G.DefenseRadius
--- @param opp bool - whether the opponent or the friendly defense area is considered
+-- @param blue bool - whether the blue or the yellow defense area is considered
 -- @return [Vector] - a list of intersection points, not sorted
-function Field.intersectCircleDefenseArea(pos, radius, extraDistance, opp)
-	-- invert coordinates if opp-flag is set
-	if opp then pos = pos * -1 end
+function Field.intersectCircleDefenseArea(pos, radius, extraDistance, blue)
+	-- invert coordinates if blue-flag is set
+	if blue then pos = pos * -1 end
 
 	local leftCenter = Vector(-G.DefenseStretch/2, -G.FieldHeightHalf)
 	local rightCenter = Vector(G.DefenseStretch/2, -G.FieldHeightHalf)
@@ -395,8 +421,8 @@ function Field.intersectCircleDefenseArea(pos, radius, extraDistance, opp)
 	end
 
 
-	-- invert coordinates if opp-flag is set
-	if opp then
+	-- invert coordinates if blue-flag is set
+	if blue then
 		for i, pos in ipairs(intersections) do
 			intersections[i] = pos * -1
 		end
