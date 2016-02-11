@@ -33,7 +33,7 @@ local fouls = {
     -- require "collision",
     require "fastshot",
     require "outoffield",
-    -- require "multipledefender",
+    require "multipledefender",
     require "chooseteamsides",
     require "dribbling",
     require "attackerindefensearea",

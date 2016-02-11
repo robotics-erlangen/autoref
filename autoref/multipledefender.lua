@@ -21,52 +21,41 @@
 local MultipleDefender = {}
 
 local Field = require "../base/field"
+local Referee = require "../base/referee"
 
 MultipleDefender.possibleRefStates = {
-    Game = true,
-    Kickoff = true,
-    Direct = true,
-    Indirect = true,
+    Game = true
 }
 
-local offendingTeam =""
-local occupation = ""
-
-local function robotIsOffending(robot, team, testOccupation)
-    local defAreaDistThreshold = (testOccupation == "partial") and robot.radius or -robot.radius
-    if Field["isIn"..team.."DefenseArea"](robot.pos, defAreaDistThreshold) then
-        local touchDistance = World.Ball.radius + robot.radius
-        if robot.pos:distanceTo(World.Ball.pos) < touchDistance then
-            if team == "Blue" then
-                offendingTeam = World.BlueColorStr
-            else
-                offendingTeam = World.YellowColorStr
-            end
-            occupation = testOccupation
+local offender, occupation
+local function checkOccupation(team, partially)
+    for _, robot in ipairs(World[team.."Robots"]) do
+        local distThreshold = partially == true and robot.radius or -robot.radius
+        if Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
+                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
+        then
+            offender = robot
+            occupation = partially and "partially" or "entirely"
+            MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
             return true
         end
     end
-end
-
-local function checkTeam(team)
-    for _, robot in ipairs(World[team .. "Robots"]) do
-        if robot ~= World[team .. "Keeper"] then
-            if robotIsOffending(robot, team, "full") then return true end
-            if robotIsOffending(robot, team, "partial") then return true end
-        end
-    end
-end
-
-function MultipleDefender:occuring()
-    if checkTeam("Yellow") or checkTeam("Blue") then
-        return true
-    end
-
     return false
 end
 
+function MultipleDefender.occuring()
+    local defense = "Yellow"
+    if World.Ball.pos.y > 0 then -- on blue side of field
+        defense = "Blue"
+    end
+    return checkOccupation(defense, false) or checkOccupation(defense, true)
+end
+
+
 function MultipleDefender:print()
-    log("Multiple defenders by " .. offendingTeam .. " team: " .. occupation .. " occupation")
+    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
+    log(color .. " " .. offender.id .. " touched the ball while being located <b>"
+        .. occupation .. "</b> within its own defense area")
 end
 
 return MultipleDefender
