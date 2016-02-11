@@ -46,6 +46,7 @@ local Constants = require "../base/constants"
 -- @field IsLargeField bool - True if playing on the large field
 -- @field Time number - Current unix timestamp in seconds (with nanoseconds precision)
 -- @field TimeDiff number - Time since last update
+-- @field BallPlacementPos - Position where the ball has to be placed
 -- @field RefereeState string - current refereestate, can be one of these:
 -- Halt, Stop, Game, GameForce,
 -- KickoffYellowPrepare, KickoffBluePrepare, KickoffYellow, KickoffBlue,
@@ -294,6 +295,12 @@ function World._updateGameState(state)
 
 	if World.RefereeState == "TimeoutOffensive" or World.RefereeState == "TimeoutDefensive" then
 		World.RefereeState = "Halt"
+	end
+
+	if state.designated_position and state.designated_position.x and
+			(not World.BallPlacementPos or World.BallPlacementPos.y ~= state.designated_position.y
+			or World.BallPlacementPos.x ~= state.designated_position.x) then
+		World.BallPlacementPos = Vector(state.designated_position.x, state.designated_position.y)
 	end
 
 	World.GameStage = World.gameStageMapping[state.stage]
