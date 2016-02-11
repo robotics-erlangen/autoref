@@ -24,6 +24,7 @@ require "../base/base"
 local Entrypoints = require "../base/entrypoints"
 local debug = require "../base/debug"
 local Referee = require "../base/referee"
+local Refbox = require "../base/refbox"
 local BallOwner = require "../base/ballowner"
 World = require "../base/world"
 local ballPlacement = require "ballplacement"
@@ -39,10 +40,19 @@ local fouls = {
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
+local cardToSend
+local function sendCardIfPending()
+    if World.RefereeState == "Stop" and cardToSend then
+        Refbox.send(cardToSend)
+        cardToSend = nil
+    end
+end
+
 local function main()
     if ballPlacement.active() then
         ballPlacement.run()
     end
+    sendCardIfPending()
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter
         -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
@@ -51,12 +61,19 @@ local function main()
             (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT)
         then
             foulTimes[foul] = World.Time
-            assert(foul.executingTeam, "an occuring foul must define an executing team")
-            assert(foul.freekickPosition, "an occuring foul must define a freekick position")
             assert(foul.consequence, "an occuring foul must define a consequence")
             foul.print()
             log("")
-            ballPlacement.start(foul)
+            if foul.freekickPosition and foul.executingTeam then
+                ballPlacement.start(foul)
+            elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
+                cardToSend = foul.consequence
+                if World.RefereeState ~= "Stop" then
+                    Refbox.send("STOP") -- Stop is required for sending cards
+                end
+            else
+                error("A foul must either send a card, STOP, or define a freekick position and executing team")
+            end
         end
     end
     Referee.illustrateRefereeStates()
