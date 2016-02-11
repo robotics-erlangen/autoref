@@ -37,6 +37,7 @@ local fouls = {
     require "chooseteamsides",
     require "dribbling",
     require "attackerindefensearea",
+    require "stopspeed",
 }
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
