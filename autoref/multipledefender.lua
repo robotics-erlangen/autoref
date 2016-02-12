@@ -31,7 +31,8 @@ local offender, occupation
 local function checkOccupation(team, partially)
     for _, robot in ipairs(World[team.."Robots"]) do
         local distThreshold = partially == true and robot.radius or -robot.radius
-        if Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
+        if robot ~= World[team.."Keeper"]
+                and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
                 and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
         then
             offender = robot
