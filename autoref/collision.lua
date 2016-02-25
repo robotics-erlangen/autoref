@@ -20,14 +20,15 @@
 
 local Collision = {}
 
-local MINIMUM_COLLISION_SPEED_DIFF = 4.5
+-- collision fouls involve one fast moving and one stationary or
+-- slow moving robot. See the "Decisions" paragraph of section 12.4
+local FAST_SPEED = 2.5
+local SLOW_SPEED = 0.5
 
 local speedDiff = 0
-local offenderSpeed = 0
+local offender = 0
 
 Collision.possibleRefStates = {
-    Halt = true,
-    Stop = true,
     Game = true,
     Kickoff = true,
     Penalty = true,
@@ -36,29 +37,30 @@ Collision.possibleRefStates = {
 }
 
 function Collision.occuring()
-    for _, blue in ipairs(World.BlueRobots) do
-        for _, yellow in ipairs(World.YellowRobots) do
-            if blue.pos:distanceTo(yellow.pos) < 2*yellow.radius and
-                (yellow.speed-blue.speed):length() > MINIMUM_COLLISION_SPEED_DIFF then
-                if blue.speed:length() > yellow.speed:length() then
-                    foulingTeam = World.BlueColorStr
-                    speedDiff = (blue.speed - yellow.speed):length()
-                    offenderSpeed = blue.speed
-                else
-                    foulingTeam = World.YellowColorStr
-                    speedDiff = (yellow.speed - blue.speed):length()
-                    offenderSpeed = yellow.speed
+    for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
+        for _, OffRobot in ipairs(World[offense.."Robots"]) do
+            for _, DefRobot in ipairs(World[defense.."Robots"]) do
+                if OffRobot.pos:distanceTo(DefRobot.pos) <= 2*DefRobot.radius
+                    and OffRobot.speed:length() > FAST_SPEED
+                    and DefRobot.speed:length() < SLOW_SPEED
+                then
+                    Collision.consequence = "DIRECT_FREE_"..defense:upper()
+                    Collision.freekickPosition = OffRobot.pos:copy()
+                    Collision.executingTeam = World[defense.."ColorStr"]
+                    offender = OffRobot
+                    return true
                 end
-                return true -- one foul at a time
             end
         end
     end
+
     return false
 end
 
 function Collision.print()
-    log("Collision foul by " .. foulingTeam .. " team")
-    log("with " .. speedDiff .. " m/s, while driving at " .. offenderSpeed .. " m/s")
+    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
+    log("Collision foul by " .. color .. " " .. offender.id)
+    log("while driving at " .. offender.speed:length() .. " m/s")
 end
 
 return Collision

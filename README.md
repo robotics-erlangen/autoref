@@ -65,7 +65,7 @@ foul can occur
 the foul occurs and that the `print` and `consequence` attributes have to be set
 - `print`: This function prints a message for the user in case the foul occurs,
 but should not implement any other referee logics
-- `consequence`: The referee command which follows the foul, e.g. "INDIRECT_FREE_BLUE"
+- `consequence`: The referee command which follows the foul, e.g. "INDIRECT_FREE_BLUE".
 If it is not "STOP" or a card, `freekickPosition` has to be set
 - `freekickPosition`: A vector with the position where the resulting free kick
 will be executed. This field is used for autonomous ball placement
