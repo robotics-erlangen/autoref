@@ -53,7 +53,17 @@ local function sendCardIfPending()
     end
 end
 
+local ballWasValidBefore = false
 local function main()
+    if World.Ball:isPositionValid() then
+        ballWasValidBefore = true
+    elseif ballWasValidBefore then
+        ballWasValidBefore = false
+        log("Ball is not visible!")
+    else
+        return
+    end
+
     if ballPlacement.active() then
         ballPlacement.run()
     end
