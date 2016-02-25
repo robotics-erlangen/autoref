@@ -9,7 +9,7 @@ local offender
 function FreekickDistance.occuring()
     local defense = World.RefereeState:match("irect(%a+)") == "Yellow" and "Blue" or "Yellow"
     for _, robot in ipairs(World[defense.."Robots"]) do
-        if robot.pos:distanceTo(World.Ball.pos)-robot.radius-World.Ball.radius < 0.5 then
+        if robot.pos:distanceTo(World.Ball.pos)-robot.shootRadius < 0.5 then
             offender = robot
             FreekickDistance.consequence = "STOP"
             return true
