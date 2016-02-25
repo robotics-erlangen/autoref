@@ -6,7 +6,7 @@ local Refbox = require "../base/refbox"
 local Field = require "../base/field"
 
 local BALL_PLACEMENT_TIMEOUT = 15
-local BALL_PLACEMENT_PRECISION = 0.05
+local BALL_PLACEMENT_RADIUS = 0.1
 local TEAM_CAPABLE_OF_PLACEMENT = {
     [World.YellowColorStr] = true,
     [World.BlueColorStr] = true
@@ -42,7 +42,7 @@ function BallPlacement.run()
 
     if placementTimer ~= 0 then
         debug.set("placement time", World.Time - placementTimer)
-        vis.addCircle("ball placement", foul.freekickPosition, 0.05, vis.colors.orangeHalf, true)
+        vis.addCircle("ball placement", foul.freekickPosition, BALL_PLACEMENT_RADIUS, vis.colors.orangeHalf, true)
     end
 
     if refState ~= "Stop" and World.Time - startTime < 1 then
@@ -74,7 +74,7 @@ function BallPlacement.run()
                 noRobotNearBall = false
             end
         end
-        if World.Ball.pos:distanceTo(foul.freekickPosition) < BALL_PLACEMENT_PRECISION
+        if World.Ball.pos:distanceTo(foul.freekickPosition) < BALL_PLACEMENT_RADIUS
                 and noRobotNearBall and World.Ball.speed:length() < SLOW_BALL then
             log("success placing the ball")
             Refbox.send(foul.consequence)
