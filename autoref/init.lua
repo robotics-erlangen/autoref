@@ -40,7 +40,8 @@ local fouls = {
     require "stopspeed",
     require "numberofplayers",
     require "attackerdefareadist",
-    require "freekickdistance"
+    require "freekickdistance",
+    require "doubletouch"
 }
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
