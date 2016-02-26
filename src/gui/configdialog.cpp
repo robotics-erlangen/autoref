@@ -23,7 +23,7 @@
 #include <QPushButton>
 #include <QSettings>
 
-const uint DEFAULT_SYSTEM_DELAY = 30; // in ms
+const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
 const uint DEFAULT_VISION_PORT = 10005;
 const bool DEFAULT_ENABLE_REFBOX_CONTROL = true;
 
@@ -57,7 +57,7 @@ void ConfigDialog::sendConfiguration()
 void ConfigDialog::load()
 {
     QSettings s;
-    ui->systemDelayBox->setValue(s.value("Tracking/SystemDelay", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
+    ui->systemDelayBox->setValue(s.value("Tracking/SystemDelayAutoref", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
 
     ui->visionPort->setValue(s.value("Amun/VisionPort", DEFAULT_VISION_PORT).toUInt());
     ui->refboxControlUse->setChecked(s.value("Amun/EnableRefboxControl", DEFAULT_ENABLE_REFBOX_CONTROL).toBool());
@@ -74,7 +74,7 @@ void ConfigDialog::reset()
 void ConfigDialog::apply()
 {
     QSettings s;
-    s.setValue("Tracking/SystemDelay", ui->systemDelayBox->value());
+    s.setValue("Tracking/SystemDelayAutoref", ui->systemDelayBox->value());
 
     s.setValue("Amun/VisionPort", ui->visionPort->value());
     s.setValue("Amun/EnableRefboxControl", ui->refboxControlUse->isChecked());
