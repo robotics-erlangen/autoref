@@ -36,6 +36,7 @@ typedef struct { const double x, y; } VectorReadOnly;
 -- avoid global lookups
 local abs, atan2, cos, sin, sqrt = math.abs, math.atan2, math.cos, math.sin, math.sqrt
 local format = string.format
+local geom = nil
 
 local vector_c -- ffi constructor
 local vector_c_readonly -- ffi readonly constructor
@@ -52,6 +53,10 @@ local mt = {
   __tostring = function(a) return format("(%.4f, %.4f)", a.x, a.y) end,
   __index = vector_mt,
 }
+
+function vector_mt:isReadonly()
+	return ffi.istype(vector_c_readonly, self)
+end
 
 --- Creates a copy of the current vector.
 -- Doesn't copy read-only flag
@@ -147,7 +152,9 @@ end
 -- @param other Vector
 -- @return number - angle in interval [-pi, +pi]
 function vector_mt:angleDiff(other)
-	local geom = require "../base/geom"
+	if self:lengthSq() == 0 or other:lengthSq() == 0 then
+		return 0
+	end
 	return geom.getAngleDiff(self:angle(), other:angle())
 end
 
@@ -155,10 +162,12 @@ end
 -- @param other Vector
 -- @return number - absolute angle in interval [0, +pi]
 function vector_mt:absoluteAngleDiff(other)
-	if self:length() == 0 or other:length() == 0 then
+	local selfLength = self:lengthSq()
+	local otherLength = other:lengthSq()
+	if selfLength == 0 or otherLength == 0 then
 		return 0
 	end
-	return math.acos(math.bound(-1, self:dot(other) / (self:length() * other:length()), 1))
+	return math.acos(math.bound(-1, self:dot(other) / (sqrt(selfLength) * sqrt(otherLength)), 1))
 end
 
 --- Perpendicular to current vector.
@@ -168,7 +177,7 @@ end
 -- @name Vector:perpendicular
 -- @return Vector - perpendicular
 function vector_mt:perpendicular()
-	-- rotate by 90 degree ccw
+	-- rotate by 90 degree cw
 	return vector_c(self.y, -self.x)
 end
 
@@ -191,7 +200,6 @@ end
 -- @return Vector - projected point
 -- @return number - distance to line
 function vector_mt:orthogonalProjection(linePoint1, linePoint2)
-	local geom = require "../base/geom"
 	local rv = linePoint2 - linePoint1
 	local is, dist = geom.intersectLineLine(self, rv:perpendicular(), linePoint1, rv)
 	if is then
@@ -289,6 +297,10 @@ end
 -- @return Vector
 function Vector.fromAngle(angle)
 	return vector_c(cos(angle), sin(angle))
+end
+
+function Vector._loadGeom()
+	geom = require "../base/geom"
 end
 
 local vector_class_mt = {

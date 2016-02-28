@@ -24,9 +24,11 @@ module "Referee"
 *************************************************************************]]
 
 local Referee = {}
-local World = require "../base/world"
-local vis = require "../base/vis"
+
 local robotRadius = (require "../base/constants").maxRobotRadius -- avoid table lookups for speed reasons
+local vis = require "../base/vis"
+local World = require "../base/world"
+
 
 -- states, in which we must keep a dist of 50cm
 local stopStates = {
@@ -34,7 +36,9 @@ local stopStates = {
 	KickoffDefensivePrepare = true,
 	KickoffDefensive = true,
 	DirectDefensive = true,
-	IndirectDefensive = true
+	IndirectDefensive = true,
+	BallPlacementDefensive = true,
+	BallPlacementOffensive = true
 }
 
 local friendlyFreeKickStates = {
@@ -54,6 +58,22 @@ local opponentPenaltyStates = {
 	PenaltyDefensive = true
 }
 
+local friendlyPenaltyStates = {
+	PenaltyOffensivePrepare = true,
+	PenaltyOffensive = true
+}
+
+local nonGameStages = {
+	FirstHalfPre = true,
+	HalfTime = true,
+	SecondHalfPre = true,
+	ExtraTimeBreak = true,
+	ExtraFirstHalfPre = true,
+	ExtraHalfTime = true,
+	ExtraSecondHalfPre = true,
+	PenaltyShootoutBreak = true,
+	PostGame = true
+}
 
 --- Check whether the stop rules apply
 -- @name isStopState
@@ -83,6 +103,14 @@ function Referee.isOpponentPenaltyState()
 	return opponentPenaltyStates[World.RefereeState]
 end
 
+function Referee.isFriendlyPenaltyState()
+	return friendlyPenaltyStates[World.RefereeState]
+end
+
+function Referee.isNonGameStage()
+	return nonGameStages[World.GameStage]
+end
+
 local rightLine = World.Geometry.FieldWidthHalf
 local leftLine = -rightLine
 local goalLine = World.Geometry.FieldHeightHalf
@@ -92,7 +120,8 @@ local cornerDist = 0.7 -- some tolerance, rules say 10cm
 -- @return boolean - True if a corner kick in the opponents corner
 function Referee.isOffensiveCornerKick()
 	local ballPos = World.Ball.pos
-	return World.RefereeState == "DirectOffensive"
+	local refState = World.RefereeState
+	return (refState == "DirectOffensive" or refState == "IndirectOffensive")
 		and goalLine - ballPos.y < cornerDist
 		and (leftLine - ballPos.x > -cornerDist or rightLine - ballPos.x < cornerDist)
 end

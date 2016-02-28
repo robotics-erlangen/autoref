@@ -24,7 +24,6 @@ module "math"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-
 local max, min = math.max, math.min
 
 --- Limits value to interval [min, max].
@@ -101,7 +100,12 @@ end
 -- @return [number]]
 function math.solveSq(a, b, c)
 	if a == 0 then
-		return math.solveLin(b, c)
+		-- return math.solveLin(b, c)
+		if b == 0 then
+			return
+		else
+			return -c/b
+		end
 	end
 
 	local det = b*b - 4*a*c
@@ -147,9 +151,9 @@ function math.average(array, indexStart, indexEnd)
 		for i = indexStart, indexEnd do
 			sum = sum + array[i]
 		end
-		n = indexEnd - indexStart
+		n = indexEnd - indexStart + 1
 	else
-		for _, v in pairs(array) do
+		for _, v in ipairs(array) do
 			sum = sum + v
 		end
 		n = #array

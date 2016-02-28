@@ -23,13 +23,14 @@ module "Robot"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local debug = require "../base/debug"
-local Coordinates = require "../base/coordinates"
-local Trajectory = require "../base/trajectory"
-local Constants = require "../base/constants"
-local amun = amun
-
 local Robot, RobotMt = (require "../base/class")("Robot")
+
+local amun = amun
+local Constants = require "../base/constants"
+local Coordinates = require "../base/coordinates"
+local debug = require "../base/debug"
+local Trajectory = require "../base/trajectory"
+
 
 --- Values provided by a robot object.
 --- Fields marked with * are only available for own robots
@@ -37,7 +38,7 @@ local Robot, RobotMt = (require "../base/class")("Robot")
 -- @name Robot
 -- @field constants table - robot specific constants *(empty for opponents)
 -- @field id number - robot id
--- @field generation number - robot generation *
+-- @field generation number - robot generation (-1 for unknown robots)
 -- @field year number - year robot was built in *
 -- @field pos Vector - current position
 -- @field dir number - current direction faced
@@ -47,16 +48,16 @@ local Robot, RobotMt = (require "../base/class")("Robot")
 -- @field isVisible bool - True if robot is tracked
 -- @field radius number - the robot's radius (defaults to 0.09m)
 -- @field height number - the robot's height *
--- @field shootRadius number *
--- @field dribblerWidth number - Width of the dribbler *
--- @field maxSpeed number - maximum speed *
--- @field maxAngularSpeed number - maximum angular speed *
+-- @field shootRadius number
+-- @field dribblerWidth number - Width of the dribbler
+-- @field maxSpeed number - maximum speed
+-- @field maxAngularSpeed number - maximum angular speed
 -- @field lastResponseTime number - strategy time when the last radio response was handled *
 -- @field radioResponse table - response from the robot, only set if there is a current response *
 -- @field userControl table - command from input devices (fields: speed, omega, kickStyle, kickPower, dribblerSpeed) *
 Robot.constants = {
 	hasBallDistance = 0.04, -- 4 cm, robots where the balls distance to the dribbler is less than 2cm are considered to have the ball [m]
-	passSpeed = 1.5, -- speed with which the ball should arrive at the pass target  [m/s]
+	passSpeed = 3.0, -- speed with which the ball should arrive at the pass target  [m/s]
 	shootDriveSpeed = 0.2, -- how fast the shoot task drives at the ball [m/s]
 	minAngleError = 4/180 * math.pi -- minimal angular precision that the shoot task guarantees [in radians]
 }
@@ -75,8 +76,16 @@ function Robot:init(data, isYellow, geometry)
 		self.shootRadius = math.sqrt(self.radius^2 - (self.dribblerWidth/2)^2)
 		self.generation = -1
 		self.id = data
-		self.maxSpeed = 1 -- Init max speed and acceleration for opponents
-		self.maxAcceleration = 1
+		self.maxSpeed = 2 -- Init max speed and acceleration for opponents
+		self.maxAngularSpeed = 4
+
+		self.acceleration = {}
+		self.acceleration.aSpeedupFMax = 2
+		self.acceleration.aSpeedupSMax = 2
+		self.acceleration.aSpeedupPhiMax = 20
+		self.acceleration.aBrakeFMax = 3
+		self.acceleration.aBrakeSMax = 3
+		self.acceleration.aBrakePhiMax = 20
 	end
 	self.lostSince = 0
 	self.lastResponseTime = 0
@@ -87,6 +96,7 @@ function Robot:init(data, isYellow, geometry)
 	self._controllerInput = nil
 	self._kickStyle = nil
 	self._kickPower = nil
+	self._forceKick = false
 	self._dribblerSpeed = nil
 	self._standbyTimer = nil
 	self._standby = nil
@@ -155,7 +165,9 @@ function Robot:_updateUserControl(command)
 	local omega = command.omega
 	if command.direct then
 		-- correctly align local and strategy coordinate system
-		v = v:rotate(self.dir - math.pi/2)
+		-- self.dir can be nil if robot was not yet visible
+		local dir = self.dir or 0
+		v = v:rotate(dir - math.pi/2)
 	else
 		-- global to strategy coordinate mapping
 		v = Coordinates.toLocal(v)
@@ -182,29 +194,18 @@ function Robot:_setSpecs(specs)
 	else -- estimate dribbler width
 		self.dribblerWidth = 2 * math.sqrt(self.radius^2 - self.shootRadius^2)
 	end
-	if specs.v_max then
-		self.maxSpeed = specs.v_max
-	end
-	if specs.omega_max then
-		self.maxAngularSpeed = specs.omega_max
-	end
-	if specs.shot_linear_max then
-		self.maxShotLinear = specs.shot_linear_max
-	end
-	if specs.shot_chip_max then
-		self.maxShotChip = specs.shot_chip_max
-	end
-	if specs.acceleration then
-		self.acceleration = {}
-		self.acceleration.aSpeedupFMax = specs.acceleration.a_speedup_f_max or 1.0
-		self.acceleration.aSpeedupSMax = specs.acceleration.a_speedup_s_max or 1.0
-		self.acceleration.aSpeedupPhiMax = specs.acceleration.a_speedup_phi_max or 1.0
-		self.acceleration.aBrakeFMax = specs.acceleration.a_brake_f_max or 1.0
-		self.acceleration.aBrakeSMax = specs.acceleration.a_brake_s_max or 1.0
-		self.acceleration.aBrakePhiMax = specs.acceleration.a_brake_phi_max or 1.0
-
-		self.maxAcceleration = specs.acceleration.a_speedup_f_max or 1.0
-	end
+	self.maxSpeed = specs.v_max or 2
+	self.maxAngularSpeed = specs.omega_max or 5
+	self.maxShotLinear = specs.shot_linear_max or 8
+	self.maxShotChip = specs.shot_chip_max or 3
+	self.acceleration = {}
+	local accelData = specs.acceleration or {}
+	self.acceleration.aSpeedupFMax = accelData.a_speedup_f_max or 1.0
+	self.acceleration.aSpeedupSMax = accelData.a_speedup_s_max or 1.0
+	self.acceleration.aSpeedupPhiMax = accelData.a_speedup_phi_max or 1.0
+	self.acceleration.aBrakeFMax = accelData.a_brake_f_max or 1.0
+	self.acceleration.aBrakeSMax = accelData.a_brake_s_max or 1.0
+	self.acceleration.aBrakePhiMax = accelData.a_brake_phi_max or 1.0
 end
 
 function Robot:_setCommand()
@@ -212,8 +213,10 @@ function Robot:_setCommand()
 		controller = self._controllerInput,
 		v_f = self._controllerInput and self._controllerInput.v_f,
 		v_s = self._controllerInput and self._controllerInput.v_s,
+		omega = self._controllerInput and self._controllerInput.omega,
 		kick_style = self._kickStyle,
 		kick_power = self._kickPower,
+		force_kick = self._forceKick,
 		dribbler = self._dribblerSpeed,
 		standby = self._standby
 	})
@@ -234,6 +237,7 @@ end
 function Robot:shootDisable()
 	self._kickStyle = nil
 	self._kickPower = nil
+	self._forceKick = false
 end
 
 --- Enable linear kick.
@@ -250,6 +254,11 @@ end
 function Robot:shootChip(power)
 	self._kickStyle = "Chip"
 	self._kickPower = power
+end
+
+--- Force the robot to shoot even if the IR isn't triggered
+function Robot:forceShoot()
+	self._forceKick = true
 end
 
 --- Enable dribbler
@@ -347,10 +356,12 @@ end
 
 --- Shoot function wrapper.
 -- Calls Robot:_shoot with distance adapted speed
--- @param destSpeed number - Ball speed at destination [m/s]
--- @param distance number - Distance to shoot [m]
-function Robot:shoot(destSpeed, distance)
-	local speed = self:calculateShootSpeed(destSpeed, distance)
+-- @param speed number - Shoot speed destination [m/s]
+-- @param ignoreLimit bool - Don't enforce shoot speed limit, if true
+function Robot:shoot(speed, ignoreLimit)
+	if not ignoreLimit then
+		speed = math.min(Constants.maxBallSpeed, speed)
+	end
 	self:_shoot(speed)
 end
 
@@ -360,16 +371,6 @@ function Robot:_shoot(speed)
 	log("Error: no implementation for function shoot for robot generation "..self.generation)
 end
 
---- Ball position relative to dribbler mid
--- @param ball Ball - ball object to check
--- @return Vector
-function Robot:posToBall(ball)
-	local relpos = (ball.pos - self.pos):rotate(-self.dir)
-	relpos.x = relpos.x - self.shootRadius - ball.radius
-	debug.set("relpos", relpos)
-	return relpos
-end
-
 --- Check whether the robot has the given ball.
 -- Checks whether the ball is in rectangle in front of the dribbler with hasBallDistance depth. Uses hysteresis for the left and right side of that rectangle
 -- @param ball Ball - ball object to check
@@ -377,7 +378,44 @@ end
 -- @return boolean - has ball
 function Robot:hasBall(ball, sideOffset)
 	sideOffset = sideOffset or 0
-	local relpos = self:posToBall(ball)
+
+	-- handle sidewards balls
+	local latencyCompensation = (ball.speed - self.speed):scaleLength(Constants.systemLatency)
+	-- interpolate vector used for correction to circumvent noise
+	local MIN_COMPENSATION = 0.005
+	local BOUND_COMPENSATION_ANGLE = 70/180*math.pi
+	local lclen = latencyCompensation:length()
+	if lclen < MIN_COMPENSATION then
+		latencyCompensation = Vector(0, 0)
+	elseif lclen < 2*MIN_COMPENSATION then
+		local scale = (lclen - MIN_COMPENSATION) / MIN_COMPENSATION
+		latencyCompensation:scaleLength(scale)
+	end
+	-- local coordinate system
+	latencyCompensation = latencyCompensation:rotate(-self.dir)
+	-- let the vector point away from the robot
+	if latencyCompensation.x < 0 then
+		latencyCompensation:scaleLength(-1)
+	end
+	-- bound angle
+	lclen = latencyCompensation:length()
+	if lclen > 0.001 and math.abs(latencyCompensation:angle()) > BOUND_COMPENSATION_ANGLE then
+		local boundAngle = math.bound(-BOUND_COMPENSATION_ANGLE, latencyCompensation:angle(), BOUND_COMPENSATION_ANGLE)
+		latencyCompensation = Vector.fromAngle(boundAngle):scaleLength(lclen)
+	end
+
+	-- add hasBallDistance
+	if lclen <= 0.001 then
+		latencyCompensation = Vector(self.constants.hasBallDistance, 0)
+	else
+		latencyCompensation = latencyCompensation:setLength(lclen + self.constants.hasBallDistance)
+	end
+
+	-- Ball position relative to dribbler mid
+	local relpos = (ball.pos - self.pos):rotate(-self.dir)
+	relpos.x = relpos.x - self.shootRadius - ball.radius
+
+	-- only apply sidewards correction is the ball is in front of the robot
 	local offset = math.abs(relpos.y)
 	-- if too far to the sides
 	if offset > self.dribblerWidth / 2 + sideOffset then

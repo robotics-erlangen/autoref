@@ -24,10 +24,10 @@ module "World"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Ball = require "../base/ball"
-local Robot = require "../base/robot"
 local amun = amun
+local Ball = require "../base/ball"
 local Constants = require "../base/constants"
+local Robot = require "../base/robot"
 
 --- Ball and team informations.
 -- @class table
@@ -74,6 +74,7 @@ World.Robots = {}
 World.TeamIsBlue = false
 World.IsSimulated = false
 World.IsLargeField = false
+World.SelectedOptions = nil
 
 World.Geometry = {}
 --- Field geometry.
@@ -121,6 +122,9 @@ end
 -- @name update
 -- @return bool - false if no vision data was received since strategy start
 function World.update()
+	if World.SelectedOptions == nil then
+		World.SelectedOptions = amun.getSelectedOptions()
+	end
 	local hasVisionData = World._updateWorld(amun.getWorldState())
 	World._updateGameState(amun.getGameState())
 	World._updateUserInput(amun.getUserInput())
@@ -175,7 +179,7 @@ function World._updateGeometry(geom)
 	wgeom.BoundaryWidth = geom.boundary_width
 	wgeom.RefereeWidth = geom.referee_width
 
-	wgeom.IsLargeField = wgeom.FieldWidth > 5 and wgeom.FieldHeight > 7
+	World.IsLargeField = wgeom.FieldWidth > 5 and wgeom.FieldHeight > 7
 end
 
 function World._updateWorld(state)
@@ -203,14 +207,14 @@ function World._updateWorld(state)
 	if dataFriendly then
 		-- sort data by robot id
 		local dataById = {}
-		for _,rdata in pairs(dataFriendly) do
+		for _,rdata in ipairs(dataFriendly) do
 			dataById[rdata.id] = rdata
 		end
 
 		-- Update data of every own robot
 		World.YellowRobots = {}
 		World.YellowInvisibleRobots = {}
-		for id, robot in pairs(World.YellowRobotsById) do
+		for _, robot in pairs(World.YellowRobotsById) do
 			-- get responses for the current robot
 			-- these are identified by the robot generation and id
 			local robotResponses = {}
@@ -221,7 +225,7 @@ function World._updateWorld(state)
 				end
 			end
 
-			robot:_update(dataById[id], World.Time, robotResponses)
+			robot:_update(dataById[robot.id], World.Time, robotResponses)
 			-- sort robot into visible / not visible
 			if robot.isVisible then
 				table.insert(World.YellowRobots, robot)
@@ -239,7 +243,7 @@ function World._updateWorld(state)
 		World.BlueRobotsById = {}
 		-- just update every opponent robot
 		-- robots that are invisible for more than one second are dropped by amun
-		for _,rdata in pairs(dataOpponent) do
+		for _,rdata in ipairs(dataOpponent) do
 			local robot = opponentRobotsById[rdata.id]
 			opponentRobotsById[rdata.id] = nil
 			if not robot then
@@ -300,7 +304,7 @@ function World._updateGameState(state)
 	if state.designated_position and state.designated_position.x and
 			(not World.BallPlacementPos or World.BallPlacementPos.y ~= state.designated_position.y
 			or World.BallPlacementPos.x ~= state.designated_position.x) then
-		World.BallPlacementPos = Vector(state.designated_position.x, state.designated_position.y)
+		World.BallPlacementPos = Vector.createReadOnly(state.designated_position.x, state.designated_position.y)
 	end
 
 	World.GameStage = World.gameStageMapping[state.stage]

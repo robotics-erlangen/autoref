@@ -24,22 +24,33 @@ module "debug"
 *************************************************************************]]
 
 local debug = {}
-local Class = require "../base/class"
+
 local amun = amun
+local Class = require "../base/class"
+
 
 local debugStack = { "" }
 
-local function joinName(prefix, name)
+local joinCache = {}
+
+local function prefixName(name)
+	local prefix = debugStack[#debugStack]
 	if #prefix == 0 then
 		return name
 	elseif name == nil then
 		return prefix
 	end
-	return prefix .. "/" .. name
-end
 
-local function prefixName(name)
-	return joinName(debugStack[#debugStack], name)
+	-- caching to avoid joining the debug keys over and over
+	if joinCache[prefix] and joinCache[prefix][name] then
+		return joinCache[prefix][name]
+	end
+	local joined = prefix .. "/" .. name
+	if not joinCache[prefix] then
+		joinCache[prefix] = {}
+	end
+	joinCache[prefix][name] = joined
+	return joined
 end
 
 --- Pushes a new key on the debug stack.
@@ -47,8 +58,7 @@ end
 -- @param name string - Name of the new subtree
 -- @param [value string - Value for the subtree header]
 function debug.push(name, value)
-	local current = debugStack[#debugStack]
-	table.insert(debugStack, joinName(current, name))
+	table.insert(debugStack, prefixName(name))
 	if value then
 		debug.set(nil, value)
 	end
@@ -56,9 +66,9 @@ end
 
 --- Pushes a root key on the debug stack.
 -- @name pushtop
--- @param name string - Name of the new root tree
+-- @param name string - Name of the new root tree or nil to push root
 function debug.pushtop(name)
-	table.insert(debugStack, name)
+	table.insert(debugStack, name or "")
 end
 
 --- Pops last key from the debug stack.
@@ -89,11 +99,15 @@ function debug.set(name, value, visited)
 		else
 			debug.push(tostring(name))
 			local class = Class.toClass(value, true)
-			if class then
-				debug.set(nil, Class.name(class))
-			end
+			local hasValues = false
 			for k, v in pairs(value) do
 				debug.set(k, v, visited)
+				hasValues = true
+			end
+			if class then
+				debug.set(nil, Class.name(class))
+			elseif not hasValues then
+				debug.set(nil, "empty table")
 			end
 			debug.pop()
 			return
@@ -107,9 +121,9 @@ end
 --- Clears the debug stack
 -- @name resetStack
 function debug.resetStack()
-	if #debugStack ~= 1 then
+	if #debugStack ~= 1 or debugStack[1] ~= "" then
 		log("Unbalanced push/pop on debug stack")
-		for k,v in pairs(debugStack) do
+		for _,v in ipairs(debugStack) do
 			log(v)
 		end
 	end
