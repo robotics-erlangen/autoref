@@ -24,13 +24,15 @@ module "vis"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Coordinates = require "../base/coordinates"
+local vis = {}
+
 local amun = amun
+local Coordinates = require "../base/coordinates"
+
 
 local gcolor = {}
 local gisFilled = true
 
-local vis = {}
 
 --- Joins rgba-value to a color.
 -- Values from 0 to 255
@@ -182,6 +184,32 @@ function vis.addPolygonRaw(name, points, color, isFilled, background, style)
 		polygon = {point = points},
 		background = background
 	})
+end
+
+--- Paints a Pizza where everything outside of [startAngle, endAngle] is filled
+--- The shape of the pizza is approximated by a regular hexagon
+-- @param name string - Name of the pizza
+-- @param center Vectos - center point of the pizza
+-- @param radius number - radius of the pizza
+-- @param startAngle number - the starting angle of the missing pizza piece
+-- @param endAngle number - the end angle of the missing pizza piece
+local N_corners = 25
+function vis.addPizza(name, center, radius, startAngle, endAngle, color, isFilled, background, style)
+	local points = {center + Vector.fromAngle(startAngle)*radius, center, center + Vector.fromAngle(endAngle)*radius}
+	if (startAngle - endAngle)%(2*math.pi) < 2*math.pi/N_corners then
+		vis.addPolygon(name, points, color, isFilled, background, style)
+	else
+		local wStart = math.ceil(N_corners*endAngle/(2*math.pi))
+		local wEnd = math.floor(N_corners*startAngle/(2*math.pi))
+		if wEnd < wStart then
+			wEnd = wEnd + N_corners
+		end
+		for w = wStart, wEnd do
+			local angle = w*math.pi*2/N_corners
+			table.insert(points, center + Vector.fromAngle(angle)*radius)
+		end
+		vis.addPolygon(name, points, color, isFilled, background, style)
+	end
 end
 
 --- Adds a path.

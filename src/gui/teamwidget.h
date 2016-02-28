@@ -35,7 +35,7 @@ class TeamWidget : public QFrame
 
 public:
     explicit TeamWidget(QWidget *parent = 0);
-    ~TeamWidget();
+    ~TeamWidget() override;
 
 signals:
     void sendCommand(const Command &command);
@@ -76,7 +76,6 @@ private:
     QString m_entryPoint;
     QAction *m_actionDisable;
     QAction *m_reloadAction;
-    QAction *m_debugAction;
     bool m_userAutoReload;
     bool m_notification;
     QStringList m_recentScripts;

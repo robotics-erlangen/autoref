@@ -88,10 +88,6 @@ void TeamWidget::init()
     m_reloadAction->setCheckable(true);
     connect(m_reloadAction, SIGNAL(toggled(bool)), SLOT(sendAutoReload()));
 
-    m_debugAction = reload_menu->addAction("Enable debugging");
-    m_debugAction->setCheckable(true);
-    connect(m_debugAction, SIGNAL(toggled(bool)), SLOT(sendEnableDebug(bool)));
-
     m_btnReload = new QToolButton;
     m_btnReload->setToolTip("Reload script");
     m_btnReload->setIcon(QIcon("icon:32/view-refresh.png"));
@@ -114,9 +110,8 @@ void TeamWidget::load()
     m_filename = s.value("Script").toString();
     m_entryPoint = s.value("EntryPoint").toString();
     m_reloadAction->setChecked(s.value("AutoReload").toBool());
-    m_debugAction->setDisabled(true);
-    m_debugAction->setChecked(true);
     s.endGroup();
+    sendEnableDebug(true);
 
     if (QFileInfo(m_filename).exists()) {
         selectEntryPoint(m_entryPoint);
@@ -262,8 +257,9 @@ QString TeamWidget::shortenEntrypointName(const QMenu *menu, const QString &name
 void TeamWidget::showOpenDialog()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open script", QString(), QString("Lua scripts (*.lua)"), 0, 0);
-    if (filename.isNull())
+    if (filename.isNull()) {
         return;
+    }
 
     open(filename);
 }
@@ -271,8 +267,9 @@ void TeamWidget::showOpenDialog()
 void TeamWidget::open()
 {
     QString filename = sender()->property("filename").toString();
-    if (filename.isNull())
+    if (filename.isNull()) {
         return;
+    }
 
     open(filename);
 }
@@ -313,8 +310,9 @@ void TeamWidget::prepareScriptMenu()
         m_scriptMenu->removeAction(m_scriptMenu->actions().last());
     }
 
-    if (m_recentScripts.isEmpty())
+    if (m_recentScripts.isEmpty()) {
         return;
+    }
 
     // add seperator and filenames
     m_scriptMenu->addSeparator();

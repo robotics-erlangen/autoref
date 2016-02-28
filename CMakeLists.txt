@@ -27,12 +27,24 @@ endif()
 if(POLICY CMP0043) # compatibility with CMake 3.0.1
     cmake_policy(SET CMP0043 OLD)
 endif()
+if(POLICY CMP0058)
+    cmake_policy(SET CMP0058 NEW)
+endif()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++11")
 
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting build type to Release")
     set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+if(APPLE)
+    # the option "S" prevents execution of ranlib
+    SET(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> Sqc <TARGET> <LINK_FLAGS> <OBJECTS>")
+    SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Sqc <TARGET> <LINK_FLAGS> <OBJECTS>")
+    # silence ranlib "has no symbols"-warning
+    SET(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols <TARGET>")
+    SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols <TARGET>")
 endif()
 
 find_package(OpenGL)
@@ -51,8 +63,8 @@ find_package(LuaJIT2)
 
 include(ExternalProject)
 ExternalProject_Add(eigen
-    URL http://www.robotics-erlangen.de/downloads/libraries/eigen-3.1.4.tar.bz2
-    URL_MD5 15a7914c3768d51a3637fb3d64556a28
+    URL http://www.robotics-erlangen.de/downloads/libraries/eigen-eigen-c58038c56923.tar.bz2
+    URL_MD5 87274966745d2d3e7964fcc654d0a24b
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 )

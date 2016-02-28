@@ -7,10 +7,13 @@ local Field = require "../base/field"
 
 local BALL_PLACEMENT_TIMEOUT = 15
 local BALL_PLACEMENT_RADIUS = 0.1
-local TEAM_CAPABLE_OF_PLACEMENT = {
-    [World.YellowColorStr] = true,
-    [World.BlueColorStr] = true
-}
+local TEAM_CAPABLE_OF_PLACEMENT = {}
+function BallPlacement.setYellowTeamCapable()
+    TEAM_CAPABLE_OF_PLACEMENT[World.YellowColorStr] = true
+end
+function BallPlacement.setBlueTeamCapable()
+    TEAM_CAPABLE_OF_PLACEMENT[World.BlueColorStr] = true
+end
 local SLOW_BALL = 0.1
 
 -- the 'foul' variable is a rule object,

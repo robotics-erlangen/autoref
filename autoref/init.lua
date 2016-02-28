@@ -29,20 +29,28 @@ local BallOwner = require "../base/ballowner"
 World = require "../base/world"
 local ballPlacement = require "ballplacement"
 
-local fouls = {
-    require "collision",
-    require "fastshot",
-    require "outoffield",
-    require "multipledefender",
-    require "chooseteamsides",
-    require "dribbling",
-    require "attackerindefensearea",
-    require "stopspeed",
-    require "numberofplayers",
-    require "attackerdefareadist",
-    require "freekickdistance",
-    require "doubletouch"
+local descriptionToFileNames = {
+    ["Robot collisions"] = "collision",
+    ["Shots over 8m/s"] = "fastshot",
+    ["Ball out of field"] = "outoffield",
+    ["Multiple Defender"] = "multipledefender",
+    ["Dribbling over 1m"] = "dribbling",
+    ["Attacker in defense area"] = "attackerindefensearea",
+    ["Robot speed during Stop"] = "stopspeed",
+    ["Number of players on the field"] = "numberofplayers",
+    ["Attacker distance to defense area"] = "attackerdefareadist",
+    ["Distance during free kicks"] = "freekickdistance",
+    ["Double touch after free kick"] = "doubletouch",
 }
+local optionnames = {
+    " Yellow team can place ball",
+    " Blue team can place ball"
+}
+for description, _ in pairs(descriptionToFileNames) do
+    table.insert(optionnames, description)
+end
+
+local fouls = nil
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
@@ -69,6 +77,18 @@ local function main()
         ballPlacement.run()
     end
     sendCardIfPending()
+    if fouls == nil then
+        fouls = { require("chooseteamsides") }
+        for _, option in ipairs(World.SelectedOptions) do
+            if option == " Yellow team can place ball" then
+                ballPlacement.setYellowTeamCapable()
+            elseif option == " Blue team can place ball" then
+                ballPlacement.setBlueTeamCapable()
+            elseif descriptionToFileNames[option] then
+                table.insert(fouls, require(descriptionToFileNames[option]))
+            end
+        end
+    end
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter
         -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
@@ -110,4 +130,5 @@ Entrypoints.add("main", function()
     BallOwner.lastRobot()
 end)
 
-return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper)}
+return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper),
+        options = optionnames}
