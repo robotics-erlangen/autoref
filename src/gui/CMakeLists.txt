@@ -43,8 +43,12 @@ set(SOURCES
     ../framework/src/ra/debugtreewidget.h
     ../framework/src/ra/fieldwidget.cpp
     ../framework/src/ra/fieldwidget.h
+    ../framework/src/ra/guitimer.cpp
+    ../framework/src/ra/guitimer.h
     ../framework/src/ra/logwidget.cpp
     ../framework/src/ra/logwidget.h
+    ../framework/src/ra/optionswidget.cpp
+    ../framework/src/ra/optionswidget.h
     ../framework/src/ra/refereestatuswidget.cpp
     ../framework/src/ra/refereestatuswidget.h
     ../framework/src/ra/timingwidget.cpp
@@ -65,6 +69,7 @@ set(UI_SOURCES
     configdialog.ui
     mainwindow.ui
     ballspeedplotter.ui
+    ../framework/src/ra/optionswidget.ui
     ../framework/src/ra/refereestatuswidget.ui
     ../framework/src/ra/timingwidget.ui
     ../framework/src/ra/visualizationwidget.ui

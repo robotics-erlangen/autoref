@@ -29,6 +29,7 @@
 
 class LeafFilterProxyModel;
 class Plot;
+class GuiTimer;
 namespace Ui {
     class BallSpeedPlotter;
 }
@@ -39,7 +40,7 @@ class BallSpeedPlotter : public QWidget
 
 public:
     explicit BallSpeedPlotter(QWidget *parent);
-    ~BallSpeedPlotter();
+    ~BallSpeedPlotter() override;
 
 public slots:
     void handleStatus(const Status &status);
@@ -59,6 +60,7 @@ private:
     void addPoint(const std::string &name, const QString &parent, float time, float value, QVector<QStandardItem *> &childLookup, int descriptorIndex);
     void tryAddLength(const std::string &name, const QString &parent, float time, float value1, float value2, QVector<QStandardItem *> &childLookup, int descriptorIndex);
 
+private:
     enum ItemRole {
         FullNameRole = Qt::UserRole + 2
     };
@@ -68,6 +70,7 @@ private:
     qint64 m_time;
     double m_timeLimit;
     bool m_freeze;
+    GuiTimer *m_guiTimer;
     QHash<QString, QStandardItem*> m_items;
     QHash<QString, QVector<QStandardItem *>> m_itemLookup;
     QHash<QStandardItem*, Plot*> m_plots;

@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_configDialog = new ConfigDialog(this);
     connect(m_configDialog, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
 
+    connect(ui->options, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
+
     // setup visualization only parts of the ui
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));
 
@@ -89,6 +91,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(gotStatus(Status)), m_refereeStatus, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->log, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->autoref, SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotStatus(Status)), ui->options, SLOT(handleStatus(Status)));
 
     // start amun
     connect(&m_amun, SIGNAL(gotStatus(Status)), SLOT(handleStatus(Status)));

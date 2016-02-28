@@ -21,11 +21,11 @@
 #include "leaffilterproxymodel.h"
 #include "ballspeedplotter.h"
 #include "plot.h"
+#include "../guitimer.h"
 #include "ui_ballspeedplotter.h"
 #include "google/protobuf/descriptor.h"
 #include "protobuf/status.pb.h"
 #include <cmath>
-#include <QTimer>
 #include <QStringBuilder>
 #include <unordered_map>
 
@@ -43,7 +43,7 @@ BallSpeedPlotter::BallSpeedPlotter(QWidget *parent) :
     m_proxy->setSourceModel(&m_model);
 
     // root items in the plotter
-    addRootItem("Ball", "Ball");
+    addRootItem(QStringLiteral("Ball"), QStringLiteral("Ball"));
 
     // connect freeze
     connect(ui->btnFreeze, SIGNAL(toggled(bool)), this, SLOT(setFreeze(bool)));
@@ -52,9 +52,8 @@ BallSpeedPlotter::BallSpeedPlotter(QWidget *parent) :
     connect(this, SIGNAL(addPlot(const Plot*)), ui->widget, SLOT(addPlot(const Plot*)));
 
     // setup invalidate timer
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(invalidatePlots()));
-    timer->start(1000);
+    m_guiTimer = new GuiTimer(1000, this);
+    connect(m_guiTimer, &GuiTimer::timeout, this, &BallSpeedPlotter::invalidatePlots);
 
     m_timeLimit = 120;
     ui->widget->setYMin(0);
@@ -104,13 +103,17 @@ void BallSpeedPlotter::setFreeze(bool freeze)
 void BallSpeedPlotter::handleStatus(const Status &status)
 {
     // don't consume cpu while closed
-    if (!isVisible())
+    if (!isVisible()) {
         return;
+    }
+
+    m_guiTimer->requestTriggering();
 
     m_time = status->time();
     // normalize time to be able to store it in floats
-    if (m_startTime == 0)
+    if (m_startTime == 0) {
         m_startTime = status->time();
+    }
 
     const float time = (status->time() - m_startTime) / 1E9;
 
@@ -120,7 +123,7 @@ void BallSpeedPlotter::handleStatus(const Status &status)
         float time = (worldState.time() - m_startTime) / 1E9;
 
         if (worldState.has_ball()) {
-            parseMessage(worldState.ball(), "Ball", time);
+            parseMessage(worldState.ball(), QStringLiteral("Ball"), time);
         }
     }
 
@@ -156,8 +159,9 @@ QStandardItem* BallSpeedPlotter::getItem(const QString &name)
 
 void BallSpeedPlotter::invalidatePlots()
 {
-    if (!isVisible()) // values are'nt update while hidden
+    if (!isVisible()) { // values aren't update while hidden
         return;
+    }
 
     const float time = (m_time - m_startTime) / 1E9;
 
@@ -272,15 +276,13 @@ void BallSpeedPlotter::tryAddLength(const std::string &name, const QString &pare
     }
 }
 
-static const QString qstringDot(".");
-
 void BallSpeedPlotter::addPoint(const std::string &name, const QString &parent, float time, float value,
                        QVector<QStandardItem *> &childLookup, int descriptorIndex)
 {
     QStandardItem *item;
     if (childLookup.isEmpty() || childLookup[descriptorIndex] == nullptr) {
         // full name for item retrieval
-        const QString fullName = parent % qstringDot % QString::fromStdString(name);
+        const QString fullName = parent % QStringLiteral(".") % QString::fromStdString(name);
         item = getItem(fullName);
         if (!childLookup.isEmpty()) {
             childLookup[descriptorIndex] = item;
@@ -294,7 +296,7 @@ void BallSpeedPlotter::addPoint(const std::string &name, const QString &parent, 
     Plot *plot = plots.value(item, nullptr);
 
     if (plot == nullptr) { // create new plot
-        const QString fullName = parent % qstringDot % QString::fromStdString(name);
+        const QString fullName = parent % QStringLiteral(".") % QString::fromStdString(name);
         plot = new Plot(fullName, this);
         item->setCheckable(true);
         if (m_selection.contains(fullName)) {
