@@ -29,20 +29,21 @@ local BallOwner = require "../base/ballowner"
 World = require "../base/world"
 local ballPlacement = require "ballplacement"
 
-local fouls = {
-    require "collision",
-    require "fastshot",
-    require "outoffield",
-    require "multipledefender",
-    require "chooseteamsides",
-    require "dribbling",
-    require "attackerindefensearea",
-    require "stopspeed",
-    require "numberofplayers",
-    require "attackerdefareadist",
-    require "freekickdistance",
-    require "doubletouch"
+local foulnames = {
+    "collision",
+    "fastshot",
+    "outoffield",
+    "multipledefender",
+    "chooseteamsides",
+    "dribbling",
+    "attackerindefensearea",
+    "stopspeed",
+    "numberofplayers",
+    "attackerdefareadist",
+    "freekickdistance",
+    "doubletouch"
 }
+local fouls = nil
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
@@ -69,6 +70,13 @@ local function main()
         ballPlacement.run()
     end
     sendCardIfPending()
+    if fouls == nil then
+        fouls = {}
+        for _, option in ipairs(World.SelectedOptions) do
+            table.insert(fouls, require(option))
+            -- log("enabled " .. option)
+        end
+    end
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter
         -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
@@ -110,4 +118,5 @@ Entrypoints.add("main", function()
     BallOwner.lastRobot()
 end)
 
-return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper)}
+return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper),
+        options = foulnames}
