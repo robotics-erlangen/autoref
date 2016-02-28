@@ -5,7 +5,7 @@ Follow the instructions in [COMPILE.md](COMPILE.md). Building the framework
 separately is **not** neccesary!
 
 ## Usage
-In order to use the Autoref, run the previously built `autoref`.
+In order to use the Autoref, run the previously built binary `autoref`.
 
 The program receives the Protobuf data via network from SSL-Vision and the
 Refbox.

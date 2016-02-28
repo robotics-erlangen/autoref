@@ -25,12 +25,15 @@ local Field = require "../base/field"
 local debug = require "../base/debug"
 local vis = require "../base/vis"
 
+local OUT_OF_FIELD_MIN_TIME = 0.1
+
 OutOfField.possibleRefStates = {
     Game = true
 }
 
 local outOfFieldEvent -- for print messages only
 local wasInFieldBefore = false
+local outOfFieldTime = math.huge
 function OutOfField.occuring()
     local ballPos = World.Ball.pos
 
@@ -45,7 +48,11 @@ function OutOfField.occuring()
     if Field.isInField(ballPos, World.Ball.radius) then
         wasInFieldBefore = true
     elseif wasInFieldBefore and lastRobot then -- we detected the ball going out of field
+        -- delay decision to increase certainty, because the tracking is not always reliable
+        outOfFieldTime = World.Time
         wasInFieldBefore = false -- reset
+    elseif World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME and lastRobot then
+        outOfFieldTime = math.huge -- reset
 
         OutOfField.executingTeam = World.YellowColorStr
         if Referee.teamWhichTouchedBallLast() == World.YellowColorStr then
@@ -73,7 +80,8 @@ function OutOfField.occuring()
                 and lastPos.y * ballPos.y < 0 -- last touch was on other side of field
 
             if math.abs(ballPos.x) < World.Geometry.GoalWidth/2 then
-                log("(probably) goal!")
+                local team = ballPos.y>0 and World.YellowColorStr or World.BlueColorStr
+                log("(probably) <b>goal</b> for " .. team .. "!")
                 return false
             elseif icing then
                 OutOfField.executingTeam = lastRobot.isYellow and World.BlueColorStr or World.YellowColorStr
