@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "robotselectionwidget.h"
+#include "ballspeedplotter.h"
 #include "configdialog.h"
 #include "mainwindow.h"
 #include "refereestatuswidget.h"
@@ -77,6 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->log->hideLogToggles();
 
+    m_plotter = new BallSpeedPlotter();
+    m_plotter->show();
+
     // connect the menu actions
     connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
@@ -84,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // setup data distribution
     connect(this, SIGNAL(gotStatus(Status)), ui->field, SLOT(handleStatus(Status)));
-    connect(this, SIGNAL(gotStatus(Status)), ui->plotter, SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotStatus(Status)), m_plotter, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->visualization, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->debugTree, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->timing, SLOT(handleStatus(Status)));
@@ -130,7 +134,17 @@ MainWindow::~MainWindow()
         delete m_logFileThread;
     }
     delete m_logFile;
+    delete m_plotter;
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    // make sure the plotter is closed along with the mainwindow
+    // this also ensure that a closeEvent is triggered
+    m_plotter->close();
+
+    QMainWindow::closeEvent(e);
 }
 
 void MainWindow::handleStatus(const Status &status)

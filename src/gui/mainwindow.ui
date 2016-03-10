@@ -32,7 +32,6 @@
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
        </widget>
-       <widget class="BallSpeedPlotter" name="plotter" native="true"/>
       </widget>
       <widget class="QSplitter" name="splitterBottom">
        <property name="orientation">
@@ -197,9 +196,9 @@
    <header>ra/debugtreewidget.h</header>
   </customwidget>
   <customwidget>
-   <class>BallSpeedPlotter</class>
+   <class>OptionsWidget</class>
    <extends>QWidget</extends>
-   <header>ballspeedplotter.h</header>
+   <header>optionswidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

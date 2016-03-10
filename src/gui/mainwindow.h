@@ -26,6 +26,7 @@
 #include <QMainWindow>
 #include <QSet>
 
+class BallSpeedPlotter;
 class ConfigDialog;
 class LogFileWriter;
 class RefereeStatusWidget;
@@ -47,6 +48,9 @@ public:
 signals:
     void gotStatus(const Status &status);
 
+protected:
+    void closeEvent(QCloseEvent *e) override;
+
 private slots:
     void handleStatus(const Status &status);
     void sendCommand(const Command &command);
@@ -59,6 +63,7 @@ private:
 
 private:
     Ui::MainWindow *ui;
+    BallSpeedPlotter *m_plotter;
     AmunClient m_amun;
     RefereeStatusWidget *m_refereeStatus;
     ConfigDialog *m_configDialog;
