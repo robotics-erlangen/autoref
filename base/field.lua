@@ -223,7 +223,7 @@ function Field.limitToFreekickPosition(pos, executingTeam)
 	local ballSide = pos.y > 0 and "Blue" or "Yellow"
 	local attackColor = executingTeam == World.BlueColorStr and "Blue" or "Yellow"
 
-	if Field["isIn"..ballSide.."DefenseArea"](pos) then
+	if Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) <= World.Geometry.DefenseRadius+0.2 then
 		-- closest point 600mm from the goal line and 100mm from the touch line
 		pos = Vector(
 			math.sign(pos.x) * World.Geometry.FieldWidthHalf - math.sign(pos.x)*0.1,
