@@ -80,6 +80,7 @@
      <string>Configuration</string>
     </property>
     <addaction name="actionConfiguration"/>
+    <addaction name="actionShowOptions"/>
    </widget>
    <addaction name="menu_Game"/>
    <addaction name="menuVideo"/>
@@ -158,6 +159,11 @@
   <action name="actionConfiguration">
    <property name="text">
     <string>Configuration</string>
+   </property>
+  </action>
+  <action name="actionShowOptions">
+   <property name="text">
+    <string>Toggle options panel</string>
    </property>
   </action>
  </widget>

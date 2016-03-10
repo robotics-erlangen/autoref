@@ -85,6 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
     connect(ui->actionRecord, SIGNAL(toggled(bool)), SLOT(setRecording(bool)));
+    connect(ui->actionShowOptions, &QAction::triggered, [=]() {
+            ui->dockOptions->setVisible(!ui->dockOptions->isVisible());
+    });
 
     // setup data distribution
     connect(this, SIGNAL(gotStatus(Status)), ui->field, SLOT(handleStatus(Status)));
