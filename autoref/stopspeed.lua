@@ -3,7 +3,8 @@ local StopSpeed = {}
 local ROBOT_SLOW_DOWN_TIME = 2
 
 StopSpeed.possibleRefStates = {
-    Stop = true
+    Stop = true,
+    Ball = true,
 }
 
 local lastCallTime = 0

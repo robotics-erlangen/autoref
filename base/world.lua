@@ -52,7 +52,7 @@ local Robot = require "../base/robot"
 -- KickoffYellowPrepare, KickoffBluePrepare, KickoffYellow, KickoffBlue,
 -- PenaltyYellowPrepare, PenaltyBluePrepare, PenaltyYellow, PenaltyBlue,
 -- DirectYellow, DirectBlue, IndirectYellow, IndirectBlue,
--- TimeoutOffensive, TimeoutDefensive
+-- TimeoutBlue, TimeoutYellow, BallPlacementBlue, BallPlacementYellow
 -- @field GameStage string - current game stage, can be one of these:
 -- FirstHalfPre, FirstHalf, HalfTime, SecondHalfPre, SecondHalf,
 -- ExtraTimeBreak, ExtraFirstHalfPre, ExtraFirstHalf, ExtraHalfTime, ExtraSecondHalfPre, ExtraSecondHalf,

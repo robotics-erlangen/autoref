@@ -90,8 +90,8 @@ local function main()
         end
     end
     for _, foul in ipairs(fouls) do
-        -- take the referee state until the second upper case letter
-        -- thereby stripping 'Offensive', 'Defensive', 'Prepare' and 'Force'
+        -- take the referee state until the second upper case letter, thereby
+        -- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
         local simpleRefState = World.RefereeState:match("%u%l+")
         if foul.possibleRefStates[simpleRefState] and foul.occuring() and
             (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT)
