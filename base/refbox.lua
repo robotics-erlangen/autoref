@@ -1,5 +1,7 @@
 local Refbox = {}
 
+local Coordinates = require "../base/coordinates"
+
 local VALID_REF_COMMANDS = {
     HALT = true,
     STOP = true,
@@ -32,10 +34,13 @@ function Refbox.send(command, placementPos)
         message_id = 1,
         command = command,
     }
+    local posInGlobal = Coordinates.toGlobal(placementPos)
     if command:sub(0,14) == "BALL_PLACEMENT" then
         cmd.designated_position = {
-            x = placementPos.x,
-            y = placementPos.y
+            -- refbox position message uses millimeters
+            -- ssl-vision's coordinate system is rotated by 90 degrees
+            y = -posInGlobal.x * 1000,
+            x = posInGlobal.y * 1000
         }
     end
 	if command:match("(%a+)_CARD_(%a+)") then
