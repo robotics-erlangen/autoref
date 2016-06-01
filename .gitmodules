@@ -1,3 +1,6 @@
 [submodule "src/framework"]
 	path = src/framework
 	url = https://github.com/robotics-erlangen/framework.git
+[submodule "data/ssl-refbox"]
+	path = data/ssl-refbox
+	url = https://github.com/RoboCup-SSL/ssl-refbox
