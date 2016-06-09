@@ -34,18 +34,17 @@ function AttackerInDefenseArea.occuring()
                 AttackerInDefenseArea.consequence = "INDIRECT_FREE_" .. defense:upper()
                 AttackerInDefenseArea.executingTeam = World[defense.."ColorStr"]
                 AttackerInDefenseArea.freekickPosition = robot.pos:copy()
+                local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
+                if touchingGoalie then
+                    AttackerInDefenseArea.message = color .. " " .. offender.id ..
+                        " touched goalie, while point of contact was in defense area"
+                else
+                    AttackerInDefenseArea.message = color .. " " .. offender.id ..
+                        " touched the ball in opponent's defense area"
+                end
                 return true
             end
         end
-    end
-end
-
-function AttackerInDefenseArea.print()
-    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-    if touchingGoalie then
-        log(color .. " " .. offender.id .. " touched goalie, while point of contact was in defense area")
-    else
-        log(color .. " " .. offender.id .. " touched the ball in opponent's defense area")
     end
 end
 

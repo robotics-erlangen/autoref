@@ -25,9 +25,6 @@ local Collision = {}
 local FAST_SPEED = 2.5
 local SLOW_SPEED = 0.5
 
-local speedDiff = 0
-local offender = 0
-
 Collision.possibleRefStates = {
     Game = true,
     Kickoff = true,
@@ -47,7 +44,8 @@ function Collision.occuring()
                     Collision.consequence = "DIRECT_FREE_"..defense:upper()
                     Collision.freekickPosition = OffRobot.pos:copy()
                     Collision.executingTeam = World[defense.."ColorStr"]
-                    offender = OffRobot
+                    Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
+                        OffRobot.id .. "<br>while driving at " .. OffRobot.speed:length() .. " m/s"
                     return true
                 end
             end
@@ -55,12 +53,6 @@ function Collision.occuring()
     end
 
     return false
-end
-
-function Collision.print()
-    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-    log("Collision foul by " .. color .. " " .. offender.id)
-    log("while driving at " .. offender.speed:length() .. " m/s")
 end
 
 return Collision

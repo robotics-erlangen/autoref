@@ -63,6 +63,8 @@ local function sendCardIfPending()
 end
 
 local ballWasValidBefore = false
+local debugMessage = ""
+local debugNextEvent = ""
 local function main()
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
@@ -98,8 +100,10 @@ local function main()
         then
             foulTimes[foul] = World.Time
             assert(foul.consequence, "an occuring foul must define a consequence")
-            foul.print()
-            log("")
+            assert(foul.message, "an occuring foul must define a message")
+            log(foul.message)
+            debugMessage = foul.message
+            debugNextEvent = foul.consequence
             if foul.freekickPosition and foul.executingTeam then
                 ballPlacement.start(foul)
             elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
@@ -112,6 +116,10 @@ local function main()
             end
         end
     end
+    debug.pushtop()
+    debug.set("AUTOREF_EVENT", debugMessage)
+    debug.set("AUTOREF_NEXT", debugNextEvent)
+    debug.pop()
     Referee.illustrateRefereeStates()
 end
 

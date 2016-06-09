@@ -10,24 +10,18 @@ NumberOfPlayers.possibleRefStates = {
     Indirect = true,
 }
 
-local offendingTeam
 function NumberOfPlayers.occuring()
-    offendingTeam = nil
     if #World.YellowRobots > 6 then
         NumberOfPlayers.consequence = "STOP"
-        offendingTeam = World.YellowColorStr
+        NumberOfPlayers.message = World.YellowColorStr .. " team has more than 6 players on the field!"
         return true
     elseif #World.BlueRobots > 6 then
         NumberOfPlayers.consequence = "STOP"
-        offendingTeam = World.BlueColorStr
+        NumberOfPlayers.message = World.BlueColorStr .. " team has more than 6 players on the field!"
         return true
     end
 
     return false
-end
-
-function NumberOfPlayers.print()
-    log(offendingTeam .. " team has more than 6 players on the field!")
 end
 
 return NumberOfPlayers

@@ -63,8 +63,7 @@ A rule must define the following attributes:
 foul can occur
 - `occuring`: A function which either returns true or false. true means that
 the foul occurs and that the `print` and `consequence` attributes have to be set
-- `print`: This function prints a message for the user in case the foul occurs,
-but should not implement any other referee logics
+- `message`: Describes the foul and possibly involved robots
 - `consequence`: The referee command which follows the foul, e.g. "INDIRECT_FREE_BLUE".
 If it is not "STOP" or a card, `freekickPosition` has to be set
 - `freekickPosition`: A vector with the position where the resulting free kick

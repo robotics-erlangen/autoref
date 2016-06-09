@@ -31,11 +31,11 @@ OutOfField.possibleRefStates = {
     Game = true
 }
 
-local outOfFieldEvent -- for print messages only
 local wasInFieldBefore = false
 local outOfFieldTime = math.huge
 function OutOfField.occuring()
     local ballPos = World.Ball.pos
+    local outOfFieldEvent = "" -- for event message
 
     local lastTeam = Referee.teamWhichTouchedBallLast()
     local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
@@ -97,16 +97,12 @@ function OutOfField.occuring()
         end
 
         OutOfField.consequence = freekickType .. "_" .. OutOfField.executingTeam:match(">(%a+)<"):upper()
-
+        OutOfField.message = "Ball out field. Last touch: " .. Referee.teamWhichTouchedBallLast()
+            .. "<br>" .. outOfFieldEvent .. " for " .. OutOfField.executingTeam
         return true
     end
 
     return false
-end
-
-function OutOfField.print()
-    log("Ball out field. Last touch: " .. Referee.teamWhichTouchedBallLast())
-    log(outOfFieldEvent .. " for " .. OutOfField.executingTeam)
 end
 
 return OutOfField

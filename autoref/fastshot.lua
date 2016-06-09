@@ -33,7 +33,6 @@ FastShot.possibleRefStates = {
 
 local lastSpeeds = {}
 local maxSpeed = 0
-local lastMaxSpeed = 0
 function FastShot.occuring()
     local speed = World.Ball.speed:length()
     if speed > 8 then
@@ -55,7 +54,9 @@ function FastShot.occuring()
                 FastShot.freekickPosition = lastBallOwner.pos
                 FastShot.executingTeam = lastBallOwner.isYellow and World.BlueColorStr or World.YellowColorStr
                 FastShot.consequence = lastBallOwner.isYellow and "INDIRECT_FREE_BLUE" or "INDIRECT_FREE_YELLOW"
-                lastMaxSpeed = maxSpeed
+                local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
+                FastShot.message = "Shot over 8m/s by " .. color .. " " .. lastBallOwner.id ..
+                    "<br>Speed: " .. maxSpeed .. "m/s"
                 maxSpeed = 0
                 return true
             end
@@ -64,17 +65,6 @@ function FastShot.occuring()
         lastSpeeds = {}
     end
     return false
-end
-
-function FastShot.print()
-    local lastBallOwner = BallOwner.lastRobot()
-    if lastBallOwner then
-        local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
-        log("Shot over 8m/s by " .. color .. " robot with id " .. lastBallOwner.id)
-    else
-        log("Shot over 8m/s, but could not determine offender")
-    end
-    log("Speed: " .. lastMaxSpeed .. "m/s")
 end
 
 return FastShot

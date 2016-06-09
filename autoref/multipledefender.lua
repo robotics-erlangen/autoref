@@ -27,17 +27,17 @@ MultipleDefender.possibleRefStates = {
     Game = true
 }
 
-local offender, occupation
-local function checkOccupation(team, partially)
+local function checkOccupation(team, occupation)
     for _, robot in ipairs(World[team.."Robots"]) do
-        local distThreshold = partially == true and robot.radius or -robot.radius
+        local distThreshold = occupation == "partially" and robot.radius or -robot.radius
         if robot ~= World[team.."Keeper"]
                 and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
                 and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
         then
-            offender = robot
-            occupation = partially and "partially" or "entirely"
             MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
+            MultipleDefender.message = team .. " " .. robot.id ..
+                " touched the ball while being located <b>" ..
+                occupation .. "</b> within its own defense area"
             return true
         end
     end
@@ -49,14 +49,7 @@ function MultipleDefender.occuring()
     if World.Ball.pos.y > 0 then -- on blue side of field
         defense = "Blue"
     end
-    return checkOccupation(defense, false) or checkOccupation(defense, true)
-end
-
-
-function MultipleDefender:print()
-    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-    log(color .. " " .. offender.id .. " touched the ball while being located <b>"
-        .. occupation .. "</b> within its own defense area")
+    return checkOccupation(defense, "entirely") or checkOccupation(defense, "partially")
 end
 
 return MultipleDefender

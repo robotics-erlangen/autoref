@@ -40,6 +40,8 @@ function DoubleTouch.occuring()
                 DoubleTouch.consequence = "INDIRECT_FREE_" .. defenseTeam:upper()
                 DoubleTouch.freekickPosition = touchingRobot.pos:copy()
                 DoubleTouch.executingTeam = World[defenseTeam.."ColorStr"]
+                local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
+                DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
                 return true
             else
                 lastTouchingRobotInFreekick = nil
@@ -49,11 +51,6 @@ function DoubleTouch.occuring()
         lastTouchingRobotInFreekick = nil
     end
     return false
-end
-
-function DoubleTouch.print()
-    local color = lastTouchingRobotInFreekick.isYellow and World.YellowColorStr or World.BlueColorStr
-    log("Double touch by " .. color .. " " .. lastTouchingRobotInFreekick.id)
 end
 
 return DoubleTouch

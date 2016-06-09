@@ -28,18 +28,13 @@ function Dribbling.occuring()
                 Dribbling.consequence = "INDIRECT_FREE_BLUE"
             end
             Dribbling.freekickPosition = currentTouchingRobot.pos:copy()
+            local lastRobot = Referee.robotAndPosOfLastBallTouch()
+            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m by "
+                .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
             return true
         end
     else
         dribblingStart = nil
-    end
-end
-
-function Dribbling.print()
-    local lastTeam = Referee.teamWhichTouchedBallLast()
-    local lastRobot = Referee.robotAndPosOfLastBallTouch()
-    if lastRobot then -- should always be the case
-        log("dribbling over " .. MAX_DRIBBLING_DIST .. "m by " .. lastTeam .. " " .. lastRobot.id)
     end
 end
 
