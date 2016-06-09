@@ -70,6 +70,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_configDialog = new ConfigDialog(this);
     connect(m_configDialog, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
+    if (m_configDialog->plotterInExtraWindow()) {
+        m_plotter = new BallSpeedPlotter(nullptr);
+    } else {
+        m_plotter = new BallSpeedPlotter(this);
+        ui->splitterTop->addWidget(m_plotter);
+    }
+    m_plotter->show();
 
     connect(ui->options, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
 
@@ -77,9 +84,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));
 
     ui->log->hideLogToggles();
-
-    m_plotter = new BallSpeedPlotter();
-    m_plotter->show();
 
     // connect the menu actions
     connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));

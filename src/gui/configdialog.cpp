@@ -26,6 +26,7 @@
 const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
 const uint DEFAULT_VISION_PORT = 10005;
 const bool DEFAULT_ENABLE_REFBOX_CONTROL = true;
+const bool DEFAULT_PLOTTER_IN_EXTRA_WINDOW = false;
 
 ConfigDialog::ConfigDialog(QWidget *parent) :
     QDialog(parent),
@@ -61,6 +62,8 @@ void ConfigDialog::load()
 
     ui->visionPort->setValue(s.value("Amun/VisionPort", DEFAULT_VISION_PORT).toUInt());
     ui->refboxControlUse->setChecked(s.value("Amun/EnableRefboxControl", DEFAULT_ENABLE_REFBOX_CONTROL).toBool());
+    ui->plotterInExtraWindow->setChecked(s.value("Amun/PlotterInExtraWindow", DEFAULT_PLOTTER_IN_EXTRA_WINDOW).toBool());
+
     sendConfiguration();
 }
 
@@ -69,6 +72,7 @@ void ConfigDialog::reset()
     ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
     ui->visionPort->setValue(DEFAULT_VISION_PORT);
     ui->refboxControlUse->setChecked(DEFAULT_ENABLE_REFBOX_CONTROL);
+    ui->plotterInExtraWindow->setChecked(DEFAULT_PLOTTER_IN_EXTRA_WINDOW);
 }
 
 void ConfigDialog::apply()
@@ -78,6 +82,7 @@ void ConfigDialog::apply()
 
     s.setValue("Amun/VisionPort", ui->visionPort->value());
     s.setValue("Amun/EnableRefboxControl", ui->refboxControlUse->isChecked());
+    s.setValue("Amun/PlotterInExtraWindow", ui->plotterInExtraWindow->isChecked());
 
     sendConfiguration();
 }
@@ -97,4 +102,10 @@ void ConfigDialog::clicked(QAbstractButton *button)
     default:
         break;
     }
+}
+
+bool ConfigDialog::plotterInExtraWindow()
+{
+    QSettings s;
+    return s.value("Amun/PlotterInExtraWindow", DEFAULT_PLOTTER_IN_EXTRA_WINDOW).toBool();
 }

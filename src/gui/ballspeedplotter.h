@@ -39,7 +39,7 @@ class BallSpeedPlotter : public QWidget
     Q_OBJECT
 
 public:
-    explicit BallSpeedPlotter();
+    explicit BallSpeedPlotter(QWidget *parent);
     ~BallSpeedPlotter() override;
 
 public slots:

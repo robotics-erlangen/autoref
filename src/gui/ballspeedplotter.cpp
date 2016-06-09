@@ -29,13 +29,12 @@
 #include <QStringBuilder>
 #include <unordered_map>
 
-BallSpeedPlotter::BallSpeedPlotter() :
-    QWidget(nullptr, Qt::Window),
+BallSpeedPlotter::BallSpeedPlotter(QWidget *parent) :
+    QWidget(parent),
     ui(new Ui::BallSpeedPlotter),
     m_startTime(0),
     m_freeze(false)
 {
-    setWindowIcon(QIcon("icon:plotter.svg"));
     ui->setupUi(this);
 
     // proxy model for tree filtering

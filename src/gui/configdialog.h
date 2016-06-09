@@ -37,6 +37,7 @@ class ConfigDialog : public QDialog
 public:
     explicit ConfigDialog(QWidget *parent = 0);
     ~ConfigDialog() override;
+    bool plotterInExtraWindow();
 
 signals:
     void sendCommand(const Command &command);

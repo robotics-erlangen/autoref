@@ -55,6 +55,10 @@ You can record games via the "Logging" menu or by pressing Ctrl-R.
 Log files will be saved in the directory from where the Autoref was started.
 These can be played with the logplayer, which is part of the [framework][1].
 
+### Ball speed plotter
+If you experience GUI freezes, try to enable "Plotter in extra window" in the
+configuration menu. This needs an application restart to take effect.
+
 ### Implementing rules
 Rules are implemented as lua tables. Each of them is located in a distinct file
 inside the `autoref` folder. They have then to be included in `init.lua`.
