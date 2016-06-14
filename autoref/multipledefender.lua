@@ -36,8 +36,8 @@ local function checkOccupation(team, occupation)
         then
             MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
             MultipleDefender.message = team .. " " .. robot.id ..
-                " touched the ball while being located <b>" ..
-                occupation .. "</b> within its own defense area"
+                " touched the ball<br>while being located <b>" ..
+                occupation .. "</b><br>within its own defense area"
             return true
         end
     end

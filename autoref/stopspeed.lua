@@ -24,7 +24,7 @@ function StopSpeed.occuring()
         if robot.speed:length() > 1.5 then
             StopSpeed.consequence = "YELLOW_CARD_" .. (robot.isYellow and "YELLOW" or "BLUE")
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            StopSpeed.message = color .. " " .. robot.id .. " is driving with over 1.5m/s during STOP"
+            StopSpeed.message = color .. " " .. robot.id .. " is driving faster<br>than 1.5m/s during STOP"
             return true
         end
     end

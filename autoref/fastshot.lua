@@ -56,7 +56,7 @@ function FastShot.occuring()
                 FastShot.consequence = lastBallOwner.isYellow and "INDIRECT_FREE_BLUE" or "INDIRECT_FREE_YELLOW"
                 local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
                 FastShot.message = "Shot over 8m/s by " .. color .. " " .. lastBallOwner.id ..
-                    "<br>Speed: " .. maxSpeed .. "m/s"
+                    "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
                 maxSpeed = 0
                 return true
             end

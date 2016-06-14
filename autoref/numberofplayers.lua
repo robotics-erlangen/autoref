@@ -13,11 +13,11 @@ NumberOfPlayers.possibleRefStates = {
 function NumberOfPlayers.occuring()
     if #World.YellowRobots > 6 then
         NumberOfPlayers.consequence = "STOP"
-        NumberOfPlayers.message = World.YellowColorStr .. " team has more than 6 players on the field!"
+        NumberOfPlayers.message = World.YellowColorStr .. " team has more thanbr>6 players on the field!"
         return true
     elseif #World.BlueRobots > 6 then
         NumberOfPlayers.consequence = "STOP"
-        NumberOfPlayers.message = World.BlueColorStr .. " team has more than 6 players on the field!"
+        NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>6 players on the field!"
         return true
     end
 

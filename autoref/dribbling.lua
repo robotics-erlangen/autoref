@@ -29,7 +29,7 @@ function Dribbling.occuring()
             end
             Dribbling.freekickPosition = currentTouchingRobot.pos:copy()
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
-            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m by "
+            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
                 .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
             return true
         end

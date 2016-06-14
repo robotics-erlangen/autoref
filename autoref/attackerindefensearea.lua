@@ -37,10 +37,10 @@ function AttackerInDefenseArea.occuring()
                 local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
                 if touchingGoalie then
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
-                        " touched goalie, while point of contact was in defense area"
+                        " touched goalie,<br>while point of contact was in defense area"
                 else
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
-                        " touched the ball in opponent's defense area"
+                        " touched the ball<br>in opponent's defense area"
                 end
                 return true
             end

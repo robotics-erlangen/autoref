@@ -17,7 +17,7 @@ function FreekickDistance.occuring()
         if robot.pos:distanceTo(stopBallPos)-robot.shootRadius < 0.5 then
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
             FreekickDistance.consequence = "STOP"
-            FreekickDistance.message = color .. " " .. robot.id .. " did not keep 50cm distance to ball during free kick"
+            FreekickDistance.message = color .. " " .. robot.id .. " did not keep 50cm distance<br>to ball during free kick"
             return true
         end
     end

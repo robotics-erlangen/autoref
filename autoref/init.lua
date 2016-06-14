@@ -49,6 +49,15 @@ local optionnames = {
 for description, _ in pairs(descriptionToFileNames) do
     table.insert(optionnames, description)
 end
+local debugConsequences = {
+    INDIRECT_FREE_BLUE = "Indirect Blue",
+    INDIRECT_FREE_YELLOW = "Indirect Yellow",
+    DIRECT_FREE_BLUE = "Direct Blue",
+    DIRECT_FREE_YELLOW = "Direct Yellow",
+    YELLOW_CARD_BLUE = "Yellow Card<br>for Blue",
+    YELLOW_CARD_YELLOW = "Yewllow Card<br>for Yellow",
+    STOP = "Stop"
+}
 
 local fouls = nil
 local foulTimes = {}
@@ -103,7 +112,7 @@ local function main()
             assert(foul.message, "an occuring foul must define a message")
             log(foul.message)
             debugMessage = foul.message
-            debugNextEvent = foul.consequence
+            debugNextEvent = debugConsequences[foul.consequence]
             if foul.freekickPosition and foul.executingTeam then
                 ballPlacement.start(foul)
             elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then

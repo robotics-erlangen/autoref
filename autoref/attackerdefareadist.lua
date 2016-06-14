@@ -44,7 +44,7 @@ function AttackerDefAreaDist.occuring()
     if offender then
         local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
         AttackerDefAreaDist.message = color .. " " .. offender.id ..
-            " did not keep 20cm distance to opponent's defense area"
+            " did not keep 20cm distance<br>to opponent's defense area"
         return true
     end
 end
