@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Copyright 2016 Alexander Danzer                                       *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,28 +18,36 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "config.h"
-#include "mainwindow.h"
-#include <QApplication>
-#include <QDir>
-#include <QIcon>
+#ifndef TEAMSCOREWIDGET_H
+#define TEAMSCOREWIDGET_H
 
-int main(int argc, char* argv[])
-{
-    QApplication app(argc, argv);
-    app.setApplicationName("Autoref");
-    app.setOrganizationName("ER-Force");
-// available starting with Qt 5.1
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
-    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
+#include <QLabel>
 
-    QDir::addSearchPath("icon", QString(ERFORCE_DATADIR) + "/icons");
-    QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
-    QDir::addSearchPath("logo", QString(AUTOREF_DATADIR) + "/ssl-refbox/scoreboard/logos");
-
-    MainWindow window;
-    window.show();
-
-    return app.exec();
+namespace Ui {
+class TeamScoreWidget;
 }
+
+class TeamScoreWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit TeamScoreWidget(QWidget *parent);
+    ~TeamScoreWidget() override;
+
+    void setScore(int score);
+    void setTeamName(const QString& teamName);
+    void setTeamBlue(); // default is yellow
+
+protected:
+    void resizeEvent(QResizeEvent *event);
+
+private:
+    Ui::TeamScoreWidget *ui;
+    bool m_isBlue;
+    QString m_teamName;
+    int m_score;
+    bool setLogo();
+};
+
+#endif // TEAMSCOREWIDGET_H

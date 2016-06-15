@@ -27,6 +27,7 @@
 #include <QSet>
 
 class BallSpeedPlotter;
+class InfoBoard;
 class ConfigDialog;
 class LogFileWriter;
 class RefereeStatusWidget;
@@ -64,6 +65,7 @@ private:
 private:
     Ui::MainWindow *ui;
     BallSpeedPlotter *m_plotter;
+    InfoBoard *m_infoboard;
     AmunClient m_amun;
     RefereeStatusWidget *m_refereeStatus;
     ConfigDialog *m_configDialog;

@@ -31,10 +31,14 @@ set(SOURCES
     configdialog.h
     mainwindow.cpp
     mainwindow.h
+    teamscorewidget.cpp
+    teamscorewidget.h
     teamwidget.cpp
     teamwidget.h
     ballspeedplotter.cpp
     ballspeedplotter.h
+    infoboard.cpp
+    infoboard.h
     ../framework/src/ra/amunclient.cpp
     ../framework/src/ra/amunclient.h
     ../framework/src/ra/debugmodel.cpp
@@ -69,6 +73,8 @@ set(UI_SOURCES
     configdialog.ui
     mainwindow.ui
     ballspeedplotter.ui
+    infoboard.ui
+    teamscorewidget.ui
     ../framework/src/ra/optionswidget.ui
     ../framework/src/ra/refereestatuswidget.ui
     ../framework/src/ra/timingwidget.ui

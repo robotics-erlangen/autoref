@@ -18,6 +18,9 @@ You can disable refbox remote control in the "Configuration" menu.
 In case you do not see a "Successfully loaded" message in the lower left box,
 you probably moved the autorefs directory after building.
 
+The Infoboard window is supposed to be placed on a big screen at the playing
+field. It shows the current game score as well as the autoref's decisions.
+It can be set to fullscreen mode by double-clicking inside the window.
 
 ## Features
 Currently, the Autoref detects a number of fouls according to the

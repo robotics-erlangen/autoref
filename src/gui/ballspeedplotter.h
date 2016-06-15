@@ -23,7 +23,7 @@
 
 #include "protobuf/status.h"
 #include "protobuf/world.pb.h"
-#include <QDialog>
+#include <QWidget>
 #include <QSet>
 #include <QStandardItemModel>
 

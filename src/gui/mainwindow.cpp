@@ -20,6 +20,7 @@
 
 #include "robotselectionwidget.h"
 #include "ballspeedplotter.h"
+#include "infoboard.h"
 #include "configdialog.h"
 #include "mainwindow.h"
 #include "refereestatuswidget.h"
@@ -80,8 +81,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->options, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
 
+    m_infoboard = new InfoBoard();
+    m_infoboard->show();
+
     // setup visualization only parts of the ui
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));
+    connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), m_infoboard->field, SLOT(visualizationsChanged(QStringList)));
 
     ui->log->hideLogToggles();
 
@@ -96,6 +101,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // setup data distribution
     connect(this, SIGNAL(gotStatus(Status)), ui->field, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), m_plotter, SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotStatus(Status)), m_infoboard, SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotStatus(Status)), m_infoboard->field, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->visualization, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->debugTree, SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotStatus(Status)), ui->timing, SLOT(handleStatus(Status)));
@@ -142,6 +149,7 @@ MainWindow::~MainWindow()
     }
     delete m_logFile;
     delete m_plotter;
+    delete m_infoboard;
     delete ui;
 }
 
@@ -150,6 +158,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
     // make sure the plotter is closed along with the mainwindow
     // this also ensure that a closeEvent is triggered
     m_plotter->close();
+    m_infoboard->close();
 
     QMainWindow::closeEvent(e);
 }
@@ -198,6 +207,9 @@ void MainWindow::handleStatus(const Status &status)
 void MainWindow::sendCommand(const Command &command)
 {
     m_amun.sendCommand(command);
+    if (command->has_strategy_autoref() && command->mutable_strategy_autoref()->has_enable_refbox_control()) {
+            m_infoboard->setAutorefIsActive(command->mutable_strategy_autoref()->enable_refbox_control());
+    }
 }
 
 void MainWindow::toggleFlip()

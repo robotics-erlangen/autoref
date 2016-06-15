@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Copyright 2016 Alexander Danzer, Janine Schneider                     *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,28 +18,57 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "config.h"
-#include "mainwindow.h"
-#include <QApplication>
-#include <QDir>
-#include <QIcon>
+#ifndef INFOBOARD_H
+#define INFOBOARD_H
 
-int main(int argc, char* argv[])
-{
-    QApplication app(argc, argv);
-    app.setApplicationName("Autoref");
-    app.setOrganizationName("ER-Force");
-// available starting with Qt 5.1
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
-    qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
+#include "protobuf/status.h"
+#include <QWidget>
+#include <QMap>
+#include "gui/teamscorewidget.h"
+#include <QTimer>
 
-    QDir::addSearchPath("icon", QString(ERFORCE_DATADIR) + "/icons");
-    QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
-    QDir::addSearchPath("logo", QString(AUTOREF_DATADIR) + "/ssl-refbox/scoreboard/logos");
+class FieldWidget;
 
-    MainWindow window;
-    window.show();
-
-    return app.exec();
+namespace Ui {
+class InfoBoard;
 }
+
+class InfoBoard : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit InfoBoard(QWidget *parent=0);
+    ~InfoBoard() override;
+    FieldWidget* field;
+    void setAutorefIsActive(bool active);
+
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
+public slots:
+    void handleStatus(const Status &status);
+    void changeColor();
+
+private:
+    Ui::InfoBoard *ui;
+    QMap<std::string, QString> m_gameStagesDict;
+    QString m_currentStage;
+    int m_blinkCounter;
+    QTimer *m_blinkTimer;
+
+    qint64 m_eventMsgTime;
+    QString m_refState;
+    QString m_foulEvent;
+    QString m_nextAction;
+    bool m_autorefIsActive;
+    bool m_autorefMsgInvalidated;
+
+    void updateGameStage(const amun::GameState &game_state);
+    void updateTime(const amun::GameState &game_state);
+    void updateTeamScores(const amun::GameState &game_state);
+    void updateRefstate(const Status &status);
+};
+
+#endif // INFOBOARD_H
