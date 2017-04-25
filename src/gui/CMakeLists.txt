@@ -24,6 +24,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra/plotter)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/amun/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/amun/include/amun)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra/widgets/include/widgets)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/core/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra/guihelper/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/ra/guihelper/include/guihelper)
 
 set(SOURCES
     autoref.cpp
@@ -39,26 +45,28 @@ set(SOURCES
     ballspeedplotter.h
     infoboard.cpp
     infoboard.h
-    ../framework/src/ra/amunclient.cpp
-    ../framework/src/ra/amunclient.h
-    ../framework/src/ra/debugmodel.cpp
-    ../framework/src/ra/debugmodel.h
-    ../framework/src/ra/debugtreewidget.cpp
-    ../framework/src/ra/debugtreewidget.h
-    ../framework/src/ra/fieldwidget.cpp
-    ../framework/src/ra/fieldwidget.h
-    ../framework/src/ra/guitimer.cpp
-    ../framework/src/ra/guitimer.h
-    ../framework/src/ra/logwidget.cpp
-    ../framework/src/ra/logwidget.h
+    ../framework/src/amun/amunclient.cpp
+    ../framework/src/amun/include/amun/amunclient.h
+    ../framework/src/ra/widgets/debugmodel.cpp
+    ../framework/src/ra/widgets/debugmodel.h
+    ../framework/src/ra/widgets/debugtreewidget.cpp
+    ../framework/src/ra/widgets/include/widgets/debugtreewidget.h
+    ../framework/src/ra/widgets/fieldwidget.cpp
+    ../framework/src/ra/widgets/include/widgets/fieldwidget.h
+    ../framework/src/ra/widgets/savesituation.cpp
+    ../framework/src/ra/widgets/savesituation.h
+    ../framework/src/ra/guihelper/guitimer.cpp
+    ../framework/src/ra/guihelper/include/guihelper/guitimer.h
+    ../framework/src/ra/widgets/logwidget.cpp
+    ../framework/src/ra/widgets/include/widgets/logwidget.h
     ../framework/src/ra/optionswidget.cpp
     ../framework/src/ra/optionswidget.h
-    ../framework/src/ra/refereestatuswidget.cpp
-    ../framework/src/ra/refereestatuswidget.h
-    ../framework/src/ra/timingwidget.cpp
-    ../framework/src/ra/timingwidget.h
-    ../framework/src/ra/visualizationwidget.cpp
-    ../framework/src/ra/visualizationwidget.h
+    ../framework/src/ra/widgets/refereestatuswidget.cpp
+    ../framework/src/ra/widgets/include/widgets/refereestatuswidget.h
+    ../framework/src/ra/widgets/timingwidget.cpp
+    ../framework/src/ra/widgets/include/widgets/timingwidget.h
+    ../framework/src/ra/widgets/visualizationwidget.cpp
+    ../framework/src/ra/widgets/include/widgets/visualizationwidget.h
     ../framework/src/ra/plotter/plotterwidget.cpp
     ../framework/src/ra/plotter/plotterwidget.h
     ../framework/src/ra/plotter/plot.cpp
@@ -76,9 +84,9 @@ set(UI_SOURCES
     infoboard.ui
     teamscorewidget.ui
     ../framework/src/ra/optionswidget.ui
-    ../framework/src/ra/refereestatuswidget.ui
-    ../framework/src/ra/timingwidget.ui
-    ../framework/src/ra/visualizationwidget.ui
+    ../framework/src/ra/widgets/refereestatuswidget.ui
+    ../framework/src/ra/widgets/timingwidget.ui
+    ../framework/src/ra/widgets/visualizationwidget.ui
 )
 
 if(MINGW)

@@ -18,7 +18,7 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8.12)
 project(erforce)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/framework/cmake")
 if(POLICY CMP0020)
@@ -57,22 +57,10 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
-set(QT_FOUND TRUE)
 
 find_package(LuaJIT2)
 
-include(ExternalProject)
-ExternalProject_Add(eigen
-    URL http://www.robotics-erlangen.de/downloads/libraries/eigen-eigen-c58038c56923.tar.bz2
-    URL_MD5 87274966745d2d3e7964fcc654d0a24b
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-)
-
-externalproject_get_property(eigen install_dir)
-set_target_properties(eigen PROPERTIES EXCLUDE_FROM_ALL true)
-set(EIGEN_FOUND TRUE)
-set(EIGEN_INCLUDE_DIR "${install_dir}/include/eigen3")
+include(BuildEigen)
 
 if(MINGW)
     set(CMAKE_RC_COMPILER_INIT windres)

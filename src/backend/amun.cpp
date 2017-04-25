@@ -45,7 +45,7 @@
  * \brief Creates an Amun instance
  * \param parent Parent object
  */
-Amun::Amun(QObject *parent) :
+Amun::Amun(bool simulatorOnly, QObject *parent) :
     QObject(parent),
     m_processor(NULL),
     m_referee(NULL),

@@ -193,7 +193,7 @@
   <customwidget>
    <class>FieldWidget</class>
    <extends>QGraphicsView</extends>
-   <header>ra/fieldwidget.h</header>
+   <header>fieldwidget.h</header>
   </customwidget>
   <customwidget>
    <class>TeamScoreWidget</class>

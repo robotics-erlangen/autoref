@@ -22,6 +22,7 @@ if(TARGET processor AND TARGET strategy)
 
 include_directories(${PROTOBUF_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/amun)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../framework/src/core/include)
 
 set(SOURCES
     amun.cpp

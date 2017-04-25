@@ -20,6 +20,9 @@
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+# firmware
+add_subdirectory(framework/src/firmware)
+
 # libs
 add_subdirectory(framework/src/core)
 add_subdirectory(framework/src/protobuf)

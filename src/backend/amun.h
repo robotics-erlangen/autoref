@@ -36,7 +36,7 @@ class Amun : public QObject
     Q_OBJECT
 
 public:
-    explicit Amun(QObject *parent = 0);
+    explicit Amun(bool simulatorOnly, QObject *parent = 0);
     ~Amun();
 
 signals:
