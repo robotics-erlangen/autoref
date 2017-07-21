@@ -328,6 +328,8 @@ function World._updateGameState(state)
 	World.YellowKeeper = friendlyKeeper
 	World.BlueKeeper = opponentKeeper
 
+	World.StageTimeLeft = state.stage_time_left/1000000 -- in seconds
+
 	--[[
     optional sint32 stage_time_left = 2;
 	message TeamInfo {

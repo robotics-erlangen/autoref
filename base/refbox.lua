@@ -52,7 +52,7 @@ function Refbox.send(command, placementPos)
     if not amun.sendNetworkRefereeCommand then
         error("you must enable debug mode in order to send referee commands")
     end
-    log("send refbox command: " .. command)
+    -- log("send refbox command: " .. command)
     amun.sendNetworkRefereeCommand(cmd)
 end
 
