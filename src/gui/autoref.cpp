@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
     QDir::addSearchPath("logo", QString(AUTOREF_DATADIR) + "/ssl-refbox/scoreboard/logos");
 
-    MainWindow window;
+    MainWindow window(argc > 1);
     window.show();
 
     return app.exec();

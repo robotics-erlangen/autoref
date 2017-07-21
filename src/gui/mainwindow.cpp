@@ -34,7 +34,7 @@
 #include <QMetaType>
 #include <QThread>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_logFile(NULL),
@@ -82,7 +82,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->options, SIGNAL(sendCommand(Command)), SLOT(sendCommand(Command)));
 
     m_infoboard = new InfoBoard();
-    m_infoboard->show();
+    if (showInfoboard) {
+        m_infoboard->show();
+    }
 
     // setup visualization only parts of the ui
     connect(ui->visualization, SIGNAL(itemsChanged(QStringList)), ui->field, SLOT(visualizationsChanged(QStringList)));

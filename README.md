@@ -18,7 +18,8 @@ You can disable refbox remote control in the "Configuration" menu.
 In case you do not see a "Successfully loaded" message in the lower left box,
 you probably moved the autorefs directory after building.
 
-The Infoboard window is supposed to be placed on a big screen at the playing
+When started with a command line argument, an Infoboard will be shown.
+This window is supposed to be placed on a big screen at the playing
 field. It shows the current game score as well as the autoref's decisions.
 It can be set to fullscreen mode by double-clicking inside the window.
 
