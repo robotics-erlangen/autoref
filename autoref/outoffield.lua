@@ -24,35 +24,61 @@ local Referee = require "../base/referee"
 local Field = require "../base/field"
 local debug = require "../base/debug"
 local vis = require "../base/vis"
+local Event = require "event"
 
-local OUT_OF_FIELD_MIN_TIME = 0.1
+local OUT_OF_FIELD_MIN_TIME = 0.25
 
 OutOfField.possibleRefStates = {
-    Game = true
+    Game = true,
+    Stop = true,
+    Halt = true,
 }
 
+local wasBouncing = false
 local wasInFieldBefore = false
 local outOfFieldTime = math.huge
+local outOfFieldPos = nil
+local outOfFieldPosZ = 0
+local outOfFieldDir = nil
+local waitingForDecision = false
+
 function OutOfField.occuring()
+    debug.set("bounce", World.Ball.isBouncing)
     local ballPos = World.Ball.pos
     local outOfFieldEvent = "" -- for event message
 
     local lastTeam = Referee.teamWhichTouchedBallLast()
     local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
-    if lastTeam then
+    if lastTeam and lastRobot then
         -- "match" string to remove the font-tags
         debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
         vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
+    else
+        waitingForDecision = false
+        return false
     end
 
-    if Field.isInField(ballPos, World.Ball.radius) then
-        wasInFieldBefore = true
-    elseif wasInFieldBefore and lastRobot then -- we detected the ball going out of field
-        -- delay decision to increase certainty, because the tracking is not always reliable
-        outOfFieldTime = World.Time
-        wasInFieldBefore = false -- reset
-    elseif World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME and lastRobot then
+    if not waitingForDecision then
+        if Field.isInField(ballPos, World.Ball.radius) then
+            wasInFieldBefore = true
+        elseif wasInFieldBefore  then
+            outOfFieldTime = World.Time
+            wasInFieldBefore = false
+            outOfFieldPos = World.Ball.pos:copy()
+            outOfFieldPosZ = World.Ball.posZ
+            outOfFieldDir = World.Ball.speed:copy()
+            wasBouncing = World.Ball.isBouncing
+            waitingForDecision = true
+        end
+    end
+
+    debug.set("wait decision", waitingForDecision)
+    debug.set("in field before", wasInFieldBefore)
+    debug.set("delay time", World.Time - outOfFieldTime)
+
+    if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME then
         outOfFieldTime = math.huge -- reset
+        waitingForDecision = false
 
         OutOfField.executingTeam = World.YellowColorStr
         if Referee.teamWhichTouchedBallLast() == World.YellowColorStr then
@@ -61,44 +87,78 @@ function OutOfField.occuring()
 
         local freekickType = "INDIRECT_FREE"
         outOfFieldEvent = "Throw-In"
-        if math.abs(ballPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
-
-            OutOfField.freekickPosition = Vector( -- 10cm from the corner
-                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
-                (World.Geometry.FieldHeightHalf - 0.1) * math.sign(ballPos.y)
-            )
+        vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
+        OutOfField.freekickPosition = Vector( -- 10cm from the corner
+            (World.Geometry.FieldWidthHalf - 0.1) * math.sign(outOfFieldPos.x),
+            (World.Geometry.FieldHeightHalf - 0.1) * math.sign(outOfFieldPos.y)
+        )
+        if math.abs(outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
             freekickType = "DIRECT_FREE"
-            if (lastRobot.isYellow and ballPos.y>0) or (not lastRobot.isYellow and ballPos.y<0) then
+            if (lastRobot.isYellow and outOfFieldPos.y>0) or (not lastRobot.isYellow and outOfFieldPos.y<0) then
                 outOfFieldEvent = "Goal Kick"
             else
                 outOfFieldEvent = "Corner Kick"
             end
+            OutOfField.message = outOfFieldEvent .. " " .. OutOfField.executingTeam
+            OutOfField.event = Event("OutOfField", lastRobot.isYellow, outOfFieldPos, {lastRobot.id})
 
             -- positive y position means blue side of field, negative yellow
-            local icing = ((ballPos.y > 0 and lastTeam == World.YellowColorStr)
-                or (ballPos.y < 0 and lastTeam == World.BlueColorStr))
-                and lastPos.y * ballPos.y < 0 -- last touch was on other side of field
+            local icing = ((outOfFieldPos.y > 0 and lastTeam == World.YellowColorStr)
+                or (outOfFieldPos.y < 0 and lastTeam == World.BlueColorStr))
+                and lastPos.y * outOfFieldPos.y < 0 -- last touch was on other side of field
 
-            if math.abs(ballPos.x) < World.Geometry.GoalWidth/2 then
-                local team = ballPos.y>0 and World.YellowColorStr or World.BlueColorStr
-                log("(probably) <b>goal</b> for " .. team .. "!")
-                return false
+            if math.abs(outOfFieldPos.x) < World.Geometry.GoalWidth/2 then
+                local scoringTeam = outOfFieldPos.y>0 and World.YellowColorStr or World.BlueColorStr
+                -- TODO investigate ball position after min_time in order to
+                -- determine goal post collisions: inside goal or defense area
+                local side = outOfFieldPos.y<0 and "Yellow" or "Blue"
+                local ballPos = World.Ball.pos
+                local insideGoal = math.abs(ballPos.x) < World.Geometry.GoalWidth/2
+                    and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
+                    and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
+
+                local closeToGoal = (World.Geometry[side.."Goal"]):distanceTo(World.Ball.pos) < 0.8
+                debug.set("closeToGoal", closeToGoal)
+                debug.set("insideGoal", insideGoal)
+
+                debug.set("ball.pos.posZ", World.Ball.posZ)
+                debug.set("wasz bounce", wasBouncing)
+                if wasBouncing or (outOfFieldPosZ > 0) then
+                    wasBouncing = false
+                    freekickType = "INDIRECT_FREE"
+                    OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
+                    OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos)
+                elseif closeToGoal or insideGoal
+                        or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
+                    outOfFieldEvent = "Goal"
+                    freekickType = "KICKOFF"
+                    OutOfField.executingTeam = outOfFieldPos.y<0 and World.YellowColorStr or World.BlueColorStr
+
+                    OutOfField.event = Event("Goal", scoringTeam==World.YellowColorStr, World.Ball.pos)
+                    OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
+                else
+                    OutOfField.event = nil
+                    log("collision")
+                end
             elseif icing then
                 OutOfField.executingTeam = lastRobot.isYellow and World.BlueColorStr or World.YellowColorStr
                 OutOfField.freekickPosition = lastPos
                 freekickType = "INDIRECT_FREE"
-                outOfFieldEvent = "Indirect because of Icing"
+                outOfFieldEvent = "<b>Icing</b>"
+                OutOfField.message =  outOfFieldEvent .. " of " .. Referee.teamWhichTouchedBallLast()
+                OutOfField.event = Event("Carpeting", lastRobot.isYellow, nil, {lastRobot.id})
             end
         else -- out off field line
             OutOfField.freekickPosition = Vector( -- 10cm from field line
-                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(ballPos.x),
+                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(outOfFieldPos.x),
                 ballPos.y
             )
+            OutOfField.message = outOfFieldEvent .. " " .. OutOfField.executingTeam
+            OutOfField.event = Event("OutOfField", lastRobot.isYellow, outOfFieldPos, {lastRobot.id})
         end
 
         OutOfField.consequence = freekickType .. "_" .. OutOfField.executingTeam:match(">(%a+)<"):upper()
-        OutOfField.message = "Ball out field. Last touch: " .. Referee.teamWhichTouchedBallLast()
-            .. "<br>" .. outOfFieldEvent .. " for " .. OutOfField.executingTeam
+
         return true
     end
 

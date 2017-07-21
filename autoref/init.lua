@@ -25,9 +25,11 @@ local Entrypoints = require "../base/entrypoints"
 local debug = require "../base/debug"
 local Referee = require "../base/referee"
 local Refbox = require "../base/refbox"
+local vis = require "../base/vis"
 local BallOwner = require "../base/ballowner"
 World = require "../base/world"
 local ballPlacement = require "ballplacement"
+local Event = require "event"
 
 local descriptionToFileNames = {
     ["Robot collisions"] = "collision",
@@ -70,7 +72,6 @@ local function sendCardIfPending()
         cardToSend = nil
     end
 end
-
 local ballWasValidBefore = false
 local debugMessage = ""
 local debugNextEvent = ""
@@ -123,6 +124,14 @@ local function main()
             else
                 error("A foul must either send a card, STOP, or define a freekick position and executing team")
             end
+
+            if foul.event then
+                amun.sendAutorefEvent(foul.event)
+            end
+        end
+
+        if foulTimes[foul] and foul.freekickPosition and foulTimes[foul] > World.Time - 1 then
+            vis.addCircle("event position", foul.freekickPosition, 0.1, vis.colors.blue, true)
         end
     end
     debug.pushtop()

@@ -2,6 +2,7 @@ local Dribbling = {}
 
 local MAX_DRIBBLING_DIST = 1
 local Referee = require "../base/referee"
+local Event = require "event"
 
 Dribbling.possibleRefStates = {
     Game = true
@@ -31,6 +32,7 @@ function Dribbling.occuring()
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
             Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
                 .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
+            Dribbling.event = Event("Dribbling", lastRobot.isYellow, lastRobot.pos, {lastRobot})
             return true
         end
     else

@@ -22,6 +22,7 @@ local MultipleDefender = {}
 
 local Field = require "../base/field"
 local Referee = require "../base/referee"
+local Event = require "event"
 
 MultipleDefender.possibleRefStates = {
     Game = true
@@ -38,6 +39,11 @@ local function checkOccupation(team, occupation)
             MultipleDefender.message = team .. " " .. robot.id ..
                 " touched the ball<br>while being located <b>" ..
                 occupation .. "</b><br>within its own defense area"
+            if occupation == "partially" then
+                MultipleDefender.event = Event("MultipleDefenderPartial", robot.isYellow, robot.pos, {robot})
+            else
+                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot})
+            end
             return true
         end
     end

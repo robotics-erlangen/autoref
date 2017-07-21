@@ -1,6 +1,7 @@
 local AttackerDefAreaDist = {}
 
 local Field = require "../base/field"
+local Event = require "event"
 
 AttackerDefAreaDist.possibleRefStates = {
     Game = true,
@@ -43,8 +44,9 @@ function AttackerDefAreaDist.occuring()
 
     if offender then
         local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-        AttackerDefAreaDist.message = color .. " " .. offender.id ..
-            " did not keep 20cm distance<br>to opponent's defense area"
+        AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
+            .. color .. " " .. offender.id
+        AttackerDefAreaDist.event = Event("DefenseAreaDist", offender.isYellow, offender.pos, {offender.id})
         return true
     end
 end

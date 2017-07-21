@@ -20,6 +20,8 @@
 
 local Collision = {}
 
+local Event = require "event"
+
 -- collision fouls involve one fast moving and one stationary or
 -- slow moving robot. See the "Decisions" paragraph of section 12.4
 local FAST_SPEED = 2.5
@@ -44,8 +46,11 @@ function Collision.occuring()
                     Collision.consequence = "DIRECT_FREE_"..defense:upper()
                     Collision.freekickPosition = OffRobot.pos:copy()
                     Collision.executingTeam = World[defense.."ColorStr"]
+                    local speed = math.round(OffRobot.speed:length(), 2)
                     Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
-                        OffRobot.id .. "<br>while driving at " .. OffRobot.speed:length() .. " m/s"
+                        OffRobot.id .. "<br>while traveling at " .. speed .. " m/s"
+                    Collision.event = Event("Collision", OffRobot.isYellow, OffRobot.pos, {OffRobot},
+                        "traveling at " .. speed .. " m/s")
                     return true
                 end
             end

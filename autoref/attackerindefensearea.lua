@@ -2,6 +2,7 @@ local AttackerInDefenseArea = {}
 
 local Field = require "../base/field"
 local Referee = require "../base/referee"
+local Event = require "event"
 
 AttackerInDefenseArea.possibleRefStates = {
     Game = true,
@@ -33,15 +34,17 @@ function AttackerInDefenseArea.occuring()
             if offender then
                 AttackerInDefenseArea.consequence = "INDIRECT_FREE_" .. defense:upper()
                 AttackerInDefenseArea.executingTeam = World[defense.."ColorStr"]
-                AttackerInDefenseArea.freekickPosition = robot.pos:copy()
+                AttackerInDefenseArea.freekickPosition = offender.pos:copy()
                 local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
                 if touchingGoalie then
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
-                        " touched goalie,<br>while point of contact was in defense area"
+                        " touched goalie inside defense area"
                 else
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
-                        " touched the ball<br>in opponent's defense area"
+                        " touched the ball in defense area"
                 end
+                AttackerInDefenseArea.event = Event("AttackerInDefenseArea",
+                    offender.isYellow, offender.pos, {offender.id}, "contact with " .. (touchingGoalie and "goalie" or "ball"))
                 return true
             end
         end

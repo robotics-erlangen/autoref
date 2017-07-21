@@ -1,10 +1,10 @@
 local StopSpeed = {}
 
+local Event = require "event"
 local ROBOT_SLOW_DOWN_TIME = 2
 
 StopSpeed.possibleRefStates = {
     Stop = true,
-    Ball = true,
 }
 
 local lastCallTime = 0
@@ -22,9 +22,10 @@ function StopSpeed.occuring()
 
     for _, robot in ipairs(World.Robots) do
         if robot.speed:length() > 1.5 then
-            StopSpeed.consequence = "YELLOW_CARD_" .. (robot.isYellow and "YELLOW" or "BLUE")
+            StopSpeed.consequence = "STOP"
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
             StopSpeed.message = color .. " " .. robot.id .. " is driving faster<br>than 1.5m/s during STOP"
+            StopSpeed.event = Event("StopSpeed", robot.isYellow, robot.pos, {robot})
             return true
         end
     end

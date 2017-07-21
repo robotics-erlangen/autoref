@@ -20,6 +20,7 @@
 
 local Referee = require "../base/referee"
 local BallOwner = require "../base/ballowner"
+local Event = require "event"
 
 local FastShot = {}
 
@@ -57,6 +58,7 @@ function FastShot.occuring()
                 local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
                 FastShot.message = "Shot over 8m/s by " .. color .. " " .. lastBallOwner.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
+                FastShot.event = Event("FastShot", lastBallOwner.isYellow, lastBallOwner.pos, {lastBallOwner}, "kick at " .. math.round(maxSpeed, 2) .. "m/s")
                 maxSpeed = 0
                 return true
             end
