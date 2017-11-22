@@ -58,9 +58,8 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
-find_package(LuaJIT2)
-
 include(BuildEigen)
+include(BuildLuaJIT2)
 
 if(MINGW)
     set(CMAKE_RC_COMPILER_INIT windres)
