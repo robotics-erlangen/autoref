@@ -230,11 +230,11 @@ function vector_mt:distanceToLineSegment(lineStart, lineEnd)
     local dir = (lineEnd - lineStart):normalize()
     local d = self - lineStart
     if d:dot(dir) < 0 then
-    	return d:length()
+		return d:length()
     end
     d = self - lineEnd
     if d:dot(dir) > 0 then
-    	return d:length()
+		return d:length()
     end
 
     --local normal = dir:perpendicular()
@@ -265,6 +265,7 @@ end
 
 vector_c = ffi.metatype("Vector", mt) -- create type
 vector_c_readonly = ffi.metatype("VectorReadOnly", mt)
+-- luacheck: globals Vector
 Vector = {} -- static functions, publish to global namespace
 
 --- Creates a new vector
@@ -304,9 +305,9 @@ function Vector._loadGeom()
 end
 
 local vector_class_mt = {
-  	__call = function (_, x, y, readonly)
-  		return vector_create(x, y, readonly)
-  	end
+	__call = function (_, x, y, readonly)
+		return vector_create(x, y, readonly)
+	end
 }
 setmetatable(Vector, vector_class_mt)
 

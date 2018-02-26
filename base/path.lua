@@ -152,6 +152,7 @@ separator for luadoc]]--
 -- @class function
 -- @name path:addTreeVisualization
 
+-- luacheck: globals path
 require "path"
 
 local teamIsBlue = amun.isBlue()

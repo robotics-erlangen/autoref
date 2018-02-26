@@ -28,8 +28,6 @@ local Robot, RobotMt = (require "../base/class")("Robot")
 local amun = amun
 local Constants = require "../base/constants"
 local Coordinates = require "../base/coordinates"
-local debug = require "../base/debug"
-local Trajectory = require "../base/trajectory"
 
 
 --- Values provided by a robot object.
@@ -66,8 +64,7 @@ Robot.constants = {
 -- Init function must be called for EVERY robot.
 -- @param data table/number - data from amun.getTeam or robot id for opponents
 -- @param isYellow boolean - true if own robot
--- @param geometry World.Geometry - used to setup path object and avoid a circular dependency with world, only required for own robots
-function Robot:init(data, isYellow, geometry)
+function Robot:init(data, isYellow)
 	if type(data) == "table" then
 		self:_setSpecs(data)
 	else
@@ -124,7 +121,7 @@ RobotMt.__tostring = Robot.tostring
 function Robot:_update(state, time, radioResponses)
 	-- keep current time for use by setStandby
 	self._currentTime = time
- 	-- bypass override check in setControllerInput
+	-- bypass override check in setControllerInput
 	self._controllerInput = {} -- halt robot by default
 	self:shootDisable() -- disable shoot
 	self:setDribblerSpeed(nil) -- stop dribbler
@@ -311,7 +308,7 @@ end
 
 --- Chip function
 -- @param distance number - Distance to chip [m]
-function Robot:chip(distance)
+function Robot:chip(_distance)
 	log("Error: no implementation for function chip for robot generation "..self.generation)
 end
 
@@ -367,7 +364,7 @@ end
 
 --- Shoot function
 -- @param speed number - Ball speed to shoot with [m/s]
-function Robot:_shoot(speed)
+function Robot:_shoot(_speed)
 	log("Error: no implementation for function shoot for robot generation "..self.generation)
 end
 

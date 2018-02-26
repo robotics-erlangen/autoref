@@ -1,3 +1,5 @@
+local World = require "../base/world"
+
 local BallOwner = {}
 
 --- Calculates the effective distance between ball and dribbler

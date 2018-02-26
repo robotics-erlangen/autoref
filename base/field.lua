@@ -123,7 +123,7 @@ end
 local defStretchHalf = G.DefenseStretch / 2
 local defRadius = G.DefenseRadius
 local function isInDefenseArea(pos, radius, friendly)
-	local radius = radius or 0
+	radius = radius or 0
 	local goalLine = G.FieldHeightHalf
 	if friendly then
 		goalLine = -G.FieldHeightHalf
@@ -250,10 +250,6 @@ local normalize = function(angle)
 	return angle
 end
 
-local isInInterval = function(angle, min, max)
-	return normalize(angle - min) <= normalize(max - min)
-end
-
 local intersectRayArc = function(pos, dir, m, r, minangle, maxangle)
 	local intersections = {}
 	local i1, i2, l1, l2 = geom.intersectLineCircle(pos, dir, m, r)
@@ -299,8 +295,6 @@ function Field.intersectRayDefenseArea(pos, dir, extraDistance, opp)
 	local oppfac = opp and -1 or 1
 	local leftCenter = Vector(-G.DefenseStretch/2, -G.FieldHeightHalf) * oppfac
 	local rightCenter = Vector(G.DefenseStretch/2, -G.FieldHeightHalf) * oppfac
-	local leftLine = Vector(-G.DefenseStretch/2, -G.FieldHeightHalf + radius) * oppfac
-	local rightLine = Vector(G.DefenseStretch/2, -G.FieldHeightHalf + radius) * oppfac
 
 	-- calclulate global angles
 	local oppadd = opp and math.pi or 0
@@ -358,7 +352,7 @@ function Field.defenseIntersectionByWay(way, extraDistance, opp)
 	local totalway = 2 * arcway + lineway
 	assert(way >= -arcway and way <= totalway + arcway, "way is out of bounds")
 
-	local intersection = nil
+	local intersection
 	if way < arcway then
 		local angle = way / radius
 		intersection = Vector.fromAngle(math.pi - angle) * radius +
@@ -424,8 +418,8 @@ function Field.intersectCircleDefenseArea(pos, radius, extraDistance, blue)
 
 	-- invert coordinates if blue-flag is set
 	if blue then
-		for i, pos in ipairs(intersections) do
-			intersections[i] = pos * -1
+		for i, position in ipairs(intersections) do
+			intersections[i] = position * -1
 		end
 	end
 
@@ -452,8 +446,8 @@ end
 -- @return bool
 function Field.isInOwnCorner(pos, opp)
 	local oppfac = opp and 1 or -1
-	return (World.Geometry.FieldWidthHalf - math.abs(World.Ball.pos.x))^2
-		+ (oppfac * World.Geometry.FieldHeightHalf - World.Ball.pos.y)^2 < 1
+	return (G.FieldWidthHalf - math.abs(pos.x))^2
+		+ (oppfac * G.FieldHeightHalf - pos.y)^2 < 1
 end
 
 --- The position, where the half-line given by startPos and dir intersects the next field boundary

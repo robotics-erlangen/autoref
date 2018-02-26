@@ -23,6 +23,8 @@ module "table"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
+-- luacheck: globals table
+
 --- Create a shallow copy of the table.
 -- @name copy
 -- @param t table - Table to copy
@@ -41,7 +43,7 @@ end
 -- @param array table - Array to truncate
 -- @param len number - target length
 function table.truncate(array, len) -- truncates an array to the first len elements
-	for i = #array, len + 1, -1 do
+	for _ = #array, len + 1, -1 do
 		table.remove(array)
 	end
 end
