@@ -18,8 +18,8 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Referee = require "../base/referee"
 local BallOwner = require "../base/ballowner"
+local World = require "../base/world"
 local Event = require "event"
 
 local FastShot = {}

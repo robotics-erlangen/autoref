@@ -27,9 +27,8 @@ local Referee = require "../base/referee"
 local Refbox = require "../base/refbox"
 local vis = require "../base/vis"
 local BallOwner = require "../base/ballowner"
-World = require "../base/world"
+local World = require "../base/world"
 local ballPlacement = require "ballplacement"
-local Event = require "event"
 
 local descriptionToFileNames = {
     ["Robot collisions"] = "collision",

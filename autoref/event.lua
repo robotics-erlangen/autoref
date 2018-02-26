@@ -2,6 +2,7 @@
 -- which will later be sent as Protobuf messages
 
 local Coordinates = require "../base/coordinates"
+local World = require "../base/world"
 
 local function Event(name, teamIsYellow, pos, offendingRobots, reason)
     assert(teamIsYellow ~= nil, "teamIsYellow must be set")

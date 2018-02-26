@@ -24,6 +24,7 @@ local Referee = require "../base/referee"
 local Field = require "../base/field"
 local debug = require "../base/debug"
 local vis = require "../base/vis"
+local World = require "../base/world"
 local Event = require "event"
 
 local OUT_OF_FIELD_MIN_TIME = 0.25
@@ -39,13 +40,12 @@ local wasInFieldBefore = false
 local outOfFieldTime = math.huge
 local outOfFieldPos = nil
 local outOfFieldPosZ = 0
-local outOfFieldDir = nil
 local waitingForDecision = false
 
 function OutOfField.occuring()
     debug.set("bounce", World.Ball.isBouncing)
     local ballPos = World.Ball.pos
-    local outOfFieldEvent = "" -- for event message
+    local outOfFieldEvent -- for event message
 
     local lastTeam = Referee.teamWhichTouchedBallLast()
     local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
@@ -66,7 +66,6 @@ function OutOfField.occuring()
             wasInFieldBefore = false
             outOfFieldPos = World.Ball.pos:copy()
             outOfFieldPosZ = World.Ball.posZ
-            outOfFieldDir = World.Ball.speed:copy()
             wasBouncing = World.Ball.isBouncing
             waitingForDecision = true
         end
@@ -112,7 +111,6 @@ function OutOfField.occuring()
                 -- TODO investigate ball position after min_time in order to
                 -- determine goal post collisions: inside goal or defense area
                 local side = outOfFieldPos.y<0 and "Yellow" or "Blue"
-                local ballPos = World.Ball.pos
                 local insideGoal = math.abs(ballPos.x) < World.Geometry.GoalWidth/2
                     and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
                     and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
@@ -130,7 +128,6 @@ function OutOfField.occuring()
                     OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos)
                 elseif closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
-                    outOfFieldEvent = "Goal"
                     freekickType = "KICKOFF"
                     OutOfField.executingTeam = outOfFieldPos.y<0 and World.YellowColorStr or World.BlueColorStr
 

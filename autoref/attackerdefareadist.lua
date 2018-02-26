@@ -1,6 +1,7 @@
 local AttackerDefAreaDist = {}
 
 local Field = require "../base/field"
+local World = require "../base/world"
 local Event = require "event"
 
 AttackerDefAreaDist.possibleRefStates = {

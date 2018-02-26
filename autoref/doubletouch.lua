@@ -2,7 +2,9 @@ local DoubleTouch = {}
 
 local Referee = require "../base/referee"
 local debug = require "../base/debug"
+local World = require "../base/world"
 local Event = require "event"
+
 local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = 0.07
 
 -- define all refstates to be able to reset variables

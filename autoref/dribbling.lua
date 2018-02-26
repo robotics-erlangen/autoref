@@ -2,6 +2,7 @@ local Dribbling = {}
 
 local MAX_DRIBBLING_DIST = 1
 local Referee = require "../base/referee"
+local World = require "../base/world"
 local Event = require "event"
 
 Dribbling.possibleRefStates = {

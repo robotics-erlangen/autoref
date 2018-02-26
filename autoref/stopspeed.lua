@@ -1,6 +1,8 @@
 local StopSpeed = {}
 
+local World = require "../base/world"
 local Event = require "event"
+
 local ROBOT_SLOW_DOWN_TIME = 2
 
 StopSpeed.possibleRefStates = {

@@ -1,5 +1,6 @@
 local FreekickDistance = {}
 
+local World = require "../base/world"
 local Event = require "event"
 
 FreekickDistance.possibleRefStates = {

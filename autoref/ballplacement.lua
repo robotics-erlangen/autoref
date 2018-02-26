@@ -1,9 +1,10 @@
 local BallPlacement = {}
 
 local debug = require "../base/debug"
-local vis = require "../base/vis"
-local Refbox = require "../base/refbox"
 local Field = require "../base/field"
+local Refbox = require "../base/refbox"
+local vis = require "../base/vis"
+local World = require "../base/world"
 
 local BALL_PLACEMENT_TIMEOUT = 15
 local BALL_PLACEMENT_RADIUS = 0.1

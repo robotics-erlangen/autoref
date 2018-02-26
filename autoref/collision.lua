@@ -20,6 +20,7 @@
 
 local Collision = {}
 
+local World = require "../base/world"
 local Event = require "event"
 
 -- collision fouls involve one fast moving and one stationary or

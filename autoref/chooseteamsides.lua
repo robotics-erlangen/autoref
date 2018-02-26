@@ -2,6 +2,8 @@
 -- therefore 'occuring' should always return false
 
 local Field = require "../base/field"
+local World = require "../base/world"
+
 local ChooseTeamSides = {}
 
 ChooseTeamSides.possibleRefStates = {
