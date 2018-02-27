@@ -20,7 +20,8 @@
 
 cmake_minimum_required(VERSION 2.8.12)
 project(erforce)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/framework/cmake")
+enable_testing()
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_SOURCE_DIR}/src/framework/cmake")
 if(POLICY CMP0020)
     cmake_policy(SET CMP0020 NEW) # remove if CMake >= 2.8.11 required
 endif()
@@ -75,6 +76,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/framework/src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(src)
+
+include(AddTests)
 
 if(UNIX AND NOT APPLE)
     configure_file(data/pkg/autoref.desktop.in autoref.desktop)

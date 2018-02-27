@@ -1,0 +1,35 @@
+compile-ra:
+  script:
+    - mkdir -p build
+    - cd build
+    - cmake -GNinja ..
+    - cmake --build .
+  stage: build
+  cache:
+    # Increase the number in the cache key to start with
+    # a fresh build cache. This is only useful in case of
+    # build system bug and/or updates of ExternalProjects!
+    key: "default-2"
+    paths:
+      - build/
+  artifacts:
+    paths:
+      - build/bin/
+    expire_in: 1 day
+
+.test: &test_template
+  script:
+    - "echo running test \"$TEST_PATTERN\""
+    - "cd build"
+    - "cmake -GNinja .."
+    - "ctest --output-on-failure -R \"$TEST_PATTERN\""
+  stage: test
+  cache:
+    key: "tests"
+    paths:
+      - build/
+
+tests:
+  <<: *test_template
+  variables:
+    TEST_PATTERN: "."
