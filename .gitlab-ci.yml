@@ -1,4 +1,7 @@
-compile-ra:
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+compile-autoref:
   script:
     - mkdir -p build
     - cd build
