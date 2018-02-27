@@ -155,8 +155,23 @@ local function mainLoopWrapper(func)
         func()
     end
 end
+
 Entrypoints.add("2017", function()
     main("2017")
+    debug.resetStack()
+    Referee.checkTouching()
+    BallOwner.lastRobot()
+end)
+
+Entrypoints.add("2018: Division A", function()
+    main("2018: Division A")
+    debug.resetStack()
+    Referee.checkTouching()
+    BallOwner.lastRobot()
+end)
+
+Entrypoints.add("2018: Division B", function()
+    main("2018: Division B")
     debug.resetStack()
     Referee.checkTouching()
     BallOwner.lastRobot()
