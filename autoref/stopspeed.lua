@@ -22,7 +22,9 @@ local StopSpeed = {}
 
 local World = require "../base/world"
 local Event = require "event"
+local Ruleset = require "ruleset"
 
+local STOP_SPEED = Ruleset.stopSpeed
 local ROBOT_SLOW_DOWN_TIME = 2
 
 StopSpeed.possibleRefStates = {
@@ -43,10 +45,10 @@ function StopSpeed.occuring()
     end
 
     for _, robot in ipairs(World.Robots) do
-        if robot.speed:length() > 1.5 then
+        if robot.speed:length() > STOP_SPEED then
             StopSpeed.consequence = "STOP"
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            StopSpeed.message = color .. " " .. robot.id .. " is driving faster<br>than 1.5m/s during STOP"
+            StopSpeed.message = color .. " " .. robot.id .. " is driving faster<br>than "..STOP_SPEED.." m/s during STOP"
             StopSpeed.event = Event("StopSpeed", robot.isYellow, robot.pos, {robot})
             return true
         end
