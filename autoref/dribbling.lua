@@ -20,10 +20,12 @@
 
 local Dribbling = {}
 
-local MAX_DRIBBLING_DIST = 1
 local Referee = require "../base/referee"
 local World = require "../base/world"
 local Event = require "event"
+local Ruleset = require "ruleset"
+
+local MAX_DRIBBLING_DIST = Ruleset.dribblingDist
 
 Dribbling.possibleRefStates = {
     Game = true
