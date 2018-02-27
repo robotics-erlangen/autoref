@@ -21,8 +21,11 @@
 local BallOwner = require "../base/ballowner"
 local World = require "../base/world"
 local Event = require "event"
+local Ruleset = require "ruleset"
 
 local FastShot = {}
+
+local MAX_SHOOT_SPEED = Ruleset.shootSpeed
 
 FastShot.possibleRefStates = {
     Game = true,
@@ -36,7 +39,7 @@ local lastSpeeds = {}
 local maxSpeed = 0
 function FastShot.occuring()
     local speed = World.Ball.speed:length()
-    if speed > 8 then
+    if speed > MAX_SHOOT_SPEED then
         table.insert(lastSpeeds, speed)
         local maxVal = 0
         -- we take the maximum from the 5 last frames above 8m/s
@@ -56,7 +59,7 @@ function FastShot.occuring()
                 FastShot.executingTeam = lastBallOwner.isYellow and World.BlueColorStr or World.YellowColorStr
                 FastShot.consequence = lastBallOwner.isYellow and "INDIRECT_FREE_BLUE" or "INDIRECT_FREE_YELLOW"
                 local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
-                FastShot.message = "Shot over 8m/s by " .. color .. " " .. lastBallOwner.id ..
+                FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastBallOwner.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
                 FastShot.event = Event("FastShot", lastBallOwner.isYellow, lastBallOwner.pos, {lastBallOwner}, "kick at " .. math.round(maxSpeed, 2) .. "m/s")
                 maxSpeed = 0
