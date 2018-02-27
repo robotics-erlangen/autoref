@@ -22,6 +22,9 @@ local NumberOfPlayers = {}
 
 local World = require "../base/world"
 local Event = require "event"
+local Ruleset = require "ruleset"
+
+local MAX_PLAYERS = Ruleset.numPlayers
 
 NumberOfPlayers.possibleRefStates = {
     Halt = true,
@@ -34,7 +37,7 @@ NumberOfPlayers.possibleRefStates = {
 }
 
 function NumberOfPlayers.occuring()
-    if #World.YellowRobots > 6 then
+    if #World.YellowRobots > MAX_PLAYERS then
         for _, robot in ipairs(World.YellowRobots) do
             for _, otherRobot in ipairs(World.YellowRobots) do
                 if robot~= otherRobot and robot.pos:distanceTo(otherRobot.pos) < 0.07 then
@@ -47,7 +50,7 @@ function NumberOfPlayers.occuring()
         NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>6 players on the field!"
         NumberOfPlayers.event = Event("NumberOfPlayers", true, nil, nil, #World.YellowRobots .. " players on the field")
         return true
-    elseif #World.BlueRobots > 6 then
+    elseif #World.BlueRobots > MAX_PLAYERS then
         for _, robot in ipairs(World.BlueRobots) do
             for _, otherRobot in ipairs(World.BlueRobots) do
                 if robot~= otherRobot and robot.pos:distanceTo(otherRobot.pos) < 0.07 then
