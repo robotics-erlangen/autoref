@@ -370,18 +370,28 @@ end
 
 --- Check whether the robot has the given ball.
 -- Checks whether the ball is in rectangle in front of the dribbler with hasBallDistance depth. Uses hysteresis for the left and right side of that rectangle
--- @param ball Ball - ball object to check
+-- @param ball Ball - must be World.Ball to make sure hysteresis will work
 -- @param [sideOffset number - extends the hasBall area sidewards]
 -- @return boolean - has ball
 function Robot:hasBall(ball, sideOffset)
 	sideOffset = sideOffset or 0
+	local hasBallDistance = self.constants.hasBallDistance
 
-	-- handle sidewards balls
-	local latencyCompensation = (ball.speed - self.speed):scaleLength(Constants.systemLatency)
+	-- handle sidewards balls, add extra time for strategy timing jitter
+	local latencyCompensation = (ball.speed - self.speed):scaleLength(Constants.systemLatency + 0.03)
+	local lclen = latencyCompensation:length()
+
+	-- fast fail
+	local approxMaxDist = lclen + hasBallDistance + self.shootRadius + ball.radius + self.dribblerWidth / 2 + sideOffset
+	if ball.pos:distanceToSq(self.pos) > approxMaxDist * approxMaxDist then
+		-- reset hystersis
+		self._hasBall[sideOffset] = false
+		return false
+	end
+
 	-- interpolate vector used for correction to circumvent noise
 	local MIN_COMPENSATION = 0.005
 	local BOUND_COMPENSATION_ANGLE = 70/180*math.pi
-	local lclen = latencyCompensation:length()
 	if lclen < MIN_COMPENSATION then
 		latencyCompensation = Vector(0, 0)
 	elseif lclen < 2*MIN_COMPENSATION then
@@ -403,19 +413,24 @@ function Robot:hasBall(ball, sideOffset)
 
 	-- add hasBallDistance
 	if lclen <= 0.001 then
-		latencyCompensation = Vector(self.constants.hasBallDistance, 0)
+		latencyCompensation = Vector(hasBallDistance, 0)
 	else
-		latencyCompensation = latencyCompensation:setLength(lclen + self.constants.hasBallDistance)
+		latencyCompensation = latencyCompensation:setLength(lclen + hasBallDistance)
 	end
 
 	-- Ball position relative to dribbler mid
 	local relpos = (ball.pos - self.pos):rotate(-self.dir)
 	relpos.x = relpos.x - self.shootRadius - ball.radius
+	-- calculate position on the dribbler that would have been hit
+	local offset = math.abs(relpos.y - relpos.x * latencyCompensation.y / latencyCompensation.x)
+	-- local debug = require "../base/debug"
+	-- debug.set("latencyCompensation", latencyCompensation)
+	-- debug.set("offset", offset)
 
-	-- only apply sidewards correction is the ball is in front of the robot
-	local offset = math.abs(relpos.y)
 	-- if too far to the sides
 	if offset > self.dribblerWidth / 2 + sideOffset then
+		-- reset hystersis
+		self._hasBall[sideOffset] = false
 		return false
 	-- in hysteresis area without having had the ball
 	elseif offset >= self.dribblerWidth / 2 - 2*Constants.positionError + sideOffset
@@ -423,9 +438,8 @@ function Robot:hasBall(ball, sideOffset)
 		return false
 	end
 
-	-- FIXME remove partial system latency hack
-	self._hasBall[sideOffset] = relpos.x > -self.shootRadius
-			and relpos.x < self.constants.hasBallDistance + ball.speed:length() * Constants.systemLatency
+	self._hasBall[sideOffset] = relpos.x > self.shootRadius * (-1.5)
+			and relpos.x < latencyCompensation.x and ball.posZ < Constants.maxRobotHeight*1.2 --*1.2 to compensate for vision error
 	return self._hasBall[sideOffset]
 end
 

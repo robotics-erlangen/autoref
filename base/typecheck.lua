@@ -33,22 +33,23 @@ local Class = require "../base/class"
 return function(value, requestedType)
 	local tval = type(value)
 	if type(requestedType) == "string" then
-		if tval ~= requestedType then
+		if requestedType == "vector" then
+			if not Vector.isVector(value) then
+				error("Expected vector got " .. tval)
+			end
+		elseif requestedType == "class" then
+			if not value or Class.toClass(value, true) ~= value then
+				error("Expected class got " .. tval)
+			end
+		elseif tval ~= requestedType then
 			error("Expected type " .. requestedType .. " got " .. tval)
 		end
 	elseif type(requestedType) == "table" and Class.toClass(requestedType, true) then
-		if tval ~= "table" then
-			error("Expected class "..Class.name(requestedType).. " got type " .. tval)
-		end
-		if not Class.toClass(value, true) then
-			if Class.instanceOf(requestedType, MessageBase) then
-				value = requestedType(value)
-			else
-				error("Expected class "..Class.name(requestedType).. " got type " .. tval)
-			end
+		if tval ~= "table" or not Class.toClass(value, true) then
+			error("Expected instance of class "..Class.name(requestedType).. " got type " .. tval)
 		end
 		if not Class.instanceOf(value, requestedType) then
-				error("Expected class "..Class.name(requestedType).." got class "..Class.name(value))
+			error("Expected instance of class "..Class.name(requestedType).." got class "..Class.name(value))
 		end
 	else
 		error("Can't handle requestedType")

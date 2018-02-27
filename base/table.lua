@@ -172,7 +172,7 @@ end
 function table.readonlytable(table)
 	return setmetatable({}, {
 	__index = table,
-	__newindex = function(table, key, value)
+	__newindex = function(_table, _key, _value)
 					error("Attempt to modify read-only table")
 				end,
 	__metatable = false
