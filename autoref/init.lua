@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer, Michael Eischer                      *
+*   Copyright 2018 Alexander Danzer, Michael Eischer, Lukas Wegmann       *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -28,11 +28,13 @@ local Refbox = require "../base/refbox"
 local vis = require "../base/vis"
 local BallOwner = require "../base/ballowner"
 local World = require "../base/world"
+
 local ballPlacement = require "ballplacement"
+local ruleset = require "ruleset"
 
 local descriptionToFileNames = {
     ["Robot collisions"] = "collision",
-    ["Shots over 8m/s"] = "fastshot",
+    ["Shooting speed"] = "fastshot",
     ["Ball out of field"] = "outoffield",
     ["Multiple Defender"] = "multipledefender",
     ["Dribbling over 1m"] = "dribbling",
@@ -71,10 +73,15 @@ local function sendCardIfPending()
         cardToSend = nil
     end
 end
+
 local ballWasValidBefore = false
 local debugMessage = ""
 local debugNextEvent = ""
-local function main()
+local function main(version)
+    if ruleset.name == "" then
+        ruleset.setRules(version)
+    end
+
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
     elseif ballWasValidBefore then
@@ -148,8 +155,8 @@ local function mainLoopWrapper(func)
         func()
     end
 end
-Entrypoints.add("main", function()
-    main()
+Entrypoints.add("2017", function()
+    main("2017")
     debug.resetStack()
     Referee.checkTouching()
     BallOwner.lastRobot()
