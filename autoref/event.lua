@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2018 Alexander Danzer, Lukas Wegmann                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -70,6 +70,8 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { foul_type = "NUMBER_OF_PLAYERS", offending_team = team, reason = reason }
     elseif name == "StopSpeed" then
         event.foul = { foul_type = "STOP_SPEED", offending_team = team, offending_robots = offendingRobots }
+    elseif name == "StopBallDistance" then
+        event.foul = { foul_type = "STOP_BALL_DISTANCE", offending_team = team, offending_robots = offendingRobots}
     else
         error("unknown event \"" .. name .. "\"")
     end
