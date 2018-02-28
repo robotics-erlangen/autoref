@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2015 Alexander Danzer, Lukas Wegmann                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -22,6 +22,9 @@ local FreekickDistance = {}
 
 local World = require "../base/world"
 local Event = require "event"
+local Ruleset = require "ruleset"
+
+local STOP_BALL_DISTANCE = Ruleset.stopBallDistance
 
 FreekickDistance.possibleRefStates = {
     Direct = true,
@@ -37,10 +40,10 @@ function FreekickDistance.occuring()
     end
     local defense = World.RefereeState:match("irect(%a+)") == "Yellow" and "Blue" or "Yellow"
     for _, robot in ipairs(World[defense.."Robots"]) do
-        if robot.pos:distanceTo(stopBallPos)-robot.shootRadius < 0.5 and World.Ball.speed:length() < 1 then
+        if robot.pos:distanceTo(stopBallPos)-robot.shootRadius < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
             FreekickDistance.consequence = "STOP"
-            FreekickDistance.message = color .. " " .. robot.id .. " did not keep 50cm distance<br>to ball during free kick"
+            FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
             FreekickDistance.event = Event("FreekickDistance", robot.isYellow, robot.pos, {robot})
             return true
         end
