@@ -106,14 +106,16 @@ function BallPlacement.run()
         elseif World.Time - placementTimer > BALL_PLACEMENT_TIMEOUT and
                 foul.executingTeam == World.BlueColorStr and placingTeam == World.BlueColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.YellowColorStr] then
-            -- let try other team (yellow)
+            -- let the other team try (yellow)
+            log(World.BlueColorStr .. " failed placing the ball, " .. World.YellowColorStr .. "now conducting")
             placingTeam = World.YellowColorStr
             placementTimer = World.Time
             Refbox.send("BALL_PLACEMENT_YELLOW", foul.freekickPosition)
         elseif World.Time - placementTimer > BALL_PLACEMENT_TIMEOUT and
                 foul.executingTeam == World.YellowColorStr and placingTeam == World.YellowColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.BlueColorStr] then
-            -- let try other team (blue)
+            -- let the other team try (blue)
+            log(World.YellowColorStr .. " failed placing the ball, " .. World.BlueColorStr .. "now conducting")
             placingTeam = World.BlueColorStr
             placementTimer = World.Time
             Refbox.send("BALL_PLACEMENT_BLUE", foul.freekickPosition)
