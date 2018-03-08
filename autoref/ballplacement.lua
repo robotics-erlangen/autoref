@@ -22,11 +22,11 @@ local BallPlacement = {}
 
 local debug = require "../base/debug"
 local Field = require "../base/field"
+local Ruleset = require "ruleset"
 local Refbox = require "../base/refbox"
 local vis = require "../base/vis"
 local World = require "../base/world"
 
-local BALL_PLACEMENT_TIMEOUT = 15
 local BALL_PLACEMENT_RADIUS = 0.1
 local TEAM_CAPABLE_OF_PLACEMENT = {}
 function BallPlacement.setYellowTeamCapable()
@@ -103,7 +103,7 @@ function BallPlacement.run()
             log("success placing the ball")
             Refbox.send(foul.consequence)
             endBallPlacement()
-        elseif World.Time - placementTimer > BALL_PLACEMENT_TIMEOUT and
+        elseif World.Time - placementTimer > Ruleset.placementTimeout and
                 foul.executingTeam == World.BlueColorStr and placingTeam == World.BlueColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.YellowColorStr] then
             -- let the other team try (yellow)
@@ -111,7 +111,7 @@ function BallPlacement.run()
             placingTeam = World.YellowColorStr
             placementTimer = World.Time
             Refbox.send("BALL_PLACEMENT_YELLOW", foul.freekickPosition)
-        elseif World.Time - placementTimer > BALL_PLACEMENT_TIMEOUT and
+        elseif World.Time - placementTimer > Ruleset.placementTimeout and
                 foul.executingTeam == World.YellowColorStr and placingTeam == World.YellowColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.BlueColorStr] then
             -- let the other team try (blue)
@@ -119,7 +119,8 @@ function BallPlacement.run()
             placingTeam = World.BlueColorStr
             placementTimer = World.Time
             Refbox.send("BALL_PLACEMENT_BLUE", foul.freekickPosition)
-        elseif World.Time - placementTimer > BALL_PLACEMENT_TIMEOUT then
+        elseif World.Time - placementTimer > Ruleset.placementTimeout then
+            log(Ruleset.placementTimeout)
             log("autonomous ball placement failed: timeout")
             Refbox.send("STOP")
             endBallPlacement()
