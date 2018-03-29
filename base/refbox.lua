@@ -26,13 +26,14 @@ local VALID_REF_COMMANDS = {
 	RED_CARD_BLUE = true,
 	RED_CARD_YELLOW = true,
 }
-function Refbox.send(command, placementPos)
+function Refbox.send(command, placementPos, event)
     if not VALID_REF_COMMANDS[command] then
         error("invalid refbox command " .. command)
     end
     local cmd = {
         message_id = 1,
         command = command,
+        implementation_id = "ER-Force Autoref",
     }
     local posInGlobal = Coordinates.toGlobal(placementPos)
     if command:sub(0,14) == "BALL_PLACEMENT" then

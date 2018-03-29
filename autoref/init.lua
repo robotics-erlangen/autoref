@@ -68,9 +68,10 @@ local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
 local cardToSend
+local event
 local function sendCardIfPending()
     if World.RefereeState == "Stop" and cardToSend then
-        Refbox.send(cardToSend)
+        Refbox.send(cardToSend, nil, event)
         cardToSend = nil
     end
 end
@@ -125,16 +126,18 @@ local function main(version)
                 ballPlacement.start(foul)
             elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
                 cardToSend = foul.consequence
+                event = foul.event
                 if World.RefereeState ~= "Stop" then
-                    Refbox.send("STOP") -- Stop is required for sending cards
+                    Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
                 end
             else
                 error("A foul must either send a card, STOP, or define a freekick position and executing team")
             end
 
-            if foul.event then
-                amun.sendAutorefEvent(foul.event)
-            end
+            -- will currently break
+            --if foul.event then
+                --amun.sendAutorefEvent(foul.event)
+            --end
         end
 
         if foulTimes[foul] and foul.freekickPosition and foulTimes[foul] > World.Time - 1 then

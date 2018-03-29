@@ -41,37 +41,37 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
     if name == "Goal" then
         event.goal = { scoring_team = team, position = { x = pos.x, y = pos.y }}
     elseif name == "ChipGoal" then
-        event.foul = { foul_type = "CHIP_GOAL", offending_team = team, offending_robots = offendingRobots, reason = "ball not in contact with the ground."}
-    elseif name == "OutOfField" then
+        event.foul = { foul_type = "CHIP_ON_GOAL", offending_team = team, offending_robots = offendingRobots, reason = "ball not in contact with the ground."}
+    elseif name == "OutOfField" then --TODO
         assert(pos, "Out of field event needs a position")
         local globalPos = Coordinates.toGlobal(pos)
         event.ball_out_of_field = { last_touch = team,  position = { x = globalPos.x, y = globalPos.y}}
     elseif name == "Carpeting" then
-        event.foul = { foul_type = "CARPETING", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "ICING", offending_team = team, offending_robots = offendingRobots }
     elseif name == "DefenseAreaDist" then
-        event.foul = { foul_type = "DEFENSE_AREA_DISTANCE", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "ATTACKER_TO_DEFENCE_AREA", offending_team = team, offending_robots = offendingRobots }
     elseif name == "AttackerInDefenseArea" then
-        event.foul = { foul_type = "ATTACKER_DEFENSE_AREA", offending_team = team, offending_robots = offendingRobots, reason = reason }
+        event.foul = { foul_type = "ATTACKER_IN_DEFENSE_AREA", offending_team = team, offending_robots = offendingRobots, reason = reason }
     elseif name == "Collision" then
-        event.foul = { foul_type = "COLLISION", offending_team = team, offending_robots = offendingRobots, reason = reason }
+        event.foul = { foul_type = "BOT_COLLISION", offending_team = team, offending_robots = offendingRobots, reason = reason }
     elseif name == "DoubleTouch" then
         event.foul = { foul_type = "DOUBLE_TOUCH", offending_team = team, offending_robots = offendingRobots }
     elseif name == "Dribbling" then
-        event.foul = { foul_type = "DRIBBLING", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "BALL_DRIBBLING", offending_team = team, offending_robots = offendingRobots }
     elseif name == "FastShot" then
         event.foul = { foul_type = "BALL_SPEED", offending_team = team, offending_robots = offendingRobots, reason = reason }
     elseif name == "FreekickDistance" then
-        event.foul = { foul_type = "FREEKICK_DISTANCE", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "DEFENDER_TO_KICK_POINT_DISTANCE", offending_team = team, offending_robots = offendingRobots }
     elseif name == "MultipleDefenderPartial" then
-        event.foul = { foul_type = "DEFENDER_DEFENSE_AREA_PARTIAL", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "MULTIPLE_DEFENDER_PARTIALLY", offending_team = team, offending_robots = offendingRobots }
     elseif name == "MultipleDefenderFull" then
-        event.foul = { foul_type = "DEFENDER_DEFENSE_AREA_FULL", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { foul_type = "MULTIPLE_DEFENDER", offending_team = team, offending_robots = offendingRobots }
     elseif name == "NumberOfPlayers" then
         event.foul = { foul_type = "NUMBER_OF_PLAYERS", offending_team = team, reason = reason }
     elseif name == "StopSpeed" then
-        event.foul = { foul_type = "STOP_SPEED", offending_team = team, offending_robots = offendingRobots }
-    elseif name == "StopBallDistance" then
-        event.foul = { foul_type = "STOP_BALL_DISTANCE", offending_team = team, offending_robots = offendingRobots}
+        event.foul = { foul_type = "ROBOT_STOP_SPEED", offending_team = team, offending_robots = offendingRobots }
+    elseif name == "StopBallDistance" then --STOP_BALL_DISTANCE
+        event.foul = { foul_type = "CUSTOM", offending_team = team, offending_robots = offendingRobots}
     else
         error("unknown event \"" .. name .. "\"")
     end
