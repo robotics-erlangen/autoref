@@ -66,7 +66,9 @@ set(SOURCES
     ../framework/src/ra/widgets/timingwidget.cpp
     ../framework/src/ra/widgets/include/widgets/timingwidget.h
     ../framework/src/ra/widgets/visualizationwidget.cpp
+    ../framework/src/ra/widgets/visualizationproxymodel.cpp
     ../framework/src/ra/widgets/include/widgets/visualizationwidget.h
+    ../framework/src/ra/widgets/include/widgets/visualizationproxymodel.h
     ../framework/src/ra/plotter/plotterwidget.cpp
     ../framework/src/ra/plotter/plotterwidget.h
     ../framework/src/ra/plotter/plot.cpp

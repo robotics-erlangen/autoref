@@ -96,7 +96,7 @@ void Amun::start()
 
     // start strategy threads
     Q_ASSERT(m_autoref == NULL);
-    m_autoref = new Strategy(m_timer, StrategyType::AUTOREF);
+    m_autoref = new Strategy(m_timer, StrategyType::AUTOREF, nullptr, false);
     m_autoref->moveToThread(m_autorefThread);
 
     // send tracking, geometry and referee to strategy
