@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+ *   Copyright 2016 Michael Eischer, Philipp Nordhus                       *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -47,10 +47,10 @@
  */
 Amun::Amun(bool simulatorOnly, QObject *parent) :
     QObject(parent),
-    m_processor(NULL),
-    m_referee(NULL),
-    m_vision(NULL),
-    m_autoref(NULL)
+    m_processor(nullptr),
+    m_referee(nullptr),
+    m_vision(nullptr),
+    m_autoref(nullptr)
 {
     qRegisterMetaType<QNetworkInterface>("QNetworkInterface");
     qRegisterMetaType<Command>("Command");
@@ -89,15 +89,18 @@ void Amun::start()
     Q_ASSERT(m_processor == NULL);
     m_processor = new Processor(m_timer);
     m_processor->moveToThread(m_processorThread);
+    connect(m_processorThread, SIGNAL(finished()), m_processor, SLOT(deleteLater()));
     // route commands to processor
     connect(this, SIGNAL(gotCommand(Command)), m_processor, SLOT(handleCommand(Command)));
     // relay tracking, geometry, referee, controller and accelerator information
     connect(m_processor, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
 
     // start strategy threads
-    Q_ASSERT(m_autoref == NULL);
+    Q_ASSERT(m_autoref == nullptr);
     m_autoref = new Strategy(m_timer, StrategyType::AUTOREF, nullptr, false);
     m_autoref->moveToThread(m_autorefThread);
+    connect(m_autorefThread, SIGNAL(finished()), m_autoref, SLOT(deleteLater()));
+
 
     // send tracking, geometry and referee to strategy
     connect(m_processor, SIGNAL(sendStrategyStatus(Status)),
@@ -146,16 +149,10 @@ void Amun::stop()
     m_networkThread->wait();
     m_autorefThread->wait();
 
-    delete m_vision;
+    // worker objects are destroyed on thread shutdown
     m_vision = NULL;
-
-    delete m_referee;
     m_referee = NULL;
-
-    delete m_autoref;
     m_autoref = NULL;
-
-    delete m_processor;
     m_processor = NULL;
 }
 
@@ -164,9 +161,9 @@ void Amun::setupReceiver(Receiver *&receiver, const QHostAddress &address, quint
     Q_ASSERT(receiver == NULL);
     receiver = new Receiver(address, port);
     receiver->moveToThread(m_networkThread);
+    connect(m_networkThread, SIGNAL(finished()), receiver, SLOT(deleteLater()));
     // start and stop socket
     connect(m_networkThread, SIGNAL(started()), receiver, SLOT(startListen()));
-    connect(m_networkThread, SIGNAL(finished()), receiver, SLOT(stopListen()));
     // pass packets to processor
     connect(m_networkInterfaceWatcher, &NetworkInterfaceWatcher::interfaceUpdated, receiver, &Receiver::updateInterface);
 }

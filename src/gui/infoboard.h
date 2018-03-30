@@ -44,8 +44,8 @@ public:
     void setAutorefIsActive(bool active);
 
 protected:
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 public slots:
     void handleStatus(const Status &status);

@@ -40,7 +40,7 @@ public:
     void setTeamBlue(); // default is yellow
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     Ui::TeamScoreWidget *ui;

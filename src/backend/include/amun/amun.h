@@ -23,6 +23,7 @@
 
 #include "protobuf/command.h"
 #include "protobuf/status.h"
+#include <QObject>
 
 class NetworkInterfaceWatcher;
 class Processor;
@@ -37,7 +38,7 @@ class Amun : public QObject
 
 public:
     explicit Amun(bool simulatorOnly, QObject *parent = 0);
-    ~Amun();
+    ~Amun() override;
 
 signals:
     void sendStatus(const Status &status);
