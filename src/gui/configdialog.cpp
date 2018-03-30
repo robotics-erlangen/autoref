@@ -25,6 +25,8 @@
 
 const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
 const uint DEFAULT_VISION_PORT = 10006;
+const uint DEFAULT_REFEREE_PORT = 10003;
+
 const bool DEFAULT_ENABLE_REFBOX_CONTROL = true;
 const bool DEFAULT_PLOTTER_IN_EXTRA_WINDOW = false;
 
@@ -49,6 +51,7 @@ void ConfigDialog::sendConfiguration()
     command->mutable_tracking()->set_system_delay(ui->systemDelayBox->value() * 1000 * 1000);
 
     command->mutable_amun()->set_vision_port(ui->visionPort->value());
+    command->mutable_amun()->set_referee_port(ui->refPort->value());
 
     command->mutable_strategy_autoref()->set_enable_refbox_control(ui->refboxControlUse->isChecked());
 
@@ -61,6 +64,8 @@ void ConfigDialog::load()
     ui->systemDelayBox->setValue(s.value("Tracking/SystemDelayAutoref", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
 
     ui->visionPort->setValue(s.value("Amun/VisionPort2018", DEFAULT_VISION_PORT).toUInt());
+    ui->refPort->setValue(s.value("Amun/RefereePort", DEFAULT_REFEREE_PORT).toUInt());
+
     ui->refboxControlUse->setChecked(s.value("Amun/EnableRefboxControl", DEFAULT_ENABLE_REFBOX_CONTROL).toBool());
     ui->plotterInExtraWindow->setChecked(s.value("Amun/PlotterInExtraWindow", DEFAULT_PLOTTER_IN_EXTRA_WINDOW).toBool());
 
@@ -71,6 +76,7 @@ void ConfigDialog::reset()
 {
     ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
     ui->visionPort->setValue(DEFAULT_VISION_PORT);
+    ui->refPort->setValue(DEFAULT_REFEREE_PORT);
     ui->refboxControlUse->setChecked(DEFAULT_ENABLE_REFBOX_CONTROL);
     ui->plotterInExtraWindow->setChecked(DEFAULT_PLOTTER_IN_EXTRA_WINDOW);
 }
@@ -81,6 +87,8 @@ void ConfigDialog::apply()
     s.setValue("Tracking/SystemDelayAutoref", ui->systemDelayBox->value());
 
     s.setValue("Amun/VisionPort2018", ui->visionPort->value());
+    s.setValue("Amun/RefereePort", ui->refPort->value());
+
     s.setValue("Amun/EnableRefboxControl", ui->refboxControlUse->isChecked());
     s.setValue("Amun/PlotterInExtraWindow", ui->plotterInExtraWindow->isChecked());
 
