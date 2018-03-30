@@ -38,8 +38,12 @@ AutorefTeamWidget::AutorefTeamWidget(QWidget *parent) :
 
 AutorefTeamWidget::~AutorefTeamWidget()
 {
+}
+
+void AutorefTeamWidget::shutdown()
+{
     QSettings s;
-    s.beginGroup("RefereeTeam");
+    s.beginGroup(teamTypeName());
     s.setValue("Script", m_filename);
     s.setValue("EntryPoint", m_entryPoint);
     s.setValue("AutoReload", m_userAutoReload);
@@ -99,6 +103,11 @@ void AutorefTeamWidget::init()
     updateStyleSheet();
 }
 
+QString AutorefTeamWidget::teamTypeName() const
+{
+    return "Autoref";
+}
+
 void AutorefTeamWidget::load()
 {
     QSettings s;
@@ -106,7 +115,7 @@ void AutorefTeamWidget::load()
     m_recentScripts = s.value("RecentScripts").toStringList();
     s.endGroup();
 
-    s.beginGroup("RefereeTeam");
+    s.beginGroup(teamTypeName());
     m_filename = s.value("Script").toString();
     m_entryPoint = s.value("EntryPoint").toString();
     m_reloadAction->setChecked(s.value("AutoReload").toBool());
@@ -256,7 +265,7 @@ QString AutorefTeamWidget::shortenEntrypointName(const QMenu *menu, const QStrin
 
 void AutorefTeamWidget::showOpenDialog()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open script", QString(), QString("Lua scripts (*.lua)"), 0, 0);
+    QString filename = QFileDialog::getOpenFileName(this, "Open script", QString(), QString("Lua script entrypoint (init.lua)"), 0, 0);
     if (filename.isNull()) {
         return;
     }
@@ -274,6 +283,11 @@ void AutorefTeamWidget::open()
     open(filename);
 }
 
+amun::CommandStrategy * AutorefTeamWidget::commandStrategyFromType(const Command &command) const
+{
+    return command->mutable_strategy_autoref();
+}
+
 void AutorefTeamWidget::open(const QString &filename)
 {
     m_filename = filename;
@@ -286,8 +300,7 @@ void AutorefTeamWidget::open(const QString &filename)
         m_recentScripts.takeLast();
     }
     Command command(new amun::Command);
-    amun::CommandStrategyLoad *strategy =
-                command->mutable_strategy_autoref()->mutable_load();
+    amun::CommandStrategyLoad *strategy = commandStrategyFromType(command)->mutable_load();
 
     strategy->set_filename(filename.toStdString());
     emit sendCommand(command);
@@ -296,8 +309,7 @@ void AutorefTeamWidget::open(const QString &filename)
 void AutorefTeamWidget::closeScript()
 {
     Command command(new amun::Command);
-    amun::CommandStrategy *strategy =
-                command->mutable_strategy_autoref();
+    amun::CommandStrategy *strategy = commandStrategyFromType(command);
 
     strategy->mutable_close();
     emit sendCommand(command);
@@ -326,8 +338,7 @@ void AutorefTeamWidget::prepareScriptMenu()
 void AutorefTeamWidget::selectEntryPoint(const QString &entry_point)
 {
     Command command(new amun::Command);
-    amun::CommandStrategyLoad *strategy =
-                command->mutable_strategy_autoref()->mutable_load();
+    amun::CommandStrategyLoad *strategy = commandStrategyFromType(command)->mutable_load();
 
     strategy->set_filename(m_filename.toStdString());
     strategy->set_entry_point(entry_point.toStdString());
@@ -343,7 +354,7 @@ void AutorefTeamWidget::selectEntryPoint(QAction* action)
 void AutorefTeamWidget::sendReload()
 {
     Command command(new amun::Command);
-    amun::CommandStrategy *strategy = command->mutable_strategy_autoref();
+    amun::CommandStrategy *strategy = commandStrategyFromType(command);
 
     strategy->set_reload(true);
     emit sendCommand(command);
@@ -355,7 +366,7 @@ void AutorefTeamWidget::sendAutoReload()
         m_userAutoReload = m_reloadAction->isChecked();
     }
     Command command(new amun::Command);
-    amun::CommandStrategy *strategy = command->mutable_strategy_autoref();
+    amun::CommandStrategy *strategy = commandStrategyFromType(command);
 
     strategy->set_auto_reload(m_reloadAction->isChecked());
     emit sendCommand(command);
@@ -364,7 +375,7 @@ void AutorefTeamWidget::sendAutoReload()
 void AutorefTeamWidget::sendEnableDebug(bool enable)
 {
     Command command(new amun::Command);
-    amun::CommandStrategy *strategy = command->mutable_strategy_autoref();
+    amun::CommandStrategy *strategy = commandStrategyFromType(command);
 
     strategy->set_enable_debug(enable);
     sendCommand(command);
@@ -373,8 +384,9 @@ void AutorefTeamWidget::sendEnableDebug(bool enable)
 void AutorefTeamWidget::updateStyleSheet()
 {
     // update background and border color
-    const QColor bgColor = m_notification ? "red" : QColor(Qt::darkGreen).lighter(170);
+    QColor color = Qt::darkGreen;
+    const QColor bgColor = m_notification ? "red" : color.lighter(170);
 
-    QString ss("AutorefTeamWidget { background-color: %1; border-radius: 5px; }");
-    setStyleSheet(ss.arg(bgColor.name()));
+    QString ss("AutorefTeamWidget { background-color: %2; border: 1px solid %1; border-radius: 5px; }");
+    setStyleSheet(ss.arg(color.name()).arg(bgColor.name()));
 }

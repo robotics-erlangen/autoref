@@ -44,6 +44,7 @@ public:
     void init();
     void load();
     void forceAutoReload(bool force);
+    void shutdown();
 
 public slots:
     void handleStatus(const Status &status);
@@ -65,6 +66,8 @@ private:
     void updateStyleSheet();
     void addEntryPoint(QMenu *menu, const QString &name, const QString &entryPoint);
     QString shortenEntrypointName(const QMenu *menu, const QString &name, int targetLength);
+    QString teamTypeName() const;
+    amun::CommandStrategy *commandStrategyFromType(const Command &command) const;
 
 private:
     QToolButton *m_btnOpen;

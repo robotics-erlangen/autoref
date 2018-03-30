@@ -18,15 +18,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "robotselectionwidget.h"
-#include "ballspeedplotter.h"
-#include "infoboard.h"
-#include "configdialog.h"
 #include "mainwindow.h"
-#include "widgets/refereestatuswidget.h"
 #include "ui_mainwindow.h"
-#include "logfile/logfilewriter.h"
+#include "ballspeedplotter.h"
+#include "configdialog.h"
 #include "core/timer.h"
+#include "infoboard.h"
+#include "logfile/logfilewriter.h"
+#include "robotselectionwidget.h"
+#include "widgets/refereestatuswidget.h"
 #include <QDateTime>
 #include <QFile>
 #include <QFileDialog>
@@ -161,6 +161,8 @@ void MainWindow::closeEvent(QCloseEvent *e)
     // this also ensure that a closeEvent is triggered
     m_plotter->close();
     m_infoboard->close();
+
+    ui->autoref->shutdown();
 
     QMainWindow::closeEvent(e);
 }

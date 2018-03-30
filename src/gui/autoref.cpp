@@ -20,6 +20,7 @@
 
 #include "config/config.h"
 #include "mainwindow.h"
+#include <clocale>
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
@@ -33,6 +34,13 @@ int main(int argc, char* argv[])
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 1, 0))
     qApp->setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+#ifdef Q_OS_OSX
+    if (QDir::currentPath() == "/") {
+        QDir::setCurrent(QDir::homePath());
+    }
+#endif
+
+    std::setlocale(LC_NUMERIC, "C");
 
     QDir::addSearchPath("icon", QString(ERFORCE_DATADIR) + "/icons");
     QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
