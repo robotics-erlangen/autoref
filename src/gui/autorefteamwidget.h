@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef TEAMWIDGET_H
-#define TEAMWIDGET_H
+#ifndef AUTOREFTEAMWIDGET_H
+#define AUTOREFTEAMWIDGET_H
 
 #include "protobuf/command.h"
 #include "protobuf/status.h"
@@ -29,13 +29,13 @@
 #include <QToolButton>
 #include <QStringList>
 
-class TeamWidget : public QFrame
+class AutorefTeamWidget : public QFrame
 {
     Q_OBJECT
 
 public:
-    explicit TeamWidget(QWidget *parent = 0);
-    ~TeamWidget() override;
+    explicit AutorefTeamWidget(QWidget *parent = 0);
+    ~AutorefTeamWidget() override;
 
 signals:
     void sendCommand(const Command &command);
@@ -81,4 +81,4 @@ private:
     QStringList m_recentScripts;
 };
 
-#endif // TEAMWIDGET_H
+#endif // AUTOREFTEAMWIDGET_H

@@ -1,5 +1,5 @@
 # ***************************************************************************
-# *   Copyright 2015 Michael Eischer, Philipp Nordhus                       *
+# *   Copyright 2016 Michael Eischer                                        *
 # *   Robotics Erlangen e.V.                                                *
 # *   http://www.robotics-erlangen.de/                                      *
 # *   info@robotics-erlangen.de                                             *
@@ -18,35 +18,12 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-add_library(backend
-    include/amun/amun.h
-    ../framework/src/amun/include/amun/amunclient.h
-
-    amun.cpp
-    ../framework/src/amun/amunclient.cpp
-    ../framework/src/amun/networkinterfacewatcher.cpp
-    ../framework/src/amun/networkinterfacewatcher.h
-    ../framework/src/amun/receiver.cpp
-    ../framework/src/amun/receiver.h
+configure_file(include/config/config.h.in include/config/config.h)
+add_library(config INTERFACE)
+target_include_directories(config
+    INTERFACE "${CMAKE_CURRENT_BINARY_DIR}/include"
 )
-target_link_libraries(backend
-    PRIVATE shared::core
-    PRIVATE amun::processor
-    PRIVATE amun::strategy
-    PUBLIC shared::protobuf
-    PUBLIC Qt5::Core
-    PRIVATE Qt5::Network
+target_sources(config
+    INTERFACE "${CMAKE_CURRENT_BINARY_DIR}/include/config/config.h"
 )
-target_include_directories(backend
-    INTERFACE include
-    INTERFACE ../framework/src/amun/include
-    PRIVATE include/amun
-    PRIVATE ../framework/src/amun
-    PRIVATE ../framework/src/amun/include/amun
-)
-
-if(WIN32)
-    target_link_libraries(backend PRIVATE wsock32)
-endif()
-
-add_library(autoref::backend ALIAS backend)
+add_library(shared::config ALIAS config)

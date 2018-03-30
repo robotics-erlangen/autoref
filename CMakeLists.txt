@@ -18,18 +18,12 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5.0)
 project(erforce)
 enable_testing()
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_SOURCE_DIR}/src/framework/cmake")
-if(POLICY CMP0020)
-    cmake_policy(SET CMP0020 NEW) # remove if CMake >= 2.8.11 required
-endif()
-if(POLICY CMP0043) # compatibility with CMake 3.0.1
-    cmake_policy(SET CMP0043 OLD)
-endif()
-if(POLICY CMP0058)
-    cmake_policy(SET CMP0058 NEW)
+if(POLICY CMP0071) # compatibility with CMake 3.10.0
+    cmake_policy(SET CMP0071 OLD)
 endif()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++11")
@@ -38,6 +32,15 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting build type to Release")
     set(CMAKE_BUILD_TYPE "Release")
 endif()
+
+if(MINGW)
+    find_program(WINDRES_EXECUTABLE NAMES windres)
+    set(CMAKE_RC_COMPILER_INIT ${WINDRES_EXECUTABLE})
+    enable_language(RC)
+    set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> \"-I${CMAKE_SOURCE_DIR}/data/pkg\" -i <SOURCE> -o <OBJECT>")
+    # make sure MinGW doesn't screw up packing the radiocommands
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-ms-bitfields")
+endif(MINGW)
 
 if(APPLE)
     # the option "S" prevents execution of ranlib
@@ -48,36 +51,32 @@ if(APPLE)
     SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols <TARGET>")
 endif()
 
-find_package(OpenGL)
-find_package(Threads)
+include(EnvHelper)
+
+find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
+sanitize_env()
 find_package(Protobuf)
+restore_env()
+if(NOT ${PROTOBUF_FOUND})
+    include(BuildProtobuf)
+endif()
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5OpenGL REQUIRED)
 
+if(NOT APPLE)
+    # file open dialogs crash on mac
+    find_package(Jemalloc)
+endif()
 include(BuildEigen)
 include(BuildLuaJIT2)
 
-if(MINGW)
-    set(CMAKE_RC_COMPILER_INIT windres)
-    enable_language(RC)
-    set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -I${CMAKE_SOURCE_DIR}/data/pkg -i <SOURCE> -o <OBJECT>")
-endif(MINGW)
-
-
-configure_file(src/config.h.in src/config.h)
-include_directories(${CMAKE_BINARY_DIR}/src)
-include_directories(${CMAKE_BINARY_DIR}/src/framework/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/framework/src)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(src)
-
-include(AddTests)
 
 if(UNIX AND NOT APPLE)
     configure_file(data/pkg/autoref.desktop.in autoref.desktop)
@@ -86,3 +85,6 @@ if(UNIX AND NOT APPLE)
         COMMENT "Installing menu entries" VERBATIM
     )
 endif()
+
+include(AddTests)
+

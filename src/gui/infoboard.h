@@ -24,7 +24,7 @@
 #include "protobuf/status.h"
 #include <QWidget>
 #include <QMap>
-#include "gui/teamscorewidget.h"
+#include "teamscorewidget.h"
 #include <QTimer>
 
 class FieldWidget;

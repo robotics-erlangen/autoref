@@ -118,7 +118,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="TeamWidget" name="autoref"/>
+   <widget class="AutorefTeamWidget" name="autoref"/>
   </widget>
   <widget class="QDockWidget" name="dockOptions">
    <property name="windowTitle">
@@ -169,37 +169,37 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TeamWidget</class>
+   <class>AutorefTeamWidget</class>
    <extends>QWidget</extends>
-   <header>gui/teamwidget.h</header>
+   <header>autorefteamwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>VisualizationWidget</class>
    <extends>QWidget</extends>
-   <header>visualizationwidget.h</header>
+   <header>widgets/visualizationwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>TimingWidget</class>
    <extends>QWidget</extends>
-   <header>timingwidget.h</header>
+   <header>widgets/timingwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>FieldWidget</class>
    <extends>QGraphicsView</extends>
-   <header>fieldwidget.h</header>
+   <header>widgets/fieldwidget.h</header>
   </customwidget>
   <customwidget>
    <class>LogWidget</class>
    <extends>QPlainTextEdit</extends>
-   <header>logwidget.h</header>
+   <header>widgets/logwidget.h</header>
   </customwidget>
   <customwidget>
    <class>DebugTreeWidget</class>
    <extends>QTreeView</extends>
-   <header>debugtreewidget.h</header>
+   <header>widgets/debugtreewidget.h</header>
   </customwidget>
   <customwidget>
    <class>OptionsWidget</class>

@@ -23,7 +23,7 @@
 #include "infoboard.h"
 #include "configdialog.h"
 #include "mainwindow.h"
-#include "refereestatuswidget.h"
+#include "widgets/refereestatuswidget.h"
 #include "ui_mainwindow.h"
 #include "logfile/logfilewriter.h"
 #include "core/timer.h"

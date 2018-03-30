@@ -18,12 +18,11 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 # firmware
 add_subdirectory(framework/src/firmware)
 
 # libs
+add_subdirectory(config)
 add_subdirectory(framework/src/core)
 add_subdirectory(framework/src/protobuf)
 add_subdirectory(framework/src/amun/processor)
@@ -32,4 +31,7 @@ add_subdirectory(backend)
 
 # apps
 add_subdirectory(framework/src/ra/logfile)
+add_subdirectory(framework/src/ra/guihelper)
+add_subdirectory(framework/src/ra/plotter)
+add_subdirectory(framework/src/ra/widgets)
 add_subdirectory(gui)

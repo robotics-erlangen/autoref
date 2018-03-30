@@ -21,7 +21,7 @@
 #include <QLabel>
 #include "teamscorewidget.h"
 #include "ui_teamscorewidget.h"
-#include "config.h"
+#include "config/config.h"
 
 TeamScoreWidget::TeamScoreWidget(QWidget *parent) :
     QWidget(parent),

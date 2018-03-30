@@ -20,7 +20,7 @@
 
 #include "infoboard.h"
 #include "ui_infoboard.h"
-#include "fieldwidget.h"
+#include "widgets/fieldwidget.h"
 #include "protobuf/debug.pb.h"
 
 InfoBoard::InfoBoard(QWidget *parent) :

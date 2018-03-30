@@ -193,12 +193,12 @@
   <customwidget>
    <class>FieldWidget</class>
    <extends>QGraphicsView</extends>
-   <header>fieldwidget.h</header>
+   <header>widgets/fieldwidget.h</header>
   </customwidget>
   <customwidget>
    <class>TeamScoreWidget</class>
    <extends>QWidget</extends>
-   <header location="global">teamscorewidget.h</header>
+   <header>teamscorewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

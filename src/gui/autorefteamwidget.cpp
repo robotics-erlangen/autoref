@@ -18,7 +18,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#include "teamwidget.h"
+#include "autorefteamwidget.h"
 #include "protobuf/command.pb.h"
 #include "protobuf/status.pb.h"
 #include <QAction>
@@ -29,14 +29,14 @@
 #include <QToolButton>
 #include <QMenu>
 
-TeamWidget::TeamWidget(QWidget *parent) :
+AutorefTeamWidget::AutorefTeamWidget(QWidget *parent) :
     QFrame(parent),
     m_userAutoReload(false),
     m_notification(false)
 {
 }
 
-TeamWidget::~TeamWidget()
+AutorefTeamWidget::~AutorefTeamWidget()
 {
     QSettings s;
     s.beginGroup("RefereeTeam");
@@ -50,7 +50,7 @@ TeamWidget::~TeamWidget()
     s.endGroup();
 }
 
-void TeamWidget::init()
+void AutorefTeamWidget::init()
 {
     QBoxLayout *hLayout = new QHBoxLayout(this);
     hLayout->setMargin(4);
@@ -99,7 +99,7 @@ void TeamWidget::init()
     updateStyleSheet();
 }
 
-void TeamWidget::load()
+void AutorefTeamWidget::load()
 {
     QSettings s;
     s.beginGroup("Strategy");
@@ -124,7 +124,7 @@ void TeamWidget::load()
     }
 }
 
-void TeamWidget::forceAutoReload(bool force)
+void AutorefTeamWidget::forceAutoReload(bool force)
 {
     // must be updated before call to setChecked!
     m_reloadAction->setDisabled(force); // disable when forced
@@ -135,7 +135,7 @@ void TeamWidget::forceAutoReload(bool force)
     }
 }
 
-void TeamWidget::handleStatus(const Status &status)
+void AutorefTeamWidget::handleStatus(const Status &status)
 {
     // select corresponding strategy status
     const amun::StatusStrategy *strategy = NULL;
@@ -190,7 +190,7 @@ void TeamWidget::handleStatus(const Status &status)
     }
 }
 
-void TeamWidget::addEntryPoint(QMenu *menu, const QString &name, const QString &entryPoint)
+void AutorefTeamWidget::addEntryPoint(QMenu *menu, const QString &name, const QString &entryPoint)
 {
     int idx = name.indexOf("/");
     if (idx == -1) {
@@ -214,7 +214,7 @@ void TeamWidget::addEntryPoint(QMenu *menu, const QString &name, const QString &
     }
 }
 
-QString TeamWidget::shortenEntrypointName(const QMenu *menu, const QString &name, int targetLength)
+QString AutorefTeamWidget::shortenEntrypointName(const QMenu *menu, const QString &name, int targetLength)
 {
     // shorten entry point name
     QString left = "";
@@ -254,7 +254,7 @@ QString TeamWidget::shortenEntrypointName(const QMenu *menu, const QString &name
     return left + ((left.isEmpty())?"" : "/") + right;
 }
 
-void TeamWidget::showOpenDialog()
+void AutorefTeamWidget::showOpenDialog()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open script", QString(), QString("Lua scripts (*.lua)"), 0, 0);
     if (filename.isNull()) {
@@ -264,7 +264,7 @@ void TeamWidget::showOpenDialog()
     open(filename);
 }
 
-void TeamWidget::open()
+void AutorefTeamWidget::open()
 {
     QString filename = sender()->property("filename").toString();
     if (filename.isNull()) {
@@ -274,7 +274,7 @@ void TeamWidget::open()
     open(filename);
 }
 
-void TeamWidget::open(const QString &filename)
+void AutorefTeamWidget::open(const QString &filename)
 {
     m_filename = filename;
 
@@ -293,7 +293,7 @@ void TeamWidget::open(const QString &filename)
     emit sendCommand(command);
 }
 
-void TeamWidget::closeScript()
+void AutorefTeamWidget::closeScript()
 {
     Command command(new amun::Command);
     amun::CommandStrategy *strategy =
@@ -303,7 +303,7 @@ void TeamWidget::closeScript()
     emit sendCommand(command);
 }
 
-void TeamWidget::prepareScriptMenu()
+void AutorefTeamWidget::prepareScriptMenu()
 {
     // only keep close and open... entries
     while (m_scriptMenu->actions().size() > 2) {
@@ -323,7 +323,7 @@ void TeamWidget::prepareScriptMenu()
     }
 }
 
-void TeamWidget::selectEntryPoint(const QString &entry_point)
+void AutorefTeamWidget::selectEntryPoint(const QString &entry_point)
 {
     Command command(new amun::Command);
     amun::CommandStrategyLoad *strategy =
@@ -335,12 +335,12 @@ void TeamWidget::selectEntryPoint(const QString &entry_point)
     emit sendCommand(command);
 }
 
-void TeamWidget::selectEntryPoint(QAction* action)
+void AutorefTeamWidget::selectEntryPoint(QAction* action)
 {
     selectEntryPoint(action->data().toString());
 }
 
-void TeamWidget::sendReload()
+void AutorefTeamWidget::sendReload()
 {
     Command command(new amun::Command);
     amun::CommandStrategy *strategy = command->mutable_strategy_autoref();
@@ -349,7 +349,7 @@ void TeamWidget::sendReload()
     emit sendCommand(command);
 }
 
-void TeamWidget::sendAutoReload()
+void AutorefTeamWidget::sendAutoReload()
 {
     if (m_reloadAction->isEnabled()) {
         m_userAutoReload = m_reloadAction->isChecked();
@@ -361,7 +361,7 @@ void TeamWidget::sendAutoReload()
     emit sendCommand(command);
 }
 
-void TeamWidget::sendEnableDebug(bool enable)
+void AutorefTeamWidget::sendEnableDebug(bool enable)
 {
     Command command(new amun::Command);
     amun::CommandStrategy *strategy = command->mutable_strategy_autoref();
@@ -370,11 +370,11 @@ void TeamWidget::sendEnableDebug(bool enable)
     sendCommand(command);
 }
 
-void TeamWidget::updateStyleSheet()
+void AutorefTeamWidget::updateStyleSheet()
 {
     // update background and border color
     const QColor bgColor = m_notification ? "red" : QColor(Qt::darkGreen).lighter(170);
 
-    QString ss("TeamWidget { background-color: %1; border-radius: 5px; }");
+    QString ss("AutorefTeamWidget { background-color: %1; border-radius: 5px; }");
     setStyleSheet(ss.arg(bgColor.name()));
 }

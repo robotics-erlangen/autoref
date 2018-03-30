@@ -23,6 +23,7 @@
 
 #ifdef _WIN32
 static const char* const ERFORCE_DATADIR = "./data/";
+static const char* const AUTOREF_DATADIR = "./data/";
 #else // _WIN32
 static const char* const ERFORCE_DATADIR = "${CMAKE_SOURCE_DIR}/src/framework/data/";
 static const char* const AUTOREF_DATADIR = "${CMAKE_SOURCE_DIR}/data/";
