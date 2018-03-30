@@ -24,7 +24,7 @@
 #include <QSettings>
 
 const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
-const uint DEFAULT_VISION_PORT = 10005;
+const uint DEFAULT_VISION_PORT = 10006;
 const bool DEFAULT_ENABLE_REFBOX_CONTROL = true;
 const bool DEFAULT_PLOTTER_IN_EXTRA_WINDOW = false;
 
@@ -60,7 +60,7 @@ void ConfigDialog::load()
     QSettings s;
     ui->systemDelayBox->setValue(s.value("Tracking/SystemDelayAutoref", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
 
-    ui->visionPort->setValue(s.value("Amun/VisionPort", DEFAULT_VISION_PORT).toUInt());
+    ui->visionPort->setValue(s.value("Amun/VisionPort2018", DEFAULT_VISION_PORT).toUInt());
     ui->refboxControlUse->setChecked(s.value("Amun/EnableRefboxControl", DEFAULT_ENABLE_REFBOX_CONTROL).toBool());
     ui->plotterInExtraWindow->setChecked(s.value("Amun/PlotterInExtraWindow", DEFAULT_PLOTTER_IN_EXTRA_WINDOW).toBool());
 
@@ -80,7 +80,7 @@ void ConfigDialog::apply()
     QSettings s;
     s.setValue("Tracking/SystemDelayAutoref", ui->systemDelayBox->value());
 
-    s.setValue("Amun/VisionPort", ui->visionPort->value());
+    s.setValue("Amun/VisionPort2018", ui->visionPort->value());
     s.setValue("Amun/EnableRefboxControl", ui->refboxControlUse->isChecked());
     s.setValue("Amun/PlotterInExtraWindow", ui->plotterInExtraWindow->isChecked());
 
