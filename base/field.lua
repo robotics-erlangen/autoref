@@ -31,7 +31,6 @@ local math = require "../base/math"
 local Referee = require "../base/referee"
 local World = require "../base/world"
 
-
 local G = World.Geometry
 
 --- returns the nearest position inside the field (extended by boundaryWidth)
@@ -42,10 +41,10 @@ local G = World.Geometry
 function Field.limitToField(pos, boundaryWidth)
 	boundaryWidth = boundaryWidth or 0
 
-	local allowedHeight = World.Geometry.FieldHeightHalf + boundaryWidth -- limit height to field
+	local allowedHeight = G.FieldHeightHalf + boundaryWidth -- limit height to field
 	local y = math.bound(-allowedHeight, pos.y, allowedHeight)
 
-	local allowedWidth = World.Geometry.FieldWidthHalf + boundaryWidth -- limit width to field
+	local allowedWidth = G.FieldWidthHalf + boundaryWidth -- limit width to field
 	local x = math.bound(-allowedWidth, pos.x, allowedWidth)
 
 	return Vector(x, y)
@@ -60,24 +59,24 @@ function Field.limitToAllowedField(pos, extraLimit, blockOpponentDefenseArea)
 	extraLimit = extraLimit or 0
 	local oppExtraLimit = extraLimit
 	if Referee.isStopState() then
-		oppExtraLimit = oppExtraLimit + World.Geometry.FreeKickDefenseDist + 0.10
+		oppExtraLimit = oppExtraLimit + G.FreeKickDefenseDist + 0.10
 	end
 	if Field.isInYellowDefenseArea(pos, extraLimit) then
-		if math.abs(pos.x) <= World.Geometry.DefenseStretch/2 then
-			pos = Vector(pos.x, -World.Geometry.FieldHeightHalf+World.Geometry.DefenseRadius+extraLimit)
+		if math.abs(pos.x) <= G.DefenseStretchHalf then
+			pos = Vector(pos.x, -G.FieldHeightHalf+G.DefenseRadius+extraLimit)
 		else
 			local circleMidpoint = Vector(
-				World.Geometry.DefenseStretch/2*math.sign(pos.x), -World.Geometry.FieldHeightHalf)
-			pos = circleMidpoint + (pos - circleMidpoint):setLength(World.Geometry.DefenseRadius+extraLimit)
+				G.DefenseStretchHalf *math.sign(pos.x), -G.FieldHeightHalf)
+			pos = circleMidpoint + (pos - circleMidpoint):setLength(G.DefenseRadius+extraLimit)
 		end
 		return pos
 	elseif blockOpponentDefenseArea and Field.isInBlueDefenseArea(pos, oppExtraLimit) then
-		if math.abs(pos.x) <= World.Geometry.DefenseStretch/2 then
-			pos = Vector(pos.x, World.Geometry.FieldHeightHalf-World.Geometry.DefenseRadius-oppExtraLimit)
+		if math.abs(pos.x) <= G.DefenseStretchHalf then
+			pos = Vector(pos.x, G.FieldHeightHalf-G.DefenseRadius-oppExtraLimit)
 		else
 			local circleMidpoint = Vector(
-				World.Geometry.DefenseStretch/2*math.sign(pos.x), World.Geometry.FieldHeightHalf)
-			pos = circleMidpoint + (pos - circleMidpoint):setLength(World.Geometry.DefenseRadius+oppExtraLimit)
+				G.DefenseStretchHalf * math.sign(pos.x), G.FieldHeightHalf)
+			pos = circleMidpoint + (pos - circleMidpoint):setLength(G.DefenseRadius+oppExtraLimit)
 		end
 		return pos
 	else
@@ -93,12 +92,11 @@ end
 function Field.isInField(pos, boundaryWidth)
 	boundaryWidth = boundaryWidth or 0
 
-	local allowedHeight = World.Geometry.FieldHeightHalf + boundaryWidth -- limit height to field
-	local allowedWidth = World.Geometry.FieldWidthHalf + boundaryWidth -- limit width to field
+	local allowedHeight = G.FieldHeightHalf + boundaryWidth -- limit height to field
+	local allowedWidth = G.FieldWidthHalf + boundaryWidth -- limit width to field
 
 	return math.abs(pos.y) < allowedHeight and math.abs(pos.x) < allowedWidth
 end
-
 
 --- Returns the minimum distance to the field borders (extended by boundaryWidth)
 -- @name distanceToFieldBorders
@@ -108,10 +106,10 @@ end
 function Field.distanceToFieldBorder(pos, boundaryWidth)
 	boundaryWidth = boundaryWidth or 0
 
-	local allowedWidth = World.Geometry.FieldWidthHalf + boundaryWidth
+	local allowedWidth = G.FieldWidthHalf + boundaryWidth
 	local dx = allowedWidth - math.abs(pos.x)
 
-	local allowedHeight = World.Geometry.FieldHeightHalf + boundaryWidth
+	local allowedHeight = G.FieldHeightHalf + boundaryWidth
 	local dy = allowedHeight - math.abs(pos.y)
 
 	-- returns the minimum of dx and dy
@@ -223,22 +221,22 @@ function Field.limitToFreekickPosition(pos, executingTeam)
 	local ballSide = pos.y > 0 and "Blue" or "Yellow"
 	local attackColor = executingTeam == World.BlueColorStr and "Blue" or "Yellow"
 
-	if Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) <= World.Geometry.DefenseRadius+0.2 then
+	if Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) <= G.DefenseRadius+0.2 then
 		-- closest point 600mm from the goal line and 100mm from the touch line
 		pos = Vector(
-			math.sign(pos.x) * World.Geometry.FieldWidthHalf - math.sign(pos.x)*0.1,
-			math.sign(pos.y) * World.Geometry.FieldHeightHalf - math.sign(pos.y)*0.6
+			math.sign(pos.x) * G.FieldWidthHalf - math.sign(pos.x)*0.1,
+			math.sign(pos.y) * G.FieldHeightHalf - math.sign(pos.y)*0.6
 		)
 	elseif Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) < 0.7 and ballSide ~= attackColor then
 		-- closest point 700mm from the defense area
-		local origin = World.Geometry[ballSide.."Goal"]
-		if math.abs(pos.x) > World.Geometry.DefenseStretch/2 then
+		local origin = G[ballSide.."Goal"]
+		if math.abs(pos.x) > G.DefenseStretch/2 then
 			origin = Vector(
-				math.sign(pos.x) * World.Geometry.DefenseStretch/2,
-				math.sign(pos.y) * World.Geometry.FieldHeightHalf
+				math.sign(pos.x) * G.DefenseStretch/2,
+				math.sign(pos.y) * G.FieldHeightHalf
 			)
 		end
-		pos = origin + (pos-origin):setLength(World.Geometry.DefenseRadius+0.7)
+		pos = origin + (pos-origin):setLength(G.DefenseRadius+0.7)
 	end
 
 	return pos
