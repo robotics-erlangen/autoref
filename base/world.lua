@@ -76,6 +76,8 @@ World.IsSimulated = false
 World.IsLargeField = false
 World.SelectedOptions = nil
 
+World.RULEVERSION = nil
+
 World.Geometry = {}
 --- Field geometry.
 -- Lengths in meter
@@ -96,6 +98,8 @@ World.Geometry = {}
 -- @field FreeKickDefenseDist number - Distance to keep to opponent defense area during a freekick
 -- @field DefenseRadius number - Radius of the defense area corners
 -- @field DefenseStretch number - Distance between the defense areas quarter circles
+-- @field DefenseWidth number - Width of the rectangular defense area (since 2018)
+-- @field DefenseHeight number - Height of the rectangular defense area (since 2018)
 -- @field YellowPenaltySpot Vector - Position of our own penalty spot
 -- @field BluePenaltySpot Vector - Position of the opponent's penalty spot
 -- @field BluePenaltyLine number - Maximal distance from centerline during an offensive penalty
@@ -113,7 +117,9 @@ World.Geometry = {}
 function World._init()
 	assert(not amun.isBlue(), "Must be run as yellow strategy or autoref!")
 	World.TeamIsBlue = false
-	World._updateGeometry(amun.getGeometry())
+	local geom = amun.getGeometry()
+	World._updateGeometry(geom)
+	World._updateRuleVersion(geom)
 	World._updateTeam()
 end
 
@@ -140,6 +146,15 @@ function World._updateTeam()
 	World.YellowRobotsById = friendlyRobotsById
 end
 
+-- Get rule version from geometry
+function World._updateRuleVersion(geom)
+	if not geom.type or geom.type == "TYPE_2014" then
+		World.RULEVERSION = "2017"
+	else
+		World.RULEVERSION = "2018"
+	end
+end
+
 -- Setup field geometry
 function World._updateGeometry(geom)
 	local wgeom = World.Geometry
@@ -161,6 +176,10 @@ function World._updateGeometry(geom)
 
 	wgeom.DefenseRadius = geom.defense_radius
 	wgeom.DefenseStretch = geom.defense_stretch
+	wgeom.DefenseStretchHalf = geom.defense_stretch / 2
+	wgeom.DefenseWidth = geom.defense_width or geom.defense_stretch
+	wgeom.DefenseHeight = geom.defense_height or geom.defense_radius
+	wgeom.DefenseWidthHalf = (geom.defense_width or geom.defense_stretch) / 2
 
 	wgeom.YellowPenaltySpot = Vector(0, - wgeom.FieldHeightHalf + geom.penalty_spot_from_field_line_dist)
 	wgeom.BluePenaltySpot = Vector(0, wgeom.FieldHeightHalf - geom.penalty_spot_from_field_line_dist)
