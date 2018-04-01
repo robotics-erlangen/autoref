@@ -117,30 +117,44 @@ function Field.distanceToFieldBorder(pos, boundaryWidth)
 end
 
 
-
-local defStretchHalf = G.DefenseStretch / 2
-local defRadius = G.DefenseRadius
-local function isInDefenseArea(pos, radius, friendly)
-	radius = radius or 0
-	local goalLine = G.FieldHeightHalf
-	if friendly then
-		goalLine = -G.FieldHeightHalf
+local function distanceToDefenseAreaSq_2018(pos, yellow)
+	local defenseMin = Vector(-G.DefenseWidthHalf, G.FieldHeightHalf - G.DefenseHeight)
+	local defenseMax = Vector(G.DefenseWidthHalf, G.FieldHeightHalf)
+	if yellow then
+		defenseMin, defenseMax = -defenseMax, -defenseMin
 	end
-
-	if (friendly and pos.y + radius < goalLine)	or (not friendly and pos.y + radius > goalLine) then
-		return false
-	end
-
-	local p1 = Vector(defStretchHalf, goalLine) -- lower bound of defense stretch
-	local p2 = Vector(-defStretchHalf, goalLine) -- upper bound of defense stretch
-	local belowDefStretch = pos.y > goalLine - defRadius - radius
-	if friendly then
-		belowDefStretch = pos.y < goalLine + defRadius + radius
-	end
-
-	return (math.abs(pos.x) < defStretchHalf + radius and belowDefStretch) -- if robot is inside defense stretch
-		or p1:distanceTo(pos) < defRadius + radius or p2:distanceTo(pos) < defRadius + radius -- if robot is inside defense radius
+	return pos:distanceToSq(geom.boundRect(defenseMin, pos, defenseMax))
 end
+
+local function distanceToDefenseArea_2018(pos, radius, friendly)
+	local distance = math.sqrt(distanceToDefenseAreaSq_2018(pos, friendly)) - radius
+	return (distance < 0) and 0 or distance
+end
+
+local function isInDefenseArea_2018(pos, radius, friendly)
+	return distanceToDefenseAreaSq_2018(pos, friendly) <= radius * radius
+end
+
+local function distanceToDefenseArea_2017(pos, radius, friendly)
+	radius = radius + G.DefenseRadius
+	local goalLine = friendly and - G.FieldHeightHalf or G.FieldHeightHalf
+	local inside = Vector(math.bound(-G.DefenseStretchHalf, pos.x, G.DefenseStretchHalf), goalLine)
+	local distance= pos:distanceTo(inside) - radius
+	return (distance < 0) and 0 or distance
+end
+
+local function distanceToDefenseAreaSq_2017(pos, friendly)
+	local d = distanceToDefenseArea_2017(pos, 0, friendly)
+	return d * d
+end
+
+local function isInDefenseArea_2017(pos, radius, friendly)
+	radius = radius + G.DefenseRadius
+	local goalLine = friendly and -G.FieldHeightHalf or G.FieldHeightHalf
+	local inside = Vector(math.bound(-G.DefenseStretchHalf, pos.x, G.DefenseStretchHalf), goalLine)
+	return pos:distanceToSq(inside) <= radius * radius
+end
+
 
 --- Returns true if the position is inside/touching the yellow defense area
 -- @name isInYellowDefenseArea
@@ -148,7 +162,7 @@ end
 -- @param radius number - Radius of object to check
 -- @return bool
 function Field.isInYellowDefenseArea(pos, radius)
-	return isInDefenseArea(pos, radius, true)
+	return Field.isInDefenseArea(pos, radius, true)
 end
 
 --- Returns true if the position is inside/touching the blue defense area
@@ -157,45 +171,7 @@ end
 -- @param radius number - Radius of object to check
 -- @return bool
 function Field.isInBlueDefenseArea(pos, radius)
-	return isInDefenseArea(pos, radius, false)
-end
-
-local function distanceToDefenseArea(pos, radius, yellow)
-	local goalLine = G.FieldHeightHalf
-	if yellow then
-		goalLine = - G.FieldHeightHalf
-	end
-	if yellow and pos.y + radius < goalLine then
-		local distx = math.max(math.abs(pos.x) - radius - defRadius - defStretchHalf, 0)
-		local disty = goalLine - pos.y - radius
-		return math.sqrt(distx^2, disty^2)
-	elseif not yellow and pos.y + radius > G.FieldHeightHalf then
-		local distx = math.max(math.abs(pos.x) - radius - defRadius - defStretchHalf, 0)
-		local disty = pos.y + radius - goalLine
-		return math.sqrt(distx^2, disty^2)
-	end
-	if isInDefenseArea(pos, radius, yellow) then
-		return 0
-	end
-	local distance
-	if math.abs(pos.x) <= defStretchHalf then
-		if yellow then
-			distance = pos.y - (goalLine + defRadius) - radius
-		else
-			distance = goalLine - defRadius - pos.y - radius
-		end
-	elseif pos.x > defStretchHalf then
-		local corner = Vector(defStretchHalf, goalLine)
-		distance = corner:distanceTo(pos) - defRadius - radius
-	else -- pos.x < -defStretchHalf
-		local corner = Vector(-defStretchHalf, goalLine)
-		distance = corner:distanceTo(pos) - defRadius - radius
-	end
-	if distance < -0.00001 then
-		error("base/field: distanceToYellowDefenseArea() becomes negative ("..distance..
-			") for pos = ("..pos.x..", "..pos.y..") and radius = "..radius)
-	end
-	return (distance < 0) and 0 or distance
+	return Field.isInDefenseArea(pos, radius, false)
 end
 
 --- Calculates the distance (between robot hull and field line) to the yellow defense area
@@ -204,7 +180,7 @@ end
 -- @param radius number - Radius of object to check
 -- @return number - distance
 function Field.distanceToYellowDefenseArea(pos, radius)
-	return distanceToDefenseArea(pos, radius, true)
+	return Field.distanceToDefenseArea(pos, radius, true)
 end
 
 --- Calculates the distance (between robot hull and field line) to the blue defense area
@@ -213,7 +189,7 @@ end
 -- @param radius number - Radius of object to check
 -- @return number - distance
 function Field.distanceToBlueDefenseArea(pos, radius)
-	return distanceToDefenseArea(pos, radius, false)
+	return Field.distanceToDefenseArea(pos, radius, false)
 end
 
 function Field.limitToFreekickPosition(pos, executingTeam)
@@ -477,5 +453,14 @@ function Field.nextLineCut(startPos, dir, offset)
 	end
 end
 
+if World.RULEVERSION == "2018" then
+	Field.distanceToDefenseAreaSq = distanceToDefenseAreaSq_2018
+	Field.distanceToDefenseArea = distanceToDefenseArea_2018
+	Field.isInDefenseArea = isInDefenseArea_2018
+else
+	Field.distanceToDefenseAreaSq = distanceToDefenseAreaSq_2017
+	Field.distanceToDefenseArea = distanceToDefenseArea_2017
+	Field.isInDefenseArea = isInDefenseArea_2017
+end
 
 return Field

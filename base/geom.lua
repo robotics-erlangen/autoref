@@ -93,6 +93,19 @@ function geom.intersectLineCircle(offset, dir, center, radius)
 	return point1, point2, lambda1, lambda2
 end
 
+-- Bounds a point inside a rectangle.
+-- @name boundRect
+-- @param p1 Vector - First corner of the rectangle
+-- @param pos Vector - The point to be bound
+-- @param p2 Vector - Second corner of the rectangle
+-- @return Vector - pos if it is inside the rect, otherwise a position bound by the spanning rectangle
+function geom.boundRect(p1, pos, p2)
+	return Vector(
+		math.bound(math.min(p1.x,p2.x), pos.x, math.max(p1.x,p2.x)),
+		math.bound(math.min(p1.y,p2.y), pos.y, math.max(p1.y,p2.y))
+	)
+end
+
 --- Calcualtes tangents to circle.
 -- Returns tangents on circle for point.
 -- @name getTangentsToCircle

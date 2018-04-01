@@ -131,8 +131,13 @@ end
 -- @class function
 -- @name Vector:distanceTo
 function vector_mt:distanceTo(other)
-	return sqrt((other.x - self.x)*(other.x - self.x)
-		+ (other.y - self.y)*(other.y - self.y))
+	return sqrt(self:distanceToSq(other))
+end
+
+function vector_mt:distanceToSq(other)
+	local dx = other.x - self.x
+	local dy = other.y - self.y
+	return dx * dx + dy * dy
 end
 
 --- Calcualates dot product

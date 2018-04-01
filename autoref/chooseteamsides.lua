@@ -44,8 +44,8 @@ function ChooseTeamSides.occuring()
     -- ssl vision does not provide information about team sides.
     -- Therefore, we switch team sides if both goalies are located in the
     -- opponents defense area.
-    if World.BlueKeeper and Field.isInYellowDefenseArea(World.BlueKeeper.pos) and
-            World.YellowKeeper and Field.isInBlueDefenseArea(World.YellowKeeper.pos)
+    if World.BlueKeeper and Field.isInYellowDefenseArea(World.BlueKeeper.pos, World.BlueKeeper.radius) and
+            World.YellowKeeper and Field.isInBlueDefenseArea(World.YellowKeeper.pos, World.YellowKeeper.radius)
             and frameNumber > frameNumberOfLastFlipAttempt+5 then
         -- currently, the switch status is not retrievable. Therefore,
         -- if the flip was not effective we try again with the other possibility
