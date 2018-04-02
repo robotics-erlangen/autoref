@@ -51,7 +51,7 @@ function BallPlacement.start(foul_)
     waitingForBallToSlowDown = true
     startTime = World.Time
     undefinedStateTime = 0
-    Refbox.send("STOP")
+    Refbox.send("STOP", nil, foul.event)
 end
 function BallPlacement.active()
     return foul ~= nil

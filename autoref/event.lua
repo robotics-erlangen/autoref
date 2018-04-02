@@ -37,41 +37,41 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         game_timestamp = { game_stage = stage, stage_time_left = World.StageTimeLeft*1000000 }
     }
 
-    local team = teamIsYellow and "YELLOW" or "BLUE"
+    local team = teamIsYellow and "TEAM_YELLOW" or "TEAM_BLUE"
     if name == "Goal" then
         event.goal = { scoring_team = team, position = { x = pos.x, y = pos.y }}
     elseif name == "ChipGoal" then
-        event.foul = { foul_type = "CHIP_ON_GOAL", offending_team = team, offending_robots = offendingRobots, reason = "ball not in contact with the ground."}
+        event.foul = { gameEventType = "CHIP_ON_GOAL", originator = {team = team, botId = offendingRobots}, message = "ball not in contact with the ground."}
     elseif name == "OutOfField" then --TODO
         assert(pos, "Out of field event needs a position")
         local globalPos = Coordinates.toGlobal(pos)
         event.ball_out_of_field = { last_touch = team,  position = { x = globalPos.x, y = globalPos.y}}
     elseif name == "Carpeting" then
-        event.foul = { foul_type = "ICING", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "ICING", originator = {team = team, botId = offendingRobots } }
     elseif name == "DefenseAreaDist" then
-        event.foul = { foul_type = "ATTACKER_TO_DEFENCE_AREA", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "ATTACKER_TO_DEFENCE_AREA", originator = {team = team, botId = offendingRobots} }
     elseif name == "AttackerInDefenseArea" then
-        event.foul = { foul_type = "ATTACKER_IN_DEFENSE_AREA", offending_team = team, offending_robots = offendingRobots, reason = reason }
+        event.foul = { gameEventType = "ATTACKER_IN_DEFENSE_AREA", originator = {team = team, botId = offendingRobots}, message = reason }
     elseif name == "Collision" then
-        event.foul = { foul_type = "BOT_COLLISION", offending_team = team, offending_robots = offendingRobots, reason = reason }
+        event.foul = { gameEventType = "BOT_COLLISION", originator = {team = team, botId = offendingRobots}, message = reason }
     elseif name == "DoubleTouch" then
-        event.foul = { foul_type = "DOUBLE_TOUCH", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "DOUBLE_TOUCH", originator = {team = team, botId = offendingRobots } }
     elseif name == "Dribbling" then
-        event.foul = { foul_type = "BALL_DRIBBLING", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "BALL_DRIBBLING", originator = {team = team, botId = offendingRobots } }
     elseif name == "FastShot" then
-        event.foul = { foul_type = "BALL_SPEED", offending_team = team, offending_robots = offendingRobots, reason = reason }
+        event.foul = { gameEventType = "BALL_SPEED", originator = {team = team, botId = offendingRobots}, message = reason }
     elseif name == "FreekickDistance" then
-        event.foul = { foul_type = "DEFENDER_TO_KICK_POINT_DISTANCE", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "DEFENDER_TO_KICK_POINT_DISTANCE", originator = {team = team, botId = offendingRobots } }
     elseif name == "MultipleDefenderPartial" then
-        event.foul = { foul_type = "MULTIPLE_DEFENDER_PARTIALLY", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "MULTIPLE_DEFENDER_PARTIALLY", originator = {team = team, botId = offendingRobots } }
     elseif name == "MultipleDefenderFull" then
-        event.foul = { foul_type = "MULTIPLE_DEFENDER", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "MULTIPLE_DEFENDER", originator = {team = team, botId = offendingRobots } }
     elseif name == "NumberOfPlayers" then
-        event.foul = { foul_type = "NUMBER_OF_PLAYERS", offending_team = team, reason = reason }
+        event.foul = { gameEventType = "NUMBER_OF_PLAYERS", originator = {team = team}, message = reason }
     elseif name == "StopSpeed" then
-        event.foul = { foul_type = "ROBOT_STOP_SPEED", offending_team = team, offending_robots = offendingRobots }
+        event.foul = { gameEventType = "ROBOT_STOP_SPEED", originator = {team = team, botId = offendingRobots } }
     elseif name == "StopBallDistance" then --STOP_BALL_DISTANCE
-        event.foul = { foul_type = "CUSTOM", offending_team = team, offending_robots = offendingRobots}
+        event.foul = { gameEventType = "CUSTOM", originator = {team = team, botId = offendingRobots} }
     else
         error("unknown event \"" .. name .. "\"")
     end

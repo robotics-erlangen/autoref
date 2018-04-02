@@ -35,6 +35,9 @@ function Refbox.send(command, placementPos, event)
         command = command,
         implementation_id = "ER-Force Autoref",
     }
+    if event and event.foul then
+        cmd.gameEvent = event.foul
+    end
     local posInGlobal = Coordinates.toGlobal(placementPos)
     if command:sub(0,14) == "BALL_PLACEMENT" then
         cmd.designated_position = {
