@@ -23,6 +23,12 @@ This window is supposed to be placed on a big screen at the playing
 field. It shows the current game score as well as the autoref's decisions.
 It can be set to fullscreen mode by double-clicking inside the window.
 
+The Autoref supports switching between different rule versions. These currently include:
+- 2017 rules (default)
+- 2018 rules for division A
+- 2018 rules for division B
+The rule version can be changed by using the dock widget called 'Autoref'.
+
 ## Features
 Currently, the Autoref detects a number of fouls according to the
 [Technical Challgenge 2016][5]. It is able to autonomously stop the game,
