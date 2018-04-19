@@ -54,6 +54,8 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { gameEventType = "ATTACKER_IN_DEFENSE_AREA", originator = {team = team, botId = offendingRobots}, message = reason }
     elseif name == "Collision" then
         event.foul = { gameEventType = "BOT_COLLISION", originator = {team = team, botId = offendingRobots}, message = reason }
+    elseif name == "CollisionBoth" then
+        event.foul = { gameEventType = "BOT_COLLISION", message = reason}
     elseif name == "DoubleTouch" then
         event.foul = { gameEventType = "DOUBLE_TOUCH", originator = {team = team, botId = offendingRobots } }
     elseif name == "Dribbling" then

@@ -23,10 +23,8 @@ local Collision = {}
 local World = require "../base/world"
 local Event = require "event"
 
--- collision fouls involve one fast moving and one stationary or
--- slow moving robot. See the "Decisions" paragraph of section 12.4
-local FAST_SPEED = 2.5
-local SLOW_SPEED = 0.5
+-- collision between two robots, at least one of them being fast.
+-- See the "Decisions" paragraph of section 12.4
 
 Collision.possibleRefStates = {
     Game = true,
@@ -38,21 +36,33 @@ Collision.possibleRefStates = {
 
 function Collision.occuring()
     for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-        for _, OffRobot in ipairs(World[offense.."Robots"]) do
-            for _, DefRobot in ipairs(World[defense.."Robots"]) do
-                if OffRobot.pos:distanceTo(DefRobot.pos) <= 2*DefRobot.radius
-                    and OffRobot.speed:length() > FAST_SPEED
-                    and DefRobot.speed:length() < SLOW_SPEED
-                then
-                    Collision.consequence = "DIRECT_FREE_"..defense:upper()
-                    Collision.freekickPosition = OffRobot.pos:copy()
-                    Collision.executingTeam = World[defense.."ColorStr"]
-                    local speed = math.round(OffRobot.speed:length(), 2)
-                    Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
-                        OffRobot.id .. "<br>while traveling at " .. speed .. " m/s"
-                    Collision.event = Event("Collision", OffRobot.isYellow, OffRobot.pos, {OffRobot},
-                        "traveling at " .. speed .. " m/s")
-                    return true
+        for _, offRobot in ipairs(World[offense.."Robots"]) do
+            for _, defRobot in ipairs(World[defense.."Robots"]) do
+                local speedDiff = offRobot.speed - defRobot.speed
+                local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
+                    defRobot.pos):distanceTo(offRobot.pos)
+                local defSpeed = defRobot.speed:length()
+                local offSpeed = offRobot.speed:length()
+                if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
+                        and projectedSpeed > 1.5 and offSpeed > defSpeed then
+                    if offSpeed - defSpeed > 0.3 then
+                        Collision.consequence = "DIRECT_FREE_"..defense:upper()
+                        Collision.freekickPosition = offRobot.pos:copy()
+                        Collision.executingTeam = World[defense.."ColorStr"]
+                        local speed = math.round(offRobot.speed:length(), 2)
+                        Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
+                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
+                        Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot},
+                            "traveling at " .. speed .. " m/s")
+                        return true
+                    else
+                        Collision.consequence = "FORCE_START"
+                        Collision.freekickPosition = World.Ball.pos
+                        Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
+                        Collision.message = "Collision foul by both teams (ids "..offRobot.id.." and "..defRobot.id..")"
+                        Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots")
+                        return true
+                    end
                 end
             end
         end
