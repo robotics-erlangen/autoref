@@ -72,6 +72,8 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { gameEventType = "ROBOT_STOP_SPEED", originator = {team = team, botId = offendingRobots } }
     elseif name == "StopBallDistance" then --STOP_BALL_DISTANCE
         event.foul = { gameEventType = "CUSTOM", originator = {team = team, botId = offendingRobots} }
+    elseif name == "Unknown" then
+        event.foul = { gameEventType = "UNKNOWN" }
     else
         error("unknown event \"" .. name .. "\"")
     end
