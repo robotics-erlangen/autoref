@@ -26,6 +26,7 @@ local Ruleset = require "ruleset"
 local Refbox = require "../base/refbox"
 local vis = require "../base/vis"
 local World = require "../base/world"
+local Event = require "event"
 
 local BALL_PLACEMENT_RADIUS = 0.1
 local TEAM_CAPABLE_OF_PLACEMENT = {}
@@ -101,7 +102,7 @@ function BallPlacement.run()
         if World.Ball.pos:distanceTo(foul.freekickPosition) < BALL_PLACEMENT_RADIUS
                 and noRobotNearBall and World.Ball.speed:length() < SLOW_BALL then
             log("success placing the ball")
-            Refbox.send(foul.consequence, nil, foul.event)
+            Refbox.send(foul.consequence, nil, Event("Unknown", true))
             endBallPlacement()
         elseif World.Time - placementTimer > Ruleset.placementTimeout and
                 foul.executingTeam == World.BlueColorStr and placingTeam == World.BlueColorStr
