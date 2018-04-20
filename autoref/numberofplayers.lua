@@ -47,7 +47,7 @@ function NumberOfPlayers.occuring()
             end
         end
         NumberOfPlayers.consequence = "STOP"
-        NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>6 players on the field!"
+        NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
         NumberOfPlayers.event = Event("NumberOfPlayers", true, nil, nil, #World.YellowRobots .. " players on the field")
         return true
     elseif #World.BlueRobots > MAX_PLAYERS then
@@ -60,7 +60,7 @@ function NumberOfPlayers.occuring()
             end
         end
         NumberOfPlayers.consequence = "STOP"
-        NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>6 players on the field!"
+        NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
         NumberOfPlayers.event = Event("NumberOfPlayers", false, nil, nil, #World.BlueRobots .. " players on the field" )
         return true
     end
