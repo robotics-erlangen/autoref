@@ -60,7 +60,7 @@ function Collision.occuring()
                         Collision.freekickPosition = World.Ball.pos
                         Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
                         Collision.message = "Collision foul by both teams (ids "..offRobot.id.." and "..defRobot.id..")"
-                        Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots")
+                        Collision.event = Event("CollisionBoth", true, nil, nil, "Collision involving two fast robots")
                         return true
                     end
                 end
