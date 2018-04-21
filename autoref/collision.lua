@@ -52,7 +52,7 @@ function Collision.occuring()
                         local speed = math.round(offRobot.speed:length(), 2)
                         Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
-                        Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot},
+                        Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot.id},
                             "traveling at " .. speed .. " m/s")
                         return true
                     else
