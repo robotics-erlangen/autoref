@@ -42,9 +42,14 @@ function FreekickDistance.occuring()
     for _, robot in ipairs(World[defense.."Robots"]) do
         if robot.pos:distanceTo(stopBallPos)-robot.shootRadius < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            FreekickDistance.consequence = "STOP"
+            FreekickDistance.freekickPosition = Vector( -- 10cm from field line
+                (World.Geometry.FieldWidthHalf - 0.1) * math.sign(stopBallPos.x),
+                stopBallPos.y
+            )
+            FreekickDistance.executingTeam = robot.isYellow and World.BlueColorStr or World.YellowColorStr
             FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
             FreekickDistance.event = Event("FreekickDistance", robot.isYellow, robot.pos, {robot})
+            FreekickDistance.consequence = "INDIRECT_FREE_"..FreekickDistance.executingTeam:match(">(%a+)<"):upper()
             return true
         end
     end
