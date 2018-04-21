@@ -31,8 +31,6 @@ local OUT_OF_FIELD_MIN_TIME = 0.25
 
 OutOfField.possibleRefStates = {
     Game = true,
-    Stop = true,
-    Halt = true,
 }
 
 local wasBouncing = false
