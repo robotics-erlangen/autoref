@@ -126,12 +126,11 @@ function OutOfField.occuring()
                     OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos)
                 elseif closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
-                    freekickType = "PREPARE_KICKOFF"
-                    OutOfField.freekickPosition = Vector(0, 0)
-                    OutOfField.executingTeam = outOfFieldPos.y<0 and World.YellowColorStr or World.BlueColorStr
-
+                    OutOfField.freekickPosition = nil
+                    OutOfField.consequence = "STOP"
                     OutOfField.event = Event("Goal", scoringTeam==World.YellowColorStr, World.Ball.pos)
                     OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
+                    return true
                 else
                     OutOfField.event = nil
                     log("collision")
