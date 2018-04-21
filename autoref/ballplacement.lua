@@ -68,7 +68,6 @@ local function endBallPlacement()
 end
 function BallPlacement.run()
     local refState = World.RefereeState
-
     if placementTimer ~= 0 then
         debug.set("placement time", World.Time - placementTimer)
         vis.addCircle("ball placement", foul.freekickPosition, BALL_PLACEMENT_RADIUS, vis.colors.orangeHalf, true)
@@ -81,6 +80,9 @@ function BallPlacement.run()
 
     if refState == "Stop" and stopTime ~= 0 then
         if World.Time - stopTime > STOP_TIME then
+            local placingTeamName = placingTeam == World.BlueColorStr and "BLUE" or "YELLOW"
+            foul.consequence = foul.consequence:gsub("YELLOW", placingTeamName)
+            foul.consequence = foul.consequence:gsub("BLUE", placingTeamName)
             Refbox.send(foul.consequence, nil, Event("Unknown", true))
             endBallPlacement()
         end
