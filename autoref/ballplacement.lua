@@ -28,6 +28,8 @@ local vis = require "../base/vis"
 local World = require "../base/world"
 local Event = require "event"
 
+local STOP_TIME = 2 -- seconds of stop state after successful ball placement
+
 local BALL_PLACEMENT_RADIUS = 0.1
 local TEAM_CAPABLE_OF_PLACEMENT = {}
 function BallPlacement.setYellowTeamCapable()
@@ -46,6 +48,7 @@ local placingTeam
 local undefinedStateTime
 local startTime = 0
 local placementTimer = 0
+local stopTime = 0
 function BallPlacement.start(foul_)
     foul = table.copy(foul_) -- preserve attributes
     foul.freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, foul.executingTeam)
@@ -59,6 +62,7 @@ function BallPlacement.active()
 end
 local function endBallPlacement()
     foul = nil
+    stopTime = 0
     placementTimer = 0
     undefinedStateTime = 0
 end
@@ -75,7 +79,12 @@ function BallPlacement.run()
         return
     end
 
-    if refState == "Stop" and waitingForBallToSlowDown then
+    if refState == "Stop" and stopTime ~= 0 then
+        if World.Time - stopTime > STOP_TIME then
+            Refbox.send(foul.consequence, nil, Event("Unknown", true))
+            endBallPlacement()
+        end
+    elseif refState == "Stop" and waitingForBallToSlowDown then
         if World.Ball.speed:length() < SLOW_BALL then
             placementTimer = World.Time
             placingTeam = foul.executingTeam
@@ -102,8 +111,8 @@ function BallPlacement.run()
         if World.Ball.pos:distanceTo(foul.freekickPosition) < BALL_PLACEMENT_RADIUS
                 and noRobotNearBall and World.Ball.speed:length() < SLOW_BALL then
             log("success placing the ball")
-            Refbox.send(foul.consequence, nil, Event("Unknown", true))
-            endBallPlacement()
+            stopTime = World.Time
+            Refbox.send("STOP", nil, Event("Unknown", true))
         elseif World.Time - placementTimer > Ruleset.placementTimeout and
                 foul.executingTeam == World.BlueColorStr and placingTeam == World.BlueColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.YellowColorStr] then
