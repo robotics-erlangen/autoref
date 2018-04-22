@@ -43,10 +43,10 @@ function AttackerInDefenseArea.occuring()
                 end
             end
 
-            -- foul 2: attacker touches keeper, while point of contact is in defense are
+            -- foul 2: attacker touches keeper, while point of contact is in defense area
             if keeper and keeper.pos:distanceTo(robot.pos) <= keeper.radius+robot.radius then
                 local pointOfContact = keeper.pos + (robot.pos-keeper.pos):normalize()*keeper.radius
-                if Field["isIn"..defense.."DefenseArea"](pointOfContact) then
+                if Field["isIn"..defense.."DefenseArea"](pointOfContact, 0) then
                     touchingGoalie = true
                     offender = robot
                 end
