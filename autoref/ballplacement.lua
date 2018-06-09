@@ -49,9 +49,9 @@ local undefinedStateTime
 local startTime = 0
 local placementTimer = 0
 local stopTime = 0
+local freekickPosition
 function BallPlacement.start(foul_)
     foul = table.copy(foul_) -- preserve attributes
-    foul.freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, foul.executingTeam)
     waitingForBallToSlowDown = true
     startTime = World.Time
     undefinedStateTime = 0
@@ -68,16 +68,6 @@ local function endBallPlacement()
 end
 function BallPlacement.run()
     local refState = World.RefereeState
-    if placementTimer ~= 0 then
-        debug.set("placement time", World.Time - placementTimer)
-        vis.addCircle("ball placement", foul.freekickPosition, BALL_PLACEMENT_RADIUS, vis.colors.orangeHalf, true)
-    end
-
-    if refState ~= "Stop" and World.Time - startTime < 1 then
-        -- wait a second for the initial stop command
-        return
-    end
-
     if refState == "Stop" and stopTime ~= 0 then
         if World.Time - stopTime > STOP_TIME then
             local placingTeamName = placingTeam == World.BlueColorStr and "BLUE" or "YELLOW"
@@ -93,12 +83,13 @@ function BallPlacement.run()
             if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then -- change team
                 placingTeam = (placingTeam == World.YellowColorStr) and World.BlueColorStr or World.YellowColorStr
             end
+            freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then
                 log("autonomous ball placement failed: no team is capable")
                 Refbox.send("STOP", nil, foul.event)
                 endBallPlacement()
             else
-                Refbox.send("BALL_PLACEMENT_" .. placingTeam:match(">(%a+)<"):upper(), foul.freekickPosition, foul.event)
+                Refbox.send("BALL_PLACEMENT_" .. placingTeam:match(">(%a+)<"):upper(), freekickPosition, foul.event)
                 log("ball placement to be conducted by team " .. placingTeam)
                 waitingForBallToSlowDown = false
             end
@@ -106,11 +97,11 @@ function BallPlacement.run()
     elseif refState:sub(0,13) == "BallPlacement" then
         local noRobotNearBall = true
         for _, robot in ipairs(World.Robots) do
-            if robot.pos:distanceTo(foul.freekickPosition) < 0.5 then
+            if robot.pos:distanceTo(freekickPosition) < 0.5 then
                 noRobotNearBall = false
             end
         end
-        if World.Ball.pos:distanceTo(foul.freekickPosition) < BALL_PLACEMENT_RADIUS
+        if World.Ball.pos:distanceTo(freekickPosition) < BALL_PLACEMENT_RADIUS
                 and noRobotNearBall and World.Ball.speed:length() < SLOW_BALL then
             log("success placing the ball")
             stopTime = World.Time
@@ -121,16 +112,19 @@ function BallPlacement.run()
             -- let the other team try (yellow)
             log(World.BlueColorStr .. " failed placing the ball, " .. World.YellowColorStr .. " now conducting")
             placingTeam = World.YellowColorStr
+            freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
+            foul.executingTeam = World.YellowColorStr
             placementTimer = World.Time
-            Refbox.send("BALL_PLACEMENT_YELLOW", foul.freekickPosition, foul.event)
+            Refbox.send("BALL_PLACEMENT_YELLOW", freekickPosition, foul.event)
         elseif World.Time - placementTimer > Ruleset.placementTimeout and
                 foul.executingTeam == World.YellowColorStr and placingTeam == World.YellowColorStr
                 and TEAM_CAPABLE_OF_PLACEMENT[World.BlueColorStr] then
             -- let the other team try (blue)
             log(World.YellowColorStr .. " failed placing the ball, " .. World.BlueColorStr .. " now conducting")
             placingTeam = World.BlueColorStr
+            freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             placementTimer = World.Time
-            Refbox.send("BALL_PLACEMENT_BLUE", foul.freekickPosition, foul.event)
+            Refbox.send("BALL_PLACEMENT_BLUE", freekickPosition, foul.event)
         elseif World.Time - placementTimer > Ruleset.placementTimeout then
             log(Ruleset.placementTimeout)
             log("autonomous ball placement failed: timeout")
@@ -144,10 +138,21 @@ function BallPlacement.run()
         if undefinedStateTime == 0 then
             undefinedStateTime = World.Time
         end
-        if World.Time-undefinedStateTime > 1 and refState:sub(0,13) ~= "BallPlacement" then
+        -- TODO: auch abbrechen wenn weder STOP noch Ballplacement ist
+        if World.Time-undefinedStateTime > 60 and refState:sub(0,13) ~= "BallPlacement" then
             -- abort autonomous ball placement
             endBallPlacement()
         end
+    end
+
+    if placementTimer ~= 0 then
+        debug.set("placement time", World.Time - placementTimer)
+        vis.addCircle("ball placement", freekickPosition, BALL_PLACEMENT_RADIUS, vis.colors.orangeHalf, true)
+    end
+
+    if refState ~= "Stop" and World.Time - startTime < 5 then
+        -- wait a second for the initial stop command
+        return
     end
 end
 
