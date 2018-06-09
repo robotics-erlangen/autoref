@@ -79,8 +79,10 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { gameEventType = "NUMBER_OF_PLAYERS", originator = {team = team}, message = reason }
     elseif name == "StopSpeed" then
         event.foul = { gameEventType = "ROBOT_STOP_SPEED", originator = {team = team, botId = offendingRobot } }
-    elseif name == "StopBallDistance" then --STOP_BALL_DISTANCE
+    elseif name == "StopBallDistance" then
         event.foul = { gameEventType = "CUSTOM", originator = {team = team, botId = offendingRobot} }
+    elseif name == "KeeperBallHolding" then
+        event.foul = { gameEventType = "BALL_HOLDING", originator = {team = team, botId = offendingRobot}, message = reason }
     elseif name == "Unknown" then
         event.foul = { gameEventType = "UNKNOWN" }
     else

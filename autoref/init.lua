@@ -44,7 +44,8 @@ local descriptionToFileNames = {
     ["Attacker distance to defense area"] = "attackerdefareadist",
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
-    ["Start kickoffs"] = "kickoffstart"
+    ["Start kickoffs"] = "kickoffstart",
+    ["Keeper ball holding"] = "ballholding"
     --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
