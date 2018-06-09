@@ -27,9 +27,12 @@ KickoffStart.possibleRefStates = {
     Kickoff = true
 }
 
+local KICKOFF_EXTRA_WAIT = 2
+
+local allCorretTime = nil
 function KickoffStart.occuring()
 	-- check if the ball is in roughly the right position
-	if World.Ball.pos:length() > 0.1 then
+	if World.Ball.pos:length() > 0.1 or World.Ball.speed:length() > 0.2 then
 		return false
 	end
 	if World.RefereeState ~= "KickoffBluePrepare" and World.RefereeState ~= "KickoffYellowPrepare" then
@@ -54,6 +57,13 @@ function KickoffStart.occuring()
 			return false
 		end
     end
+
+    allCorretTime = allCorretTime or World.Time
+    if World.Time - allCorretTime < KICKOFF_EXTRA_WAIT then
+		return false
+    end
+    allCorretTime = nil
+
     KickoffStart.consequence = "NORMAL_START"
     KickoffStart.message = "Starting kickoff as both teams were ready after kickoff prepare"
     KickoffStart.event = Event("Unknown", true)
