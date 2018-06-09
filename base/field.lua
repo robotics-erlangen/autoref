@@ -61,27 +61,46 @@ function Field.distanceToBlueDefenseArea(pos, radius)
 	return Field.distanceToDefenseArea(pos, radius, false)
 end
 
+local function limitAwayFromDefenseArea(pos, extraLimit)
+	if Field.isInFriendlyDefenseArea(pos, extraLimit) then
+		local targety = -G.FieldHeightHalf + G.DefenseHeight + extraLimit
+		local targetx = G.DefenseWidthHalf + extraLimit
+		local dy = targety - pos.y
+		local dx = targetx - math.abs(pos.x)
+		if dx > dy then
+			return Vector(pos.x, targety)
+		else
+			return Vector(math.sign(pos.x)*targetx, pos.y)
+		end
+	elseif Field.isInOpponentDefenseArea(pos, extraLimit) then
+		local targety = G.FieldHeightHalf - G.DefenseHeight - extraLimit
+		local targetx = G.DefenseWidthHalf + extraLimit
+		local dy = pos.y - targety
+		local dx = targetx - math.abs(pos.x)
+		if dx > dy then
+			return Vector(pos.x, targety)
+		else
+			return Vector(math.sign(pos.x)*targetx, pos.y)
+		end
+	end
+	return pos
+end
+
 function Field.limitToFreekickPosition(pos, executingTeam)
-	pos = Field.limitToField(pos)
+	pos = Field.limitToField(pos, -0.1)
 	local ballSide = pos.y > 0 and "Blue" or "Yellow"
 	local attackColor = executingTeam == World.BlueColorStr and "Blue" or "Yellow"
 
-	if Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) <= G.DefenseRadius+0.2 then
+	if ballSide == attackColor and
+			Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) < 0.23 then
 		-- closest point 600mm from the goal line and 100mm from the touch line
 		pos = Vector(
 			math.sign(pos.x) * G.FieldWidthHalf - math.sign(pos.x)*0.1,
 			math.sign(pos.y) * G.FieldHeightHalf - math.sign(pos.y)*0.6
 		)
-	elseif Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) < 0.7 and ballSide ~= attackColor then
-		-- closest point 700mm from the defense area
-		local origin = G[ballSide.."Goal"]
-		if math.abs(pos.x) > G.DefenseStretch/2 then
-			origin = Vector(
-				math.sign(pos.x) * G.DefenseStretch/2,
-				math.sign(pos.y) * G.FieldHeightHalf
-			)
-		end
-		pos = origin + (pos-origin):setLength(G.DefenseRadius+0.7)
+	elseif Field["distanceTo"..ballSide.."DefenseArea"](pos, 0) < 0.73 and ballSide ~= attackColor then
+		-- closest point 700mm from the defense area (plus some extra distance)
+		pos = limitAwayFromDefenseArea(pos, 0.73)
 	end
 
 	return pos
