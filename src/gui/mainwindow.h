@@ -55,12 +55,9 @@ protected:
 private slots:
     void handleStatus(const Status &status);
     void sendCommand(const Command &command);
-    void toggleFlip();
     void setRecording(bool record);
     void showConfigDialog();
-
-private:
-    void sendFlip();
+    void setFlipped(bool flipped);
 
 private:
     Ui::MainWindow *ui;
@@ -69,7 +66,6 @@ private:
     AmunClient m_amun;
     RefereeStatusWidget *m_refereeStatus;
     ConfigDialog *m_configDialog;
-    bool m_flip;
 
     LogFileWriter *m_logFile;
     QThread *m_logFileThread;

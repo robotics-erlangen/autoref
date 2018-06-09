@@ -48,7 +48,7 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     ui->setupUi(this);
 
     // setup icons
-    ui->actionFlipSides->setIcon(QIcon("icon:32/change-ends.png"));
+    ui->actionSidesFlipped->setIcon(QIcon("icon:32/change-ends.png"));
     ui->actionRecord->setIcon(QIcon("icon:32/media-record.png"));
     ui->actionConfiguration->setIcon(QIcon("icon:32/preferences-system.png"));
 
@@ -93,7 +93,7 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     ui->log->hideLogToggles();
 
     // connect the menu actions
-    connect(ui->actionFlipSides, SIGNAL(triggered()), SLOT(toggleFlip()));
+    connect(ui->actionSidesFlipped, SIGNAL(toggled(bool)), SLOT(setFlipped(bool)));
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
     connect(ui->actionRecord, SIGNAL(toggled(bool)), SLOT(setRecording(bool)));
     connect(ui->actionShowOptions, &QAction::triggered, [=]() {
@@ -138,8 +138,6 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     sendCommand(command);
     // force auto reload of strategies if external referee is used
     ui->autoref->forceAutoReload(true);
-
-    sendFlip();
 }
 
 MainWindow::~MainWindow()
@@ -178,6 +176,10 @@ void MainWindow::handleStatus(const Status &status)
 
         const SSL_Referee_TeamInfo &teamYellow = state.yellow();
         m_yellowTeamName = QString::fromStdString(teamYellow.name());
+
+        if (state.has_goals_flipped()) {
+            ui->actionSidesFlipped->setChecked(state.goals_flipped());
+        }
     }
 
     // keep team configurations for the logfile
@@ -216,18 +218,12 @@ void MainWindow::sendCommand(const Command &command)
     }
 }
 
-void MainWindow::toggleFlip()
-{
-    m_flip = !m_flip;
-    sendFlip();
-}
-
-void MainWindow::sendFlip()
+void MainWindow::setFlipped(bool flipped)
 {
     Command command(new amun::Command);
-    command->set_flip(m_flip);
+    amun::CommandReferee *referee = command->mutable_referee();
+    referee->set_flipped(flipped);
     sendCommand(command);
-    ui->field->flipAOI();
 }
 
 static QString toString(const QDateTime& dt)

@@ -45,6 +45,7 @@ signals:
     void gotCommand(const Command &command);
     void updateVisionPort(quint16 port);
     void updateRefereePort(quint16 port);
+    void gotRefereeHost(QString hostName);
 
 public:
     void start();
@@ -52,6 +53,7 @@ public:
 
 public slots:
     void handleCommand(const Command &command);
+    void handleRefereePacket(QByteArray, qint64, QString host);
 
 private slots:
     void handleStatus(const Status &status);

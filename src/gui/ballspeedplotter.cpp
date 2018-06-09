@@ -20,7 +20,7 @@
 
 #include "leaffilterproxymodel.h"
 #include "ballspeedplotter.h"
-#include "plot.h"
+#include "plotter/plot.h"
 #include "guihelper/guitimer.h"
 #include "ui_ballspeedplotter.h"
 #include "google/protobuf/descriptor.h"

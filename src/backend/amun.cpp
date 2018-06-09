@@ -111,20 +111,22 @@ void Amun::start()
             m_autoref, SLOT(handleCommand(Command)));
     // relay status and debug information of strategy
     connect(m_autoref, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
+    connect(this, SIGNAL(gotRefereeHost(QString)), m_autoref, SLOT(handleRefereeHost(QString)));
 
     // create referee
-    setupReceiver(m_referee, QHostAddress("224.5.23.1"), 10003);
+    setupReceiver(m_referee, QHostAddress("224.5.23.1"), 10007);
     connect(this, &Amun::updateRefereePort, m_referee, &Receiver::updatePort);
     // move referee packets to processor
-    connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
+    connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64, QString)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
+    connect(m_referee, SIGNAL(gotPacket(QByteArray,qint64,QString)), SLOT(handleRefereePacket(QByteArray,qint64,QString)));
 
     // create vision
     setupReceiver(m_vision, QHostAddress("224.5.23.2"), 10002);
     // allow updating the port used to listen for ssl vision
     connect(this, &Amun::updateVisionPort, m_vision, &Receiver::updatePort);
     // connect
-    connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64)),
-            m_processor, SLOT(handleVisionPacket(QByteArray,qint64)));
+    connect(m_vision, SIGNAL(gotPacket(QByteArray, qint64, QString)),
+            m_processor, SLOT(handleVisionPacket(QByteArray, qint64, QString)));
     connect(m_vision, &Receiver::sendStatus, this, &Amun::handleStatus);
 
     // start threads
@@ -155,6 +157,11 @@ void Amun::stop()
     m_referee = NULL;
     m_autoref = NULL;
     m_processor = NULL;
+}
+
+void Amun::handleRefereePacket(QByteArray, qint64, QString host)
+{
+    emit gotRefereeHost(host);
 }
 
 void Amun::setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port)
