@@ -21,6 +21,7 @@
 local KickoffStart = {}
 
 local World = require "../base/world"
+local Event = require "event"
 
 KickoffStart.possibleRefStates = {
     Kickoff = true
@@ -55,6 +56,7 @@ function KickoffStart.occuring()
     end
     KickoffStart.consequence = "NORMAL_START"
     KickoffStart.message = "Starting kickoff as both teams were ready after kickoff prepare"
+    KickoffStart.event = Event("Unknown", true)
     return true
 end
 
