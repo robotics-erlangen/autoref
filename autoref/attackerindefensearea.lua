@@ -60,12 +60,14 @@ function AttackerInDefenseArea.occuring()
                 if touchingGoalie then
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
                         " touched goalie inside defense area"
+                    AttackerInDefenseArea.event = Event("AttackerTouchGolie",
+                        offender.isYellow, offender.pos, {offender.id})
                 else
                     AttackerInDefenseArea.message = color .. " " .. offender.id ..
                         " touched the ball in defense area"
+                    AttackerInDefenseArea.event = Event("AttackerInDefenseArea",
+                        offender.isYellow, offender.pos, {offender.id})
                 end
-                AttackerInDefenseArea.event = Event("AttackerInDefenseArea",
-                    offender.isYellow, offender.pos, {offender.id}, "contact with " .. (touchingGoalie and "goalie" or "ball"))
                 return true
             end
         end

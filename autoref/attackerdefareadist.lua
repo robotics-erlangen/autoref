@@ -39,12 +39,15 @@ local wasFreeKickBefore = {
 }
 function AttackerDefAreaDist.occuring()
     offender = nil
+    local offenderDistance
 
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
         if wasFreeKickBefore[offense] and World.RefereeState == "Game" then
             for _, robot in ipairs(World[offense.."Robots"]) do
-                if Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius) <= 0.2 then
+                local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
+                if distance <= 0.2 then
                     offender = robot
+                    offenderDistance = distance
                     AttackerDefAreaDist.consequence = "INDIRECT_FREE_"..defense:upper()
                     AttackerDefAreaDist.freekickPosition = World.Ball.pos:copy()
                     AttackerDefAreaDist.executingTeam = World[defense.."ColorStr"]
@@ -67,7 +70,8 @@ function AttackerDefAreaDist.occuring()
         local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
         AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
             .. color .. " " .. offender.id
-        AttackerDefAreaDist.event = Event("DefenseAreaDist", offender.isYellow, offender.pos, {offender.id})
+        AttackerDefAreaDist.event = Event("DefenseAreaDist", offender.isYellow, offender.pos, {offender.id},
+            string.format("distance: %2d cm", offenderDistance*100))
         return true
     end
 end
