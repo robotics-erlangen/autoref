@@ -44,6 +44,7 @@ local descriptionToFileNames = {
     ["Attacker distance to defense area"] = "attackerdefareadist",
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
+    ["Start kickoffs"] = "kickoffstart"
     --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
@@ -60,7 +61,8 @@ local debugConsequences = {
     DIRECT_FREE_YELLOW = "Direct Yellow",
     YELLOW_CARD_BLUE = "Yellow Card<br>for Blue",
     YELLOW_CARD_YELLOW = "Yewllow Card<br>for Yellow",
-    STOP = "Stop"
+    STOP = "Stop",
+    NORMAL_START = "Normal start"
 }
 
 local fouls = nil
@@ -130,14 +132,11 @@ local function main(version)
                 if World.RefereeState ~= "Stop" then
                     Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
                 end
+            elseif foul.consequence == "NORMAL_START" then
+                Refbox.send(foul.consequence, nil, nil)
             else
                 error("A foul must either send a card, STOP, or define a freekick position and executing team")
             end
-
-            -- will currently break
-            --if foul.event then
-                --amun.sendAutorefEvent(foul.event)
-            --end
         end
 
         if foulTimes[foul] and foul.freekickPosition and foulTimes[foul] > World.Time - 1 then
