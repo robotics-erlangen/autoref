@@ -58,7 +58,7 @@ local Robot = require "../base/robot"
 -- ExtraTimeBreak, ExtraFirstHalfPre, ExtraFirstHalf, ExtraHalfTime, ExtraSecondHalfPre, ExtraSecondHalf,
 -- PenaltyShootoutBreak, PenaltyShootout, PostGame
 
-local World = {}
+local World = require ((require "../base/basedir").."world")
 
 World.Ball = Ball()
 World.YellowRobots = {}
@@ -123,20 +123,6 @@ function World._init()
 	World._updateTeam()
 end
 
---- Update world state.
--- Has to be called once each frame
--- @name update
--- @return bool - false if no vision data was received since strategy start
-function World.update()
-	if World.SelectedOptions == nil then
-		World.SelectedOptions = amun.getSelectedOptions()
-	end
-	local hasVisionData = World._updateWorld(amun.getWorldState())
-	World._updateGameState(amun.getGameState())
-	World._updateUserInput(amun.getUserInput())
-	return hasVisionData
-end
-
 -- Creates generation specific robot object for own team
 function World._updateTeam()
 	local friendlyRobotsById = {}
@@ -146,17 +132,10 @@ function World._updateTeam()
 	World.YellowRobotsById = friendlyRobotsById
 end
 
--- Get rule version from geometry
-function World._updateRuleVersion(geom)
-	if not geom.type or geom.type == "TYPE_2014" then
-		World.RULEVERSION = "2017"
-	else
-		World.RULEVERSION = "2018"
-	end
-end
-
 -- Setup field geometry
+local updateBefore = World._updateGeometry
 function World._updateGeometry(geom)
+	updateBefore(geom)
 	local wgeom = World.Geometry
 	wgeom.FieldWidth = geom.field_width
 	wgeom.FieldWidthHalf = geom.field_width / 2
@@ -201,7 +180,9 @@ function World._updateGeometry(geom)
 	World.IsLargeField = wgeom.FieldWidth > 5 and wgeom.FieldHeight > 7
 end
 
+local oldUpdate = World._updateWorld
 function World._updateWorld(state)
+	oldUpdate(state)
 	-- Get time
 	if World.Time then
 		World.TimeDiff = state.time * 1E-9 - World.Time
@@ -285,35 +266,8 @@ function World._updateWorld(state)
 	return state.has_vision_data ~= false
 end
 
-World.gameStageMapping = {
-	NORMAL_FIRST_HALF_PRE = "FirstHalfPre",
-	NORMAL_FIRST_HALF = "FirstHalf",
-	NORMAL_HALF_TIME = "HalfTime",
-	NORMAL_SECOND_HALF_PRE = "SecondHalfPre",
-	NORMAL_SECOND_HALF = "SecondHalf",
-
-	EXTRA_TIME_BREAK = "ExtraTimeBreak",
-	EXTRA_FIRST_HALF_PRE = "ExtraFirstHalfPre",
-	EXTRA_FIRST_HALF = "ExtraFirstHalf",
-	EXTRA_HALF_TIME = "ExtraHalfTime",
-	EXTRA_SECOND_HALF_PRE = "ExtraSecondHalfPre",
-	EXTRA_SECOND_HALF = "ExtraSecondHalf",
-
-	PENALTY_SHOOTOUT_BREAK = "PenaltyShootoutBreak",
-	PENALTY_SHOOTOUT = "PenaltyShootout",
-	POST_GAME = "PostGame"
-}
-
--- keep for use by debugcommands.sendRefereeCommand
-local fullRefereeState = nil
-
-function World._getFullRefereeState()
-	return fullRefereeState
-end
-
 -- updates referee command and keeper information
 function World._updateGameState(state)
-	fullRefereeState = state
 	World.RefereeState = state.state
 
 	if World.RefereeState == "TimeoutOffensive" or World.RefereeState == "TimeoutDefensive" then
@@ -384,25 +338,6 @@ function World._updateUserInput(input)
 				robot:_updateUserControl(cmd.command)
 			end
 		end
-	end
-end
-
-
---- Stops own robots and enables standby
--- @name haltOwnRobots
-function World.haltOwnRobots()
-	for _, robot in pairs(World.YellowRobotsById) do
-		robot:setStandby(true)
-		robot:halt()
-	end
-end
-
---- Set generated commands for our robots.
--- Robots without a command stop by default
--- @name setRobotCommands
-function World.setRobotCommands()
-	for _, robot in pairs(World.YellowRobotsById) do
-		robot:_setCommand()
 	end
 end
 

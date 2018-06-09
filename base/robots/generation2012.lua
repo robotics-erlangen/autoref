@@ -17,4 +17,5 @@
 *   You should have received a copy of the GNU General Public License     *
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
-return require ((require "../base/basedir").."class")
+-- for the purposes of the autoref, ignore this file
+return require ((require "../base/basedir").."robots/generation2012")

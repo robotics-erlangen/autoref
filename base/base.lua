@@ -1,18 +1,5 @@
---[[
---- Loads global modules. Also takes care of initializing the random number generator. <br/>
--- General informations: <br/>
--- The coordinate systems y-direction points towards the opponent goal. <br/>
--- The x-direction points from the left to the right border. <br/>
--- It is centered on the kickoff point. <br/>
--- Angles are oriented counter-clockwise, 0 points in positive x-direction. <br/>
--- Angles are measured in radians. <br/>
--- All lengths are unless specified otherwise denoted in meters.
--- Speed in m/s and acceleration in m/s^2.
-module "base"
-]]--
-
 --[[***********************************************************************
-*   Copyright 2015 Michael Eischer                                        *
+*   Copyright 2018 Andreas Wendler                                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -30,26 +17,4 @@ module "base"
 *   You should have received a copy of the GNU General Public License     *
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
-
-require "../base/amun"
--- amun.isDebug must already be set, thus load after amun
-require("../base/globalschecker")._init()
-require "../base/math"
-require "../base/path"
-require "../base/table"
-require "../base/vector"
-Vector._loadGeom()
-
-math.randomseed(amun.getCurrentTime()) -- init rng
-
--- preload classes that require access to the amun API
-require "../base/coordinates"
-require "../base/debug"
-require "../base/debugcommands"
-require "../base/plot"
-require "../base/robot"
-require "../base/vis"
-require "../base/world"
-
--- prevent access to internal APIs
-amun._hideFunctions()
+return require ((require "../base/basedir").."base")
