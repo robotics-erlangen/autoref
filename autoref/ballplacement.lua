@@ -113,7 +113,8 @@ function BallPlacement.run()
             log(World.BlueColorStr .. " failed placing the ball, " .. World.YellowColorStr .. " now conducting")
             placingTeam = World.YellowColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
-            foul.executingTeam = World.YellowColorStr
+            foul.executingTeam = ""
+            foul.consequence = "INDIRECT_FREE_YELLOW"
             placementTimer = World.Time
             Refbox.send("BALL_PLACEMENT_YELLOW", freekickPosition, foul.event)
         elseif World.Time - placementTimer > Ruleset.placementTimeout and
@@ -124,11 +125,14 @@ function BallPlacement.run()
             placingTeam = World.BlueColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             placementTimer = World.Time
+            foul.executingTeam = ""
+            foul.consequence = "INDIRECT_FREE_BLUE"
             Refbox.send("BALL_PLACEMENT_BLUE", freekickPosition, foul.event)
         elseif World.Time - placementTimer > Ruleset.placementTimeout then
             log(Ruleset.placementTimeout)
             log("autonomous ball placement failed: timeout")
-            Refbox.send("STOP", nil, foul.event)
+            Refbox.send("STOP", nil, Event("BallplacementFailed", nil, foul.freekickPosition, nil,
+                "Both teams failed. Human ref to place the ball."))
             endBallPlacement()
         end
     else

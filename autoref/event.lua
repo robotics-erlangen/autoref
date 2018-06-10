@@ -25,7 +25,6 @@ local Coordinates = require "../base/coordinates"
 local World = require "../base/world"
 
 local function Event(name, teamIsYellow, pos, offendingRobots, reason)
-    assert(teamIsYellow ~= nil, "teamIsYellow must be set")
     local stage
     for k, v in pairs(World.gameStageMapping) do
         if v == World.GameStage then
@@ -42,7 +41,10 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         local _, robot = next(offendingRobots)
         offendingRobot = robot
     end
-    local team = teamIsYellow and "TEAM_YELLOW" or "TEAM_BLUE"
+    local team = "TEAM_UNKNOWN"
+    if teamIsYellow ~= nil then
+        team = teamIsYellow and "TEAM_YELLOW" or "TEAM_BLUE"
+    end
     if name == "Goal" then
         event.goal = { scoring_team = team, position = { x = pos.x, y = pos.y }}
     elseif name == "ChipGoal" then
@@ -83,6 +85,8 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { gameEventType = "CUSTOM", originator = {team = team, botId = offendingRobot} }
     elseif name == "KeeperBallHolding" then
         event.foul = { gameEventType = "BALL_HOLDING", originator = {team = team, botId = offendingRobot}, message = reason }
+    elseif name == "BallplacementFailed" then
+        event.foul = { gameEventType = "BALL_PLACEMENT_FAILED", originator = {team = team, botId = offendingRobot}, message = reason}
     elseif name == "Unknown" then
         event.foul = { gameEventType = "UNKNOWN" }
     else
