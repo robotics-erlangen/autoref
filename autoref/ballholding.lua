@@ -44,6 +44,9 @@ end
 
 local ballHoldingTimes = {}
 function BallHolding._updateHolding(robot)
+    if not robot then
+        return false
+    end
     local currentlyHolding = checkKepperHolding(robot, ballHoldingTimes[robot])
     if not ballHoldingTimes[robot] and currentlyHolding then
         ballHoldingTimes[robot] = World.Time
