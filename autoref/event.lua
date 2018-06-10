@@ -53,6 +53,7 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         assert(pos, "Out of field event needs a position")
         local globalPos = Coordinates.toGlobal(pos)
         event.ball_out_of_field = { last_touch = team,  position = { x = globalPos.x, y = globalPos.y}}
+        event.foul = { gameEventType = "BALL_LEFT_FIELD", originator = {team = team, botId = offendingRobot}, message = reason}
     elseif name == "Carpeting" then
         event.foul = { gameEventType = "ICING", originator = {team = team, botId = offendingRobot } }
     elseif name == "DefenseAreaDist" then
