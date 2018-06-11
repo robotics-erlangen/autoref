@@ -28,6 +28,7 @@ local Refbox = require "../base/refbox"
 local vis = require "../base/vis"
 local BallOwner = require "../base/ballowner"
 local World = require "../base/world"
+local plot = require "../base/plot"
 
 local ballPlacement = require "ballplacement"
 local ruleset = require "ruleset"
@@ -162,6 +163,7 @@ local function mainLoopWrapper(func)
             return -- skip processing if no vision data is available yet
         end
         func()
+        plot._plotAggregated()
     end
 end
 
