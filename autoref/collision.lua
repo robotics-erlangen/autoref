@@ -53,7 +53,7 @@ function Collision.occuring()
                         Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
                         Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot.id},
-                            "traveling at " .. speed .. " m/s")
+                            "traveling at " .. speed .. " m/s, hitting "..defense:lower().." "..defRobot.id)
                         log(Collision.message)
                         return true
                     else
@@ -61,7 +61,7 @@ function Collision.occuring()
                         Collision.freekickPosition = World.Ball.pos
                         Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
                         Collision.message = "Collision foul by both teams (ids "..offRobot.id.." and "..defRobot.id..")"
-                        Collision.event = Event("CollisionBoth", true, nil, nil, "Collision involving two fast robots ("..
+                        Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")")
                         log(Collision.message)
                         return true
