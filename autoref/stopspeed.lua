@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -25,36 +25,62 @@ local Event = require "event"
 local Ruleset = require "ruleset"
 
 local STOP_SPEED = Ruleset.stopSpeed
-local ROBOT_SLOW_DOWN_TIME = 2
-local SPEED_TOLERANCE = 0.05
+local ROBOT_SLOW_DOWN_TIME = 1.5
+local SPEED_TOLERANCE = 0.02
 
 StopSpeed.possibleRefStates = {
     Stop = true,
+    Ball = true, -- this is ball placement
 }
 
-local lastCallTime = 0
 local enterStopTime = 0
+local wasLongEnough = false
+local tooFastCounter = { yellow = 0, blue = 0 }
+local tooFastRobots = { yellow = {}, blue = {}}
+local counterIncreased = { yellow = false, blue = false }
 function StopSpeed.occuring()
-    if World.Time - lastCallTime > 0.5 then
-        -- it is safe to assume that the strategy is executed with a higher
-        -- frequence than 0.5s -> there was another ref state in the meantime
-        enterStopTime = World.Time
-    end
-    lastCallTime = World.Time
     if World.Time - enterStopTime < ROBOT_SLOW_DOWN_TIME then
         return false
     end
 
+    wasLongEnough = true
     for _, robot in ipairs(World.Robots) do
-        if robot.speed:length() > STOP_SPEED - SPEED_TOLERANCE then
-            StopSpeed.consequence = "STOP"
-            local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            StopSpeed.message = color .. " " .. robot.id .. " is driving faster<br>than "..STOP_SPEED.." m/s during STOP"
-            StopSpeed.event = Event("StopSpeed", robot.isYellow, robot.pos, {robot})
-            return true
+        local teamStr = robot.isYellow and "yellow" or "blue"
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and
+                not counterIncreased[teamStr] then
+            counterIncreased[teamStr] = true
+            tooFastCounter[teamStr] = tooFastCounter[teamStr] + 1
+            table.insert(tooFastRobots[teamStr], robot.id)
+
+            if tooFastCounter[teamStr] == 3 then
+                tooFastCounter[teamStr] = 0
+                StopSpeed.message = teamStr.." bots were too fast 3 times in a row (robots "..tooFastRobots[teamStr][1]..
+                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3]..")"
+                StopSpeed.consequence = "YELLOW_CARD_" .. teamStr:upper()
+                StopSpeed.event = Event("StopSpeed", robot.isYellow, nil, nil, tooFastRobots[teamStr][1]..
+                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3])
+                return true
+            end
         end
     end
     return false
+end
+
+function StopSpeed.reset()
+    enterStopTime = World.Time
+    if wasLongEnough then
+        if not counterIncreased.blue then
+            tooFastCounter.blue = 0
+            tooFastRobots.blue = {}
+        end
+        if not counterIncreased.yellow then
+            tooFastCounter.yellow = 0
+            tooFastRobots.yellow = {}
+        end
+    end
+    counterIncreased.yellow = false
+    counterIncreased.blue = false
+    wasLongEnough = false
 end
 
 return StopSpeed
