@@ -45,7 +45,8 @@ local descriptionToFileNames = {
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
     ["Start kickoffs"] = "kickoffstart",
-    ["Keeper ball holding"] = "ballholding"
+    ["Keeper ball holding"] = "ballholding",
+    ["No progress"] = "noprogress"
     --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
@@ -116,27 +117,31 @@ local function main(version)
         -- take the referee state until the second upper case letter, thereby
         -- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
         local simpleRefState = World.RefereeState:match("%u%l+")
-        if foul.possibleRefStates[simpleRefState] and foul.occuring() and
-            (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT)
-        then
-            foulTimes[foul] = World.Time
-            assert(foul.consequence, "an occuring foul must define a consequence")
-            assert(foul.message, "an occuring foul must define a message")
-            log(foul.message)
-            debugMessage = foul.message
-            debugNextEvent = debugConsequences[foul.consequence]
-            if foul.freekickPosition and foul.executingTeam then
-                ballPlacement.start(foul)
-            elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
-                cardToSend = foul.consequence
-                event = foul.event
-                if World.RefereeState ~= "Stop" then
-                    Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
+        if foul.possibleRefStates[simpleRefState] then
+            if foul.occuring() and (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT) then
+                foulTimes[foul] = World.Time
+                assert(foul.consequence, "an occuring foul must define a consequence")
+                assert(foul.message, "an occuring foul must define a message")
+                log(foul.message)
+                debugMessage = foul.message
+                debugNextEvent = debugConsequences[foul.consequence]
+                if foul.freekickPosition and foul.executingTeam then
+                    ballPlacement.start(foul)
+                elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
+                    cardToSend = foul.consequence
+                    event = foul.event
+                    if World.RefereeState ~= "Stop" then
+                        Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
+                    end
+                elseif foul.consequence == "NORMAL_START" then
+                    Refbox.send(foul.consequence, nil, nil)
+                else
+                    error("A foul must either send a card, STOP, or define a freekick position and executing team")
                 end
-            elseif foul.consequence == "NORMAL_START" then
-                Refbox.send(foul.consequence, nil, nil)
-            else
-                error("A foul must either send a card, STOP, or define a freekick position and executing team")
+            end
+        else
+            if foul.reset then
+                foul.reset()
             end
         end
 
