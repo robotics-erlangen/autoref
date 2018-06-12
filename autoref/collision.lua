@@ -63,10 +63,9 @@ function Collision.occuring()
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
                         Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot.id},
                             "traveling at " .. speed .. " m/s, hitting "..defense:lower().." "..defRobot.id)
-                        log(Collision.message)
                         if collisionCounter[offense] == 3 or (collisionCounter[offense] > 3 and
                             (collisionCounter[offense]-3) % 2 == 0) then
-                            --Collision.card = "YELLOW_CARD_" .. offense:upper()
+                            Collision.card = "YELLOW_CARD_" .. offense:upper()
                             -- TODO: issue custom message for the number of collisions leading up to a yellow card
                             log("Yellow card for team "..offense..", as they collided "..collisionCounter[offense].." times during the game")
                         end
@@ -75,7 +74,7 @@ function Collision.occuring()
                         Collision.consequence = "FORCE_START"
                         Collision.freekickPosition = World.Ball.pos
                         Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
-                        Collision.message = "Collision foul by both teams (ids "..offRobot.id.." and "..defRobot.id..")"
+                        Collision.message = "Collision foul by both teams (robots "..offense.." "..offRobot.id.." and "..defense.." "..defRobot.id..")"
                         Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")")
                         log(Collision.message)
