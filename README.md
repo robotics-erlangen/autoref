@@ -29,6 +29,13 @@ The Autoref supports switching between different rule versions. These currently 
 - 2018 rules for division B
 The rule version can be changed by using the dock widget called 'Autoref'.
 
+The Autoref allows settings parameters that are used detecting rules.
+These include for example the time robots have after stop was issued to
+slow down below 1.5 m/s.
+These parameters are stored in a configuration file at autoref/parameters.
+They can be edited by hand, even while the autoref is currently running.
+In this case the autoref will load the new parameters and use them immediately.
+
 ## Features
 Currently, the Autoref detects a number of fouls according to the
 [Technical Challgenge 2016][5]. It is able to autonomously stop the game,
