@@ -24,8 +24,9 @@ local Referee = require "../base/referee"
 local debug = require "../base/debug"
 local World = require "../base/world"
 local Event = require "event"
+local Parameters = require "../base/parameters"
 
-local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = 0.07
+local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = Parameters.add("doubletouch", "CONSIDER_FREE_KICK_EXECUTED_THRESHOLD", 0.07)
 
 -- define all refstates to be able to reset variables
 -- foul occurs actually only in Game
@@ -67,7 +68,7 @@ function DoubleTouch.occuring()
         debug.set("last touch in freekick", lastTouchingRobotInFreekick)
         debug.set("touching robot", touchingRobot)
         debug.set("distToFreekickPos", distToFreekickPos)
-        if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
+        if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD() then
             if touchingRobot == lastTouchingRobotInFreekick then
                 local defenseTeam = touchingRobot.isYellow and "Blue" or "Yellow"
                 DoubleTouch.consequence = "INDIRECT_FREE_" .. defenseTeam:upper()

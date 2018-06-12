@@ -22,6 +22,10 @@ local Collision = {}
 
 local World = require "../base/world"
 local Event = require "event"
+local Parameters = require "../base/parameters"
+
+local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
+local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF", 0.3)
 
 -- collision between two robots, at least one of them being fast.
 -- See the "Decisions" paragraph of section 12.4
@@ -32,9 +36,13 @@ Collision.possibleRefStates = {
     Penalty = true,
     Direct = true,
     Indirect = true,
+    Ball = true,
 }
 
+local collisionCounter = {Blue = 0, Yellow = 0}
 function Collision.occuring()
+    local collisionSpeed = COLLISION_SPEED()
+    local maxSpeedDiff = COLLISION_SPEED_DIFF()
     for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
         for _, offRobot in ipairs(World[offense.."Robots"]) do
             for _, defRobot in ipairs(World[defense.."Robots"]) do
@@ -44,17 +52,24 @@ function Collision.occuring()
                 local defSpeed = defRobot.speed:length()
                 local offSpeed = offRobot.speed:length()
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
-                        and projectedSpeed > 1.5 and offSpeed > defSpeed then
-                    if offSpeed - defSpeed > 0.3 then
+                        and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
+                    if offSpeed - defSpeed > maxSpeedDiff then
+                        collisionCounter[offense] = collisionCounter[offense] + 1
                         Collision.consequence = "DIRECT_FREE_"..defense:upper()
                         Collision.freekickPosition = offRobot.pos:copy()
                         Collision.executingTeam = World[defense.."ColorStr"]
                         local speed = math.round(offRobot.speed:length(), 2)
                         Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
-                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
+                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
                         Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot.id},
                             "traveling at " .. speed .. " m/s, hitting "..defense:lower().." "..defRobot.id)
                         log(Collision.message)
+                        if collisionCounter[offense] == 3 or (collisionCounter[offense] > 3 and
+                            (collisionCounter[offense]-3) % 2 == 0) then
+                            --Collision.card = "YELLOW_CARD_" .. offense:upper()
+                            -- TODO: issue custom message for the number of collisions leading up to a yellow card
+                            log("Yellow card for team "..offense..", as they collided "..collisionCounter[offense].." times during the game")
+                        end
                         return true
                     else
                         Collision.consequence = "FORCE_START"

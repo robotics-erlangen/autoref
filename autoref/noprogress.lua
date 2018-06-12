@@ -21,23 +21,24 @@
 local NoProgress = {}
 
 local World = require "../base/world"
+local Parameters = require "../base/parameters"
 local Event = require "event"
 
 NoProgress.possibleRefStates = {
     Game = true,
 }
 
-local NO_PROGRESS_TIME = 10
-local NO_PROGRESS_RADIUS = 0.07
+local NO_PROGRESS_TIME = Parameters.add("noprogress", "NO_PROGRESS_TIME", 10)
+local NO_PROGRESS_RADIUS = Parameters.add("noprogress", "NO_PROGRESS_RADIUS", 0.07)
 
 local startPos = World.Ball.pos
 local startTime = World.Time
 function NoProgress.occuring()
-    if startPos:distanceTo(World.Ball.pos) > NO_PROGRESS_RADIUS then
+    if startPos:distanceTo(World.Ball.pos) > NO_PROGRESS_RADIUS() then
         startPos = World.Ball.pos
         startTime = World.Time
     end
-    if World.Time -  startTime > NO_PROGRESS_TIME then
+    if World.Time -  startTime > NO_PROGRESS_TIME() then
         NoProgress.consequence = "FORCE_START"
         NoProgress.freekickPosition = World.Ball.pos
         NoProgress.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"

@@ -22,13 +22,14 @@ local BallHolding = {}
 
 local World = require "../base/world"
 local Field = require "../base/field"
+local Parameters = require "../base/parameters"
 local Event = require "event"
 
 BallHolding.possibleRefStates = {
     Game = true,
 }
 
-local MAX_HOLDING_TIME = 15
+local MAX_HOLDING_TIME = Parameters.add("ballholding", "MAX_HOLDING_TIME", 15)
 
 local function checkKepperHolding(robot, lastHolding)
     if not Field["isIn"..(robot.isYellow and "Yellow" or "Blue").."DefenseArea"](World.Ball.pos, 0) then
@@ -54,7 +55,7 @@ function BallHolding._updateHolding(robot)
     if not currentlyHolding then
         ballHoldingTimes[robot] = nil
     end
-    if ballHoldingTimes[robot] and World.Time - ballHoldingTimes[robot] > MAX_HOLDING_TIME then
+    if ballHoldingTimes[robot] and World.Time - ballHoldingTimes[robot] > MAX_HOLDING_TIME() then
         ballHoldingTimes[robot] = nil
         BallHolding.executingTeam = World.YellowColorStr
         BallHolding.consequence = "INDIRECT_FREE_YELLOW"

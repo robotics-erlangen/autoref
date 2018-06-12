@@ -21,12 +21,13 @@
 local StopSpeed = {}
 
 local World = require "../base/world"
+local Parameters = require "../base/parameters"
 local Event = require "event"
 local Ruleset = require "ruleset"
 
 local STOP_SPEED = Ruleset.stopSpeed
-local ROBOT_SLOW_DOWN_TIME = 1.5
-local SPEED_TOLERANCE = 0.02
+local ROBOT_SLOW_DOWN_TIME = Parameters.add("stopspeed", "ROBOT_SLOW_DOWN_TIME", 1.5)
+local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
 
 StopSpeed.possibleRefStates = {
     Stop = true,
@@ -39,19 +40,20 @@ local tooFastCounter = { yellow = 0, blue = 0 }
 local tooFastRobots = { yellow = {}, blue = {}}
 local counterIncreased = { yellow = false, blue = false }
 function StopSpeed.occuring()
-    if World.Time - enterStopTime < ROBOT_SLOW_DOWN_TIME then
+    if World.Time - enterStopTime < ROBOT_SLOW_DOWN_TIME() then
         return false
     end
 
     wasLongEnough = true
     for _, robot in ipairs(World.Robots) do
         local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and
                 not counterIncreased[teamStr] then
             counterIncreased[teamStr] = true
             tooFastCounter[teamStr] = tooFastCounter[teamStr] + 1
             table.insert(tooFastRobots[teamStr], robot.id)
-
+            -- TODO: send warning game event
+            
             if tooFastCounter[teamStr] == 3 then
                 tooFastCounter[teamStr] = 0
                 StopSpeed.message = teamStr.." bots were too fast 3 times in a row (robots "..tooFastRobots[teamStr][1]..
