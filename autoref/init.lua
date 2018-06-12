@@ -29,6 +29,7 @@ local vis = require "../base/vis"
 local BallOwner = require "../base/ballowner"
 local World = require "../base/world"
 local plot = require "../base/plot"
+local Parameters = require "../base/parameters"
 
 local ballPlacement = require "ballplacement"
 local ruleset = require "ruleset"
@@ -114,6 +115,7 @@ local function main(version)
             end
         end
     end
+    Parameters.update()
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter, thereby
         -- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
