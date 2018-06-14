@@ -87,9 +87,13 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
     elseif name == "KeeperBallHolding" then
         event.foul = { gameEventType = "BALL_HOLDING", originator = {team = team, botId = offendingRobot}, message = reason }
     elseif name == "BallplacementFailed" then
-        event.foul = { gameEventType = "BALL_PLACEMENT_FAILED", originator = {team = team, botId = offendingRobot}, message = reason}
+        event.foul = { gameEventType = "BALL_PLACEMENT_FAILED", originator = {team = team, botId = offendingRobot}, message = reason }
     elseif name == "NoProgress" then
         event.foul = { gameEventType = "NO_PROGRESS_IN_GAME", message = reason }
+    elseif name == "DefensePushing" then
+        event.foul = { gameEventType = "BOT_COLLISION", originator = { team = team, botId = offendingRobot}, message = reason }
+    elseif name == "Pushing" then
+        event.foul = { gameEventType = "BOT_COLLISION", originator = { team = team, botId = offendingRobot}, message = reason }
     elseif name == "Unknown" then
         event.foul = { gameEventType = "UNKNOWN" }
     else

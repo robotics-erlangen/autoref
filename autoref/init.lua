@@ -48,7 +48,8 @@ local descriptionToFileNames = {
     ["Double touch after free kick"] = "doubletouch",
     ["Start kickoffs"] = "kickoffstart",
     ["Keeper ball holding"] = "ballholding",
-    ["No progress"] = "noprogress"
+    ["No progress"] = "noprogress",
+    ["Pushing"] = "pushing"
     --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
@@ -146,7 +147,7 @@ local function main(version)
             else
                 error("A foul must either send a card, STOP, or define a freekick position and executing team")
             end
-        else
+        elseif not foul.possibleRefStates[simpleRefState] then
             if foul.reset then
                 foul.reset()
             end
