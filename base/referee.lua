@@ -102,7 +102,23 @@ function Referee.wasIndirect()
 		Referee.lastFreekick == "IndirectYellow"
 end
 
+local lastNonGameState = nil
+local function updateGameStates()
+	if World.RefereeState ~= "Game" and World.RefereeState ~= "GameForce" then
+		lastNonGameState = World.RefereeState
+	end
+end
+
+function Referee.getLastNonGameState()
+	return lastNonGameState
+end
+
+function Referee.wasKickoff()
+	return lastNonGameState == "KickoffBlue" or lastNonGameState == "KickoffYellow"
+end
+
 function Referee.update()
+	updateGameStates()
 	Referee.updateFreekickstate()
 	Referee.checkTouching()
 end

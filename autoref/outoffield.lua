@@ -103,7 +103,8 @@ function OutOfField.occuring()
             -- positive y position means blue side of field, negative yellow
             local icing = ((outOfFieldPos.y > 0 and lastTeam == World.YellowColorStr)
                 or (outOfFieldPos.y < 0 and lastTeam == World.BlueColorStr))
-                and lastPos.y * outOfFieldPos.y < 0 -- last touch was on other side of field
+                and lastPos.y * outOfFieldPos.y < 0
+                and not Referee.wasKickoff() -- last touch was on other side of field
 
             if math.abs(outOfFieldPos.x) < World.Geometry.GoalWidth/2 then
                 local scoringTeam = outOfFieldPos.y>0 and World.YellowColorStr or World.BlueColorStr
