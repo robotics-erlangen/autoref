@@ -27,6 +27,7 @@ Ruleset.stopBallDistance = 0	-- when in stop state, the robot must not be closer
 Ruleset.numPlayers = 0			-- a team must not have more than 'numPlayers' robots on the field
 Ruleset.stopSpeed = 0			-- when in stop state, no robot may move faster than 'stopSpeed' (in metres per second)
 Ruleset.placementTimeout = 0	-- when a team is assigned to do ball placement, this is the time they have for the task
+Ruleset.placementIncapableGetsFreekick = false -- whether a team that can't perform ball placement will still get the freekick
 
 
 --[[ Stub to copy-paste:
@@ -48,6 +49,7 @@ function Ruleset.setRules(version)
 		Ruleset.numPlayers = 6
 		Ruleset.stopSpeed = 1.5
 		Ruleset.placementTimeout = 15
+		Ruleset.placementIncapableGetsFreekick = true
 	elseif version == "2018: Division A" then
 		Ruleset.name = "2018A"
 		Ruleset.dribblingDist = 1
@@ -56,6 +58,7 @@ function Ruleset.setRules(version)
 		Ruleset.numPlayers = 8
 		Ruleset.stopSpeed = 1.5
 		Ruleset.placementTimeout = 30
+		Ruleset.placementIncapableGetsFreekick = false
 	elseif version == "2018: Division B" then
 		Ruleset.name = "2018B"
 		Ruleset.dribblingDist = 1
@@ -64,6 +67,7 @@ function Ruleset.setRules(version)
 		Ruleset.numPlayers = 6
 		Ruleset.stopSpeed = 1.5
 		Ruleset.placementTimeout = 30
+		Ruleset.placementIncapableGetsFreekick = true
 	else
 		error("Attempt to set invalid ruleset: "..tostring(version))
 	end

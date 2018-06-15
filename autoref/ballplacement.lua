@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -50,6 +50,8 @@ local startTime = 0
 local placementTimer = 0
 local stopTime = 0
 local freekickPosition
+local placingFails = {blue = 0, yellow = 0}
+local overwriteConsequence = nil
 function BallPlacement.start(foul_)
     foul = table.copy(foul_) -- preserve attributes
     waitingForBallToSlowDown = true
@@ -70,9 +72,13 @@ function BallPlacement.run()
     local refState = World.RefereeState
     if refState == "Stop" and stopTime ~= 0 then
         if World.Time - stopTime > STOP_TIME then
-            local placingTeamName = placingTeam == World.BlueColorStr and "BLUE" or "YELLOW"
-            foul.consequence = foul.consequence:gsub("YELLOW", placingTeamName)
-            foul.consequence = foul.consequence:gsub("BLUE", placingTeamName)
+            if overwriteConsequence then
+                foul.consequence = overwriteConsequence
+            else
+                local placingTeamName = placingTeam == World.BlueColorStr and "BLUE" or "YELLOW"
+                foul.consequence = foul.consequence:gsub("YELLOW", placingTeamName)
+                foul.consequence = foul.consequence:gsub("BLUE", placingTeamName)
+            end
             Refbox.send(foul.consequence, nil, Event("Unknown", true))
             endBallPlacement()
         end
@@ -82,6 +88,9 @@ function BallPlacement.run()
             placingTeam = foul.executingTeam
             if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then -- change team
                 placingTeam = (placingTeam == World.YellowColorStr) and World.BlueColorStr or World.YellowColorStr
+                if Ruleset.placementIncapableGetsFreekick then
+                    overwriteConsequence = foul.consequence
+                end
             end
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then
@@ -104,6 +113,8 @@ function BallPlacement.run()
         if World.Ball.pos:distanceTo(freekickPosition) < BALL_PLACEMENT_RADIUS
                 and noRobotNearBall and World.Ball.speed:length() < SLOW_BALL then
             log("success placing the ball")
+            local team = foul.executingTeam == World.BlueColorStr and "blue" or "yellow"
+            placingFails[team] = 0
             stopTime = World.Time
             Refbox.send("STOP", nil, Event("Unknown", true))
         elseif World.Time - placementTimer > Ruleset.placementTimeout and
@@ -111,6 +122,7 @@ function BallPlacement.run()
                 and TEAM_CAPABLE_OF_PLACEMENT[World.YellowColorStr] then
             -- let the other team try (yellow)
             log(World.BlueColorStr .. " failed placing the ball, " .. World.YellowColorStr .. " now conducting")
+            placingFails.blue = placingFails.blue + 1
             placingTeam = World.YellowColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             foul.executingTeam = ""
@@ -122,6 +134,7 @@ function BallPlacement.run()
                 and TEAM_CAPABLE_OF_PLACEMENT[World.BlueColorStr] then
             -- let the other team try (blue)
             log(World.YellowColorStr .. " failed placing the ball, " .. World.BlueColorStr .. " now conducting")
+            placingFails.yellow = placingFails.yellow + 1
             placingTeam = World.BlueColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             placementTimer = World.Time
