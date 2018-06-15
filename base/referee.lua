@@ -69,4 +69,41 @@ function Referee.robotAndPosOfLastBallTouch()
 	return lastRobot, lastTouchPos
 end
 
+local freekickStates = {
+	DirectYellow = true,
+	IndirectYellow = true,
+	DirectBlue = true,
+	IndirectBlue = true,
+}
+Referee.lastFreekick = nil
+local touchingRobotsSinceFreekick = {}
+function Referee.updateFreekickstate()
+	if freekickStates[World.RefereeState] then
+		Referee.lastFreekick = World.RefereeState
+	end
+	if World.RefereeState ~= "Game" and
+		not freekickStates[World.RefereeState] then
+		touchingRobotsSinceFreekick = {}
+	else
+		for _, robot in ipairs(World.Robots) do
+			if robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
+				touchingRobotsSinceFreekick[robot] = true
+			end
+		end
+	end
+end
+
+function Referee.numTouchingRobotsSinceFreekick()
+	return table.count(touchingRobotsSinceFreekick)
+end
+
+function Referee.wasIndirect()
+	return Referee.lastFreekick == "IndirectBlue" or
+		Referee.lastFreekick == "IndirectYellow"
+end
+
+function Referee.update()
+	Referee.updateFreekickstate()
+	Referee.checkTouching()
+end
 return Referee

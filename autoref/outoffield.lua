@@ -124,17 +124,21 @@ function OutOfField.occuring()
                     wasBouncing = false
                     freekickType = "INDIRECT_FREE"
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
-                    OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos)
+                    OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos,{lastRobot.id})
+                elseif Referee.wasIndirect() and Referee.numTouchingRobotsSinceFreekick() <= 1 then
+                    OutOfField.freekickPosition = World.Ball.pos
+                    freekickType = "DIRECT_FREE"
+                    OutOfField.message = "<b>No goal</b> for "..scoringTeam..", was shot directly after an indirect"
+                    OutOfField.event = Event("IndirectGoal", scoringTeam == World.YellowColorStr, World.Ball.pos, {lastRobot.id})
                 elseif closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
                     OutOfField.freekickPosition = nil
                     OutOfField.consequence = "STOP"
-                    OutOfField.event = Event("Goal", scoringTeam==World.YellowColorStr, World.Ball.pos)
+                    OutOfField.event = Event("Goal", scoringTeam==World.YellowColorStr, World.Ball.pos, {lastRobot.id})
                     OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
                     return true
                 else
                     OutOfField.event = nil
-                    log("collision")
                 end
             elseif icing then
                 OutOfField.executingTeam = lastRobot.isYellow and World.BlueColorStr or World.YellowColorStr
