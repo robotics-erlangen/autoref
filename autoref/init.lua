@@ -174,12 +174,12 @@ local function mainLoopWrapper(func)
     end
 end
 
-Entrypoints.add("2017", function()
+--[[Entrypoints.add("2017", function()
     main("2017")
     debug.resetStack()
     Referee.update()
     BallOwner.lastRobot()
-end)
+end)]]
 
 Entrypoints.add("2018: Division A", function()
     main("2018: Division A")
