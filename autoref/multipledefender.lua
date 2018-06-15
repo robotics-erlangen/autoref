@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -34,16 +34,19 @@ local function checkOccupation(team, occupation)
         local distThreshold = occupation == "partially" and robot.radius or -robot.radius
         if robot ~= World[team.."Keeper"]
                 and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
-                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
-        then
-            MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
+                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
             MultipleDefender.message = team .. " " .. robot.id ..
                 " touched the ball<br>while being located <b>" ..
                 occupation .. "</b><br>within its own defense area"
             if occupation == "partially" then
+                MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
                 MultipleDefender.event = Event("MultipleDefenderPartial", robot.isYellow, robot.pos, {robot})
             else
-                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot})
+                MultipleDefender.consequence = "STOP"
+                local otherTeam = team == "Yellow" and "Blue" or "Yellow"
+                log("Penalty for "..otherTeam)
+                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot},
+                    "Penalty for "..otherTeam.." to be placed by the human ref")
             end
             return true
         end
