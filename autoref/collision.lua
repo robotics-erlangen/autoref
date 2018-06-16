@@ -21,6 +21,7 @@
 local Collision = {}
 
 local World = require "../base/world"
+local Field = require "../base/field"
 local Event = require "event"
 local Parameters = require "../base/parameters"
 
@@ -37,6 +38,7 @@ Collision.possibleRefStates = {
     Direct = true,
     Indirect = true,
     Ball = true,
+    Stop = true,
 }
 
 local collisionCounter = {Blue = 0, Yellow = 0}
@@ -51,17 +53,24 @@ function Collision.occuring()
                     defRobot.pos):distanceTo(offRobot.pos)
                 local defSpeed = defRobot.speed:length()
                 local offSpeed = offRobot.speed:length()
+                local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
                         and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
-                    if offSpeed - defSpeed > maxSpeedDiff then
+                    if Field["isIn"..offense.."DefenseArea"](collisionPoint, 0) then
+                        Collision.consequence = "STOP"
+                        Collision.message = "Penalty for "..defense.." as they collided inside their own defense area"
+                        Collision.event = Event("Collision", offRobot.isYellow, nil, {offRobot.id},
+                            "penalty for "..defense..", collision in their defense area with "..defense.." "..defRobot.id)
+                        return true
+                    elseif offSpeed - defSpeed > maxSpeedDiff then
                         collisionCounter[offense] = collisionCounter[offense] + 1
                         Collision.consequence = "DIRECT_FREE_"..defense:upper()
-                        Collision.freekickPosition = offRobot.pos:copy()
+                        Collision.freekickPosition = collisionPoint
                         Collision.executingTeam = World[defense.."ColorStr"]
                         local speed = math.round(offRobot.speed:length(), 2)
                         Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
-                        Collision.event = Event("Collision", offRobot.isYellow, offRobot.pos, {offRobot.id},
+                        Collision.event = Event("Collision", offRobot.isYellow, collisionPoint, {offRobot.id},
                             "traveling at " .. speed .. " m/s, hitting "..defense:lower().." "..defRobot.id)
                         if collisionCounter[offense] == 3 or (collisionCounter[offense] > 3 and
                             (collisionCounter[offense]-3) % 2 == 0) then
@@ -72,12 +81,11 @@ function Collision.occuring()
                         return true
                     else
                         Collision.consequence = "FORCE_START"
-                        Collision.freekickPosition = World.Ball.pos
+                        Collision.freekickPosition = collisionPoint
                         Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
                         Collision.message = "Collision foul by both teams (robots "..offense.." "..offRobot.id.." and "..defense.." "..defRobot.id..")"
                         Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")")
-                        log(Collision.message)
                         return true
                     end
                 end
