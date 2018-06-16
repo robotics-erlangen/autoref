@@ -91,6 +91,7 @@ local function main(version)
         ruleset.setRules(version)
     end
 
+    ballPlacement.update()
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
     elseif ballWasValidBefore then

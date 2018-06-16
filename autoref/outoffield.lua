@@ -42,6 +42,7 @@ local outOfFieldPosZ = 0
 local waitingForDecision = false
 
 function OutOfField.occuring()
+    OutOfField.isFromOutOfField = true
     debug.set("bounce", World.Ball.isBouncing)
     local ballPos = World.Ball.pos
     local outOfFieldEvent -- for event message

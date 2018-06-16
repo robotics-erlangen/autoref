@@ -24,6 +24,7 @@ local debug = require "../base/debug"
 local Field = require "../base/field"
 local Ruleset = require "ruleset"
 local Refbox = require "../base/refbox"
+local Referee = require "../base/referee"
 local vis = require "../base/vis"
 local World = require "../base/world"
 local Event = require "event"
@@ -51,6 +52,7 @@ local placementTimer = 0
 local stopTime = 0
 local freekickPosition
 local placingFails = {blue = 0, yellow = 0}
+local allowedToPlace = {Blue = true, Yellow = true}
 local overwriteConsequence = nil
 function BallPlacement.start(foul_)
     foul = table.copy(foul_) -- preserve attributes
@@ -86,15 +88,20 @@ function BallPlacement.run()
         if World.Ball.speed:length() < SLOW_BALL then
             placementTimer = World.Time
             placingTeam = foul.executingTeam
+            local shortTeam = placingTeam == World.YellowColorStr and "Yellow" or "Blue"
             if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then -- change team
                 placingTeam = (placingTeam == World.YellowColorStr) and World.BlueColorStr or World.YellowColorStr
                 if Ruleset.placementIncapableGetsFreekick then
                     overwriteConsequence = foul.consequence
                 end
             end
+            if not allowedToPlace[shortTeam] and foul.isFromOutOfField then
+                placingTeam = (placingTeam == World.YellowColorStr) and World.BlueColorStr or World.YellowColorStr
+            end
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
-            if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] then
-                log("autonomous ball placement failed: no team is capable")
+            if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] or
+                    not allowedToPlace[shortTeam] and foul.isFromOutOfField then
+                log("autonomous ball placement failed: no team is capable (or allowed to)")
                 Refbox.send("STOP", nil, foul.event)
                 endBallPlacement()
             else
@@ -123,6 +130,10 @@ function BallPlacement.run()
             -- let the other team try (yellow)
             log(World.BlueColorStr .. " failed placing the ball, " .. World.YellowColorStr .. " now conducting")
             placingFails.blue = placingFails.blue + 1
+            if placingFails.blue > 5 then
+                allowedToPlace.Blue = false
+                log("Team blue is no longer allowed to place the ball for out of field events!")
+            end
             placingTeam = World.YellowColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             foul.executingTeam = ""
@@ -135,6 +146,10 @@ function BallPlacement.run()
             -- let the other team try (blue)
             log(World.YellowColorStr .. " failed placing the ball, " .. World.BlueColorStr .. " now conducting")
             placingFails.yellow = placingFails.yellow + 1
+            if placingFails.yellow > 5 then
+                allowedToPlace.Yellow = false
+                log("Team yellow is no longer allowed to place the ball for out of field events!")
+            end
             placingTeam = World.BlueColorStr
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
             placementTimer = World.Time
@@ -142,6 +157,18 @@ function BallPlacement.run()
             foul.consequence = "INDIRECT_FREE_BLUE"
             Refbox.send("BALL_PLACEMENT_BLUE", freekickPosition, foul.event)
         elseif World.Time - placementTimer > Ruleset.placementTimeout then
+            if placingTeam == World.YellowColorStr then
+                placingFails.yellow = placingFails.yellow + 1
+                if placingFails.yellow > 5 then
+                    allowedToPlace.Yellow = false
+                end
+            else
+                placingFails.blue = placingFails.blue + 1
+                if placingFails.blue > 5 then
+                    allowedToPlace.Blue = false
+                    log("Team blue is no longer allowed to place the ball for out of field events!")
+                end
+            end
             log(Ruleset.placementTimeout)
             log("autonomous ball placement failed: timeout")
             Refbox.send("STOP", nil, Event("BallplacementFailed", nil, foul.freekickPosition, nil,
@@ -170,6 +197,16 @@ function BallPlacement.run()
     if refState ~= "Stop" and World.Time - startTime < 5 then
         -- wait a second for the initial stop command
         return
+    end
+end
+
+-- called at the start of every frame
+function BallPlacement.update()
+    if Referee.isNonGameStage() then
+        placingFails.blue = 0
+        placingFails.yellow = 0
+        allowedToPlace.Blue = true
+        allowedToPlace.Yellow = true
     end
 end
 
