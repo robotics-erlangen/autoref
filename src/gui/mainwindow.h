@@ -43,7 +43,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(bool showInfoboard, QWidget *parent = 0);
+    explicit MainWindow(bool showInfoboard, bool activeMode, QWidget *parent = 0);
     ~MainWindow() override;
 
 signals:
@@ -58,6 +58,7 @@ private slots:
     void setRecording(bool record);
     void showConfigDialog();
     void setFlipped(bool flipped);
+    void setActiveMode();
 
 private:
     Ui::MainWindow *ui;

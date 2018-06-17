@@ -34,7 +34,7 @@
 #include <QMetaType>
 #include <QThread>
 
-MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
+MainWindow::MainWindow(bool showInfoboard, bool activeMode, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_logFile(NULL),
@@ -131,6 +131,10 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     ui->splitterTop->setSizes({(int)(size().width()*0.25), (int)(size().width()*0.75)});
     ui->splitterBottom->setSizes({(int)(size().width()*0.4), (int)(size().width()*0.6)});
 
+    setActiveMode();
+    connect(ui->actionActiveMode, SIGNAL(changed()), SLOT(setActiveMode()));
+    ui->actionActiveMode->setChecked(activeMode);
+
     // disable internal referee
     Command command(new amun::Command);
     amun::CommandReferee *referee = command->mutable_referee();
@@ -151,6 +155,13 @@ MainWindow::~MainWindow()
     delete m_plotter;
     delete m_infoboard;
     delete ui;
+}
+
+void MainWindow::setActiveMode()
+{
+    Command command(new amun::Command);
+    command->mutable_strategy_autoref()->set_enable_refbox_control(ui->actionActiveMode->isChecked());
+    sendCommand(command);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

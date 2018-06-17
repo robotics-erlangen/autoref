@@ -81,6 +81,7 @@
     </property>
     <addaction name="actionConfiguration"/>
     <addaction name="actionShowOptions"/>
+    <addaction name="actionActiveMode"/>
    </widget>
    <addaction name="menu_Game"/>
    <addaction name="menuVideo"/>
@@ -167,6 +168,14 @@
   <action name="actionShowOptions">
    <property name="text">
     <string>Toggle options panel</string>
+   </property>
+  </action>
+  <action name="actionActiveMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Active mode</string>
    </property>
   </action>
  </widget>

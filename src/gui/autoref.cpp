@@ -24,6 +24,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
+#include <QCommandLineParser>
 
 int main(int argc, char* argv[])
 {
@@ -46,7 +47,16 @@ int main(int argc, char* argv[])
     QDir::addSearchPath("icon", QString(AUTOREF_DATADIR) + "/icons");
     QDir::addSearchPath("logo", QString(AUTOREF_DATADIR) + "/ssl-refbox/scoreboard/logos");
 
-    MainWindow window(argc > 1);
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Autoref");
+    parser.addHelpOption();
+    QCommandLineOption activeModeOption({"a", "active"}, "Start in active mode");
+    parser.addOption(activeModeOption);
+    QCommandLineOption infoBoardOption({"i", "info"}, "Show the info board");
+    parser.addOption(infoBoardOption);
+    parser.process(app);
+
+    MainWindow window(parser.isSet(infoBoardOption), parser.isSet(activeModeOption));
     window.show();
 
     return app.exec();
