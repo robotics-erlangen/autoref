@@ -76,7 +76,7 @@ function DoubleTouch.occuring()
                 DoubleTouch.executingTeam = World[defenseTeam.."ColorStr"]
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
-                DoubleTouch.event = Event("DoubleTouch", touchingRobot.isYellow, touchingRobot.pos, {touchingRobot})
+                DoubleTouch.event = Event("DoubleTouch", touchingRobot.isYellow, touchingRobot.pos, {touchingRobot.id})
                 return true
             else
                 lastTouchingRobotInFreekick = nil
