@@ -112,6 +112,8 @@ void Amun::start()
     // relay status and debug information of strategy
     connect(m_autoref, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
     connect(this, SIGNAL(gotRefereeHost(QString)), m_autoref, SLOT(handleRefereeHost(QString)));
+    connect(m_processor, SIGNAL(setFlipped(bool)), m_autoref, SLOT(setFlipped(bool)));
+    m_autoref->setFlipped(m_processor->getIsFlipped());
 
     // create referee
     setupReceiver(m_referee, QHostAddress("224.5.23.1"), 10007);
