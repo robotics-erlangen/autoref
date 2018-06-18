@@ -73,6 +73,7 @@ function Pushing.occuring()
 		if Field["isIn"..defense.."DefenseArea"](defRobot.pos, holding[defense][1].radius) then
 			if pushLengths[offense] < MIN_PUSH_DIST_FOR_DEFENSE_AREA() then
 				-- disable multipledefender, don't issue anything
+				debug.set("Pushing/not yet clear")
 			else
 				Pushing.consequence = "INDIRECT_FREE_"..offense:upper()
 				Pushing.freekickPosition = World.Ball.pos
