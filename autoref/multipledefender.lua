@@ -39,13 +39,14 @@ local function checkOccupation(team, occupation)
                 " touched the ball<br>while being located <b>" ..
                 occupation .. "</b><br>within its own defense area"
             if occupation == "partially" then
+                log("Yellow card for "..team.." team")
                 MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
-                MultipleDefender.event = Event("MultipleDefenderPartial", robot.isYellow, robot.pos, {robot})
+                MultipleDefender.event = Event("MultipleDefenderPartial", robot.isYellow, robot.pos, {robot.id})
             else
                 MultipleDefender.consequence = "STOP"
                 local otherTeam = team == "Yellow" and "Blue" or "Yellow"
                 log("Penalty for "..otherTeam)
-                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot},
+                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot.id},
                     "Penalty for "..otherTeam.." to be placed by the human ref")
             end
             return true

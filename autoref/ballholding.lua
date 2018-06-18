@@ -65,7 +65,7 @@ function BallHolding._updateHolding(robot)
         end
         BallHolding.freekickPosition = World.Ball.pos
         BallHolding.message = (robot.isYellow and "Yellow" or "Blue").." keeper held the ball longer than 15 seconds in its defense area"
-        BallHolding.event = Event("KeeperBallHolding", robot.isYellow, robot.pos, {robot})
+        BallHolding.event = Event("KeeperBallHolding", robot.isYellow, robot.pos, {robot.id})
         return true
     end
     return false

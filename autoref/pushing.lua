@@ -40,8 +40,8 @@ Pushing.possibleRefStates = {
 
 local MAX_PUSH_DIST = Parameters.add("pushing", "MAX_PUSH_DIST", 0.2)
 local MIN_PUSH_DIST_FOR_DEFENSE_AREA = Parameters.add("pushing", "MIN_PUSH_DIST_FOR_DEFENSE_AREA", 0.03)
-local PUSHING_CONE_ANGLE = Parameters.add("pushing", "PUSHING_CONE_ANGLE", 20)
-local RESET_FRAME_COUNT = Parameters.add("pushing", "RESET_FRAME_COUNT", 30)
+local PUSHING_CONE_ANGLE = Parameters.add("pushing", "PUSHING_CONE_ANGLE", 10)
+local RESET_FRAME_COUNT = Parameters.add("pushing", "RESET_FRAME_COUNT", 10)
 
 local pushLengths = {Blue = 0, Yellow = 0}
 local lastRobots = {}

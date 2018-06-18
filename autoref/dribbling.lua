@@ -55,7 +55,7 @@ function Dribbling.occuring()
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
             Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
                 .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
-            Dribbling.event = Event("Dribbling", lastRobot.isYellow, lastRobot.pos, {lastRobot})
+            Dribbling.event = Event("Dribbling", lastRobot.isYellow, lastRobot.pos, {lastRobot.id})
             return true
         end
     else

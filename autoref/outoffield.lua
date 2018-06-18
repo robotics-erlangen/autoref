@@ -126,7 +126,7 @@ function OutOfField.occuring()
                     wasBouncing = false
                     freekickType = "INDIRECT_FREE"
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
-                    OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos,{lastRobot.id})
+                    OutOfField.event = Event("ChipGoal", scoringTeam==World.YellowColorStr, World.Ball.pos, {lastRobot.id})
                 elseif Referee.wasIndirect() and Referee.numTouchingRobotsSinceFreekick() <= 1 then
                     OutOfField.freekickPosition = World.Ball.pos
                     freekickType = "DIRECT_FREE"

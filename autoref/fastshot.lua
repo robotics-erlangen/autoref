@@ -103,7 +103,7 @@ function FastShot.occuring()
                 local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
                 FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastBallOwner.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
-                FastShot.event = Event("FastShot", lastBallOwner.isYellow, lastBallOwner.pos, {lastBallOwner}, "kick at " .. math.round(maxSpeed, 2) .. "m/s")
+                FastShot.event = Event("FastShot", lastBallOwner.isYellow, lastBallOwner.pos, {lastBallOwner.id}, "kick at " .. math.round(maxSpeed, 2) .. "m/s")
                 maxSpeed = 0
                 return true
             end
