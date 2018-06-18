@@ -32,6 +32,7 @@ local Referee = require "../base/referee"
 local Parameters = require "../base/parameters"
 local geom = require "../base/geom"
 local Event = require "event"
+local debug = require "../base/debug"
 
 
 Pushing.possibleRefStates = {
