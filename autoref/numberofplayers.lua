@@ -27,7 +27,6 @@ local Ruleset = require "ruleset"
 local MAX_PLAYERS = Ruleset.numPlayers
 
 NumberOfPlayers.possibleRefStates = {
-    Halt = true,
     Stop = true,
     Game = true,
     Kickoff = true,
