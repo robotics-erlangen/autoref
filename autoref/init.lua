@@ -127,12 +127,16 @@ local function main(version)
                 (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
             foul.occuring() then
             foulTimes[foul] = World.Time
-            assert(foul.consequence, "an occuring foul must define a consequence")
+            if not foul.ignore then
+                assert(foul.consequence, "an occuring foul must define a consequence")
+            end
             assert(foul.message, "an occuring foul must define a message")
             log(foul.message)
             debugMessage = foul.message
             debugNextEvent = debugConsequences[foul.consequence]
-            if foul.freekickPosition and foul.executingTeam then
+            if foul.ignore then
+                debug.set("ignore") -- just for the empty if branche
+            elseif foul.freekickPosition and foul.executingTeam then
                 if foul.card then
                     table.insert(cardsToSend, foul.card)
                     table.insert(events, foul.event)

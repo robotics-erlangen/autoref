@@ -22,11 +22,13 @@ local Collision = {}
 
 local World = require "../base/world"
 local Field = require "../base/field"
+local Refbox = require "../base/refbox"
 local Event = require "event"
 local Parameters = require "../base/parameters"
 
 local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
 local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF", 0.3)
+local ASSUMED_BREAK_SPEED_DIFF = Parameters.add("collision", "ASSUMED_BREAK_SPEED_DIFF", 0.25)
 
 -- collision between two robots, at least one of them being fast.
 -- See the "Decisions" paragraph of section 12.4
@@ -43,16 +45,18 @@ Collision.possibleRefStates = {
 
 local collisionCounter = {Blue = 0, Yellow = 0}
 function Collision.occuring()
+    Collision.ignore = false
     local collisionSpeed = COLLISION_SPEED()
     local maxSpeedDiff = COLLISION_SPEED_DIFF()
+    local breakDiff = ASSUMED_BREAK_SPEED_DIFF()
     for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
         for _, offRobot in ipairs(World[offense.."Robots"]) do
             for _, defRobot in ipairs(World[defense.."Robots"]) do
                 local speedDiff = offRobot.speed - defRobot.speed
                 local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
-                    defRobot.pos):distanceTo(offRobot.pos)
-                local defSpeed = defRobot.speed:length()
-                local offSpeed = offRobot.speed:length()
+                    defRobot.pos):distanceTo(offRobot.pos) - breakDiff
+                local defSpeed = math.max(0, defRobot.speed:length() - breakDiff)
+                local offSpeed = math.max(0, offRobot.speed:length() - breakDiff)
                 local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
                         and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
@@ -64,28 +68,27 @@ function Collision.occuring()
                         return true
                     elseif offSpeed - defSpeed > maxSpeedDiff then
                         collisionCounter[offense] = collisionCounter[offense] + 1
-                        Collision.consequence = "DIRECT_FREE_"..defense:upper()
-                        Collision.freekickPosition = collisionPoint
-                        Collision.executingTeam = World[defense.."ColorStr"]
-                        local speed = math.round(offRobot.speed:length(), 2)
-                        Collision.message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
+
+                        local speed = math.round(offRobot.speed:length() - breakDiff, 2)
+                        local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
-                        Collision.event = Event("Collision", offRobot.isYellow, collisionPoint, {offRobot.id},
-                            "traveling at " .. speed .. " m/s, hitting "..defense:lower().." "..defRobot.id)
+                        Refbox.sendWarning(message)
+                        Collision.message = message
+                        Collision.ignore = true
+
                         if collisionCounter[offense] == 3 or (collisionCounter[offense] > 3 and
                             (collisionCounter[offense]-3) % 2 == 0) then
-                            Collision.card = "YELLOW_CARD_" .. offense:upper()
-                            -- TODO: issue custom message for the number of collisions leading up to a yellow card
-                            log("Yellow card for team "..offense..", as they collided "..collisionCounter[offense].." times during the game")
+                            Collision.message = "Yellow card for team "..offense..", as they collided "..collisionCounter[offense].." times"
+                            Collision.consequence = "YELLOW_CARD_" .. offense:upper()
+                            Collision.event = Event("Collision", offRobot.isYellow, nil, {}, Collision.message)
                         end
                         return true
                     else
-                        Collision.consequence = "FORCE_START"
-                        Collision.freekickPosition = collisionPoint
-                        Collision.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
-                        Collision.message = "Collision foul by both teams (robots "..offense.." "..offRobot.id.." and "..defense.." "..defRobot.id..")"
-                        Collision.event = Event("CollisionBoth", nil, nil, nil, "Collision involving two fast robots ("..
-                            offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")")
+                        local message = "Collision by both teams ("..
+                            offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")"
+                        Refbox.sendWarning(message)
+                        Collision.message = message
+                        Collision.ignore = true
                         return true
                     end
                 end
