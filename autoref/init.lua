@@ -74,12 +74,13 @@ local fouls = nil
 local foulTimes = {}
 local FOUL_TIMEOUT = Parameters.add("main", "FOUL_TIMEOUT", 3) -- minimum time between subsequent fouls of the same kind
 
-local cardToSend
-local event
+local cardsToSend = {}
+local events = {}
 local function sendCardIfPending()
-    if World.RefereeState == "Stop" and cardToSend then
-        Refbox.send(cardToSend, nil, event)
-        cardToSend = nil
+    if World.RefereeState == "Stop" and #cardsToSend > 0 then
+        Refbox.send(cardsToSend[1], nil, events[1])
+        table.remove(cardsToSend, 1)
+        table.remove(events, 1)
     end
 end
 
@@ -133,13 +134,13 @@ local function main(version)
             debugNextEvent = debugConsequences[foul.consequence]
             if foul.freekickPosition and foul.executingTeam then
                 if foul.card then
-                    cardToSend = foul.card
-                    event = foul.event
+                    table.insert(cardsToSend, foul.card)
+                    table.insert(events, foul.event)
                 end
                 ballPlacement.start(foul)
             elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
-                cardToSend = foul.consequence
-                event = foul.event
+                table.insert(cardsToSend, foul.consequence)
+                    table.insert(events, foul.event)
                 if World.RefereeState ~= "Stop" then
                     Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
                 end
