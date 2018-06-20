@@ -111,12 +111,12 @@ function Pushing.occuring()
 
 		-- check length
 		if pushLengths[offense] > MAX_PUSH_DIST() then
-			Pushing.consequence = "INDIRECT_FREE_"..offense:upper()
+			--[[Pushing.consequence = "INDIRECT_FREE_"..offense:upper()
 			Pushing.freekickPosition = World.Ball.pos
 			Pushing.executingTeam = World[defense.."ColorStr"]
 			Pushing.message = offense.." "..offRobot.id.." pushed "..defense.." "..defRobot.id.." fo 20 cm"
 			Pushing.event = Event("Pushing", offRobot.isYellow, nil, {offRobot}, defense.." "..defRobot.id.." for 20 cm")
-			return true
+			return true]]
 		end
 
 		lastRobotPositions[offense] = offRobot.pos
