@@ -57,7 +57,7 @@ function StopSpeed.occuring()
             if tooFastCounter[teamStr] == 3 then
                 tooFastCounter[teamStr] = 0
                 StopSpeed.message = teamStr.." bots were too fast 3 times in a row (robots "..tooFastRobots[teamStr][1]..
-                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3]..")"
+                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3]..") -> yellow card"
                 StopSpeed.consequence = "YELLOW_CARD_" .. teamStr:upper()
                 StopSpeed.event = Event("StopSpeed", robot.isYellow, nil, nil, tooFastRobots[teamStr][1]..
                     ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3])

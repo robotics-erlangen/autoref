@@ -28,7 +28,7 @@ local Parameters = require "../base/parameters"
 
 local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
 local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF", 0.3)
-local ASSUMED_BREAK_SPEED_DIFF = Parameters.add("collision", "ASSUMED_BREAK_SPEED_DIFF", 0.25)
+local ASSUMED_BREAK_SPEED_DIFF = Parameters.add("collision", "ASSUMED_BREAK_SPEED_DIFF", 0.2)
 
 -- collision between two robots, at least one of them being fast.
 -- See the "Decisions" paragraph of section 12.4
