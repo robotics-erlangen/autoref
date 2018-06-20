@@ -48,7 +48,7 @@ function FreekickDistance.occuring()
             )
             FreekickDistance.executingTeam = robot.isYellow and World.BlueColorStr or World.YellowColorStr
             FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
-            FreekickDistance.event = Event("FreekickDistance", robot.isYellow, robot.pos, {robot})
+            FreekickDistance.event = Event("FreekickDistance", robot.isYellow, robot.pos, {robot.id})
             FreekickDistance.consequence = "INDIRECT_FREE_"..FreekickDistance.executingTeam:match(">(%a+)<"):upper()
             return true
         end
