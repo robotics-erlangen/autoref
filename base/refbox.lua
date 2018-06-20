@@ -1,6 +1,7 @@
 local Refbox = {}
 
 local Coordinates = require "../base/coordinates"
+local Event = require "event"
 
 local VALID_REF_COMMANDS = {
     HALT = true,
@@ -53,6 +54,19 @@ function Refbox.send(command, placementPos, event)
 			team = "TEAM_" .. command:match("_CARD_(%a+)")
 		}
 	end
+    if not amun.sendNetworkRefereeCommand then
+        error("you must enable debug mode in order to send referee commands")
+    end
+    -- log("send refbox command: " .. command)
+    amun.sendNetworkRefereeCommand(cmd)
+end
+
+function Refbox.sendWarning(text)
+    local cmd = {
+        message_id = 1,
+        gameEvent = Event("Custom", nil, nil, nil, text),
+        implementation_id = "ER-Force Autoref",
+    }
     if not amun.sendNetworkRefereeCommand then
         error("you must enable debug mode in order to send referee commands")
     end

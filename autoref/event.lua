@@ -98,6 +98,8 @@ local function Event(name, teamIsYellow, pos, offendingRobots, reason)
         event.foul = { gameEventType = "INDIRECT_GOAL", originator = {team = team, botId = offendingRobot}, message = reason }
     elseif name == "Unknown" then
         event.foul = { gameEventType = "UNKNOWN" }
+    elseif name == "Custom" then
+        event.foul = { gameEventType = "CUSTOM", message = reason }
     else
         error("unknown event \"" .. name .. "\"")
     end
