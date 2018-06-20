@@ -99,11 +99,16 @@ function BallPlacement.run()
                 placingTeam = (placingTeam == World.YellowColorStr) and World.BlueColorStr or World.YellowColorStr
             end
             freekickPosition = Field.limitToFreekickPosition(foul.freekickPosition, placingTeam)
-            if not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] or
+
+            if World.Ball.pos:distanceTo(freekickPosition) < BALL_PLACEMENT_RADIUS and
+                World.Ball.speed:length() < SLOW_BALL then
+                Refbox.send("STOP", nil, foul.event)
+                stopTime = World.Time
+            elseif not TEAM_CAPABLE_OF_PLACEMENT[placingTeam] or
                     not allowedToPlace[shortTeam] and foul.isFromOutOfField then
                 log("autonomous ball placement failed: no team is capable (or allowed to)")
                 Refbox.send("STOP", nil, foul.event)
-                endBallPlacement()
+                stopTime = World.Time
             else
                 Refbox.send("BALL_PLACEMENT_" .. placingTeam:match(">(%a+)<"):upper(), freekickPosition, foul.event)
                 log("ball placement to be conducted by team " .. placingTeam)
@@ -182,8 +187,7 @@ function BallPlacement.run()
         if undefinedStateTime == 0 then
             undefinedStateTime = World.Time
         end
-        -- TODO: auch abbrechen wenn weder STOP noch Ballplacement ist
-        if World.Time-undefinedStateTime > 60 and refState:sub(0,13) ~= "BallPlacement" then
+        if World.Time-undefinedStateTime > 200 and refState:sub(0,13) ~= "BallPlacement" then
             -- abort autonomous ball placement
             endBallPlacement()
         end
