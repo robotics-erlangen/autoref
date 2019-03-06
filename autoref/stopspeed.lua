@@ -26,63 +26,39 @@ local Event = require "event"
 local Ruleset = require "ruleset"
 
 local STOP_SPEED = Ruleset.stopSpeed
-local ROBOT_SLOW_DOWN_TIME = Parameters.add("stopspeed", "ROBOT_SLOW_DOWN_TIME", 1.5)
+local GRACE_PERIOD = 2 -- as specified by rules
 local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
 
 StopSpeed.possibleRefStates = {
-    Stop = true,
-    Ball = true, -- this is ball placement
+    Stop = true
+    -- TODO: is this happening in ball placement too?
 }
 
-local enterStopTime = 0
-local wasLongEnough = false
-local tooFastCounter = { yellow = 0, blue = 0 }
-local tooFastRobots = { yellow = {}, blue = {}}
-local counterIncreased = { yellow = false, blue = false }
+-- dont stop calling the occuring function once the event triggered
+StopSpeed.shouldAlwaysExecute = true
+
+local enterStopTime = World.Time
+local fastRobotsInThisStop = {}
 function StopSpeed.occuring()
-    if World.Time - enterStopTime < ROBOT_SLOW_DOWN_TIME() then
+    if World.Time - enterStopTime < GRACE_PERIOD then
         return false
     end
 
-    wasLongEnough = true
     for _, robot in ipairs(World.Robots) do
         local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and
-                not counterIncreased[teamStr] then
-            counterIncreased[teamStr] = true
-            tooFastCounter[teamStr] = tooFastCounter[teamStr] + 1
-            table.insert(tooFastRobots[teamStr], robot.id)
-            -- TODO: send warning game event
-            
-            if tooFastCounter[teamStr] == 3 then
-                tooFastCounter[teamStr] = 0
-                StopSpeed.message = teamStr.." bots were too fast 3 times in a row (robots "..tooFastRobots[teamStr][1]..
-                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3]..") -> yellow card"
-                StopSpeed.consequence = "YELLOW_CARD_" .. teamStr:upper()
-                StopSpeed.event = Event("StopSpeed", robot.isYellow, nil, nil, tooFastRobots[teamStr][1]..
-                    ", "..tooFastRobots[teamStr][2]..", "..tooFastRobots[teamStr][3])
-                return true
-            end
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and not fastRobotsInThisStop[robot] then
+            StopSpeed.message = teamStr.." bot "..robot.id.." was too fast during stop"
+            StopSpeed.event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
+            fastRobotsInThisStop[robot] = true
+            return true
         end
     end
     return false
 end
 
 function StopSpeed.reset()
+    fastRobotsInThisStop = {}
     enterStopTime = World.Time
-    if wasLongEnough then
-        if not counterIncreased.blue then
-            tooFastCounter.blue = 0
-            tooFastRobots.blue = {}
-        end
-        if not counterIncreased.yellow then
-            tooFastCounter.yellow = 0
-            tooFastRobots.yellow = {}
-        end
-    end
-    counterIncreased.yellow = false
-    counterIncreased.blue = false
-    wasLongEnough = false
 end
 
 return StopSpeed
