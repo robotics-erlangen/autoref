@@ -33,6 +33,7 @@ target_link_libraries(backend
     PRIVATE shared::core
     PRIVATE amun::processor
     PRIVATE amun::strategy
+    PRIVATE lib::sourcemap
     PUBLIC shared::protobuf
     PUBLIC Qt5::Core
     PRIVATE Qt5::Network

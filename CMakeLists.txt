@@ -74,6 +74,7 @@ if(NOT APPLE)
 endif()
 include(BuildEigen)
 include(BuildLuaJIT2)
+include(BuildSourceMap)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(src)

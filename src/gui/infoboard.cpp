@@ -137,8 +137,8 @@ void InfoBoard::updateRefstate(const Status &status)
 {
     bool change = false;
 
-    if (status->has_debug()) {
-        for (auto& debugMsg : status->debug().value()) {
+    for (auto &debug : status->debug()) {
+        for (auto& debugMsg : debug.value()) {
             if (debugMsg.key() == "AUTOREF_EVENT" && debugMsg.has_string_value() &&
                     QString::fromStdString(debugMsg.string_value()) != m_foulEvent) {
                 m_foulEvent = QString::fromStdString(debugMsg.string_value());
