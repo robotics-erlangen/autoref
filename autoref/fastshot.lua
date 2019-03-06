@@ -20,7 +20,7 @@
 
 local BallOwner = require "../base/ballowner"
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
 local plot = require "../base/plot"
 
@@ -97,13 +97,12 @@ function FastShot.occuring()
             lastSpeeds = {}
             local lastBallOwner = BallOwner.lastRobot()
             if lastBallOwner then
-                FastShot.freekickPosition = lastBallOwner.pos
-                FastShot.executingTeam = lastBallOwner.isYellow and World.BlueColorStr or World.YellowColorStr
-                FastShot.consequence = lastBallOwner.isYellow and "INDIRECT_FREE_BLUE" or "INDIRECT_FREE_YELLOW"
                 local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
                 FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastBallOwner.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
-                FastShot.event = Event("FastShot", lastBallOwner.isYellow, lastBallOwner.pos, {lastBallOwner.id}, "kick at " .. math.round(maxSpeed, 2) .. "m/s")
+                -- TODO: the position is not the kicking position?
+                -- TODO: max ball height is not set
+                FastShot.event = Event.fastShot(lastBallOwner.isYellow, lastBallOwner.id, lastBallOwner.pos, maxSpeed)
                 maxSpeed = 0
                 return true
             end

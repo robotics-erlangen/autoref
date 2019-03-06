@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
+*   Copyright 2019 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -23,7 +23,7 @@ local MultipleDefender = {}
 local Field = require "../base/field"
 local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 
 MultipleDefender.possibleRefStates = {
     Game = true
@@ -38,17 +38,7 @@ local function checkOccupation(team, occupation)
             MultipleDefender.message = team .. " " .. robot.id ..
                 " touched the ball<br>while being located <b>" ..
                 occupation .. "</b><br>within its own defense area"
-            if occupation == "partially" then
-                log("Yellow card for "..team.." team")
-                MultipleDefender.consequence = "YELLOW_CARD_" .. team:upper()
-                MultipleDefender.event = Event("MultipleDefenderPartial", robot.isYellow, robot.pos, {robot.id})
-            else
-                MultipleDefender.consequence = "STOP"
-                local otherTeam = team == "Yellow" and "Blue" or "Yellow"
-                log("Penalty for "..otherTeam)
-                MultipleDefender.event = Event("MultipleDefenderFull", robot.isYellow, robot.pos, {robot.id},
-                    "Penalty for "..otherTeam.." to be placed by the human ref")
-            end
+            MultipleDefender.event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil, occupation == "partially")
             return true
         end
     end

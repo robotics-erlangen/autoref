@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2019 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -23,7 +23,7 @@ local DoubleTouch = {}
 local Referee = require "../base/referee"
 local debug = require "../base/debug"
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Parameters = require "../base/parameters"
 
 local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = Parameters.add("doubletouch", "CONSIDER_FREE_KICK_EXECUTED_THRESHOLD", 0.07)
@@ -71,12 +71,10 @@ function DoubleTouch.occuring()
         if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD() then
             if touchingRobot == lastTouchingRobotInFreekick then
                 local defenseTeam = touchingRobot.isYellow and "Blue" or "Yellow"
-                DoubleTouch.consequence = "INDIRECT_FREE_" .. defenseTeam:upper()
-                DoubleTouch.freekickPosition = touchingRobot.pos:copy()
-                DoubleTouch.executingTeam = World[defenseTeam.."ColorStr"]
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
-                DoubleTouch.event = Event("DoubleTouch", touchingRobot.isYellow, touchingRobot.pos, {touchingRobot.id})
+                -- TODO: it should be position of the ball when it was FIRST touched
+                DoubleTouch.event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, World.Ball.pos)
                 return true
             else
                 lastTouchingRobotInFreekick = nil

@@ -22,7 +22,7 @@ local Dribbling = {}
 
 local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
 
 local MAX_DRIBBLING_DIST = Ruleset.dribblingDist
@@ -45,17 +45,11 @@ function Dribbling.occuring()
             dribblingStart = currentTouchingRobot.pos:copy()
         end
         if currentTouchingRobot.pos:distanceTo(dribblingStart) > MAX_DRIBBLING_DIST then
-            Dribbling.executingTeam = World.YellowColorStr
-            Dribbling.consequence = "INDIRECT_FREE_YELLOW"
-            if currentTouchingRobot.isYellow then
-                Dribbling.executingTeam = World.BlueColorStr
-                Dribbling.consequence = "INDIRECT_FREE_BLUE"
-            end
-            Dribbling.freekickPosition = currentTouchingRobot.pos:copy()
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
             Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
                 .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
-            Dribbling.event = Event("Dribbling", lastRobot.isYellow, lastRobot.pos, {lastRobot.id})
+            -- TODO: should it be the ball position or the robot position
+            Dribbling.event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, dribblingStart, currentTouchingRobot.pos)
             return true
         end
     else
