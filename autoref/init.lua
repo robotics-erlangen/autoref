@@ -33,6 +33,7 @@ local Parameters = require "../base/parameters"
 
 local ballPlacement = require "ballplacement"
 local ruleset = require "ruleset"
+local GameController = require "gamecontroller"
 
 local descriptionToFileNames = {
     ["Robot collisions"] = "collision",
@@ -49,7 +50,8 @@ local descriptionToFileNames = {
     ["Start kickoffs"] = "kickoffstart",
     ["Keeper ball holding"] = "ballholding",
     ["No progress"] = "noprogress",
-    ["Pushing"] = "pushing"
+    ["Pushing"] = "pushing",
+    ["Attacker touches Keeper"] = "attackertouchkeeper"
     --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
@@ -92,6 +94,8 @@ local function main(version)
         ruleset.setRules(version)
     end
 
+    GameController.update()
+
     ballPlacement.update()
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
@@ -124,7 +128,7 @@ local function main(version)
         -- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
         local simpleRefState = World.RefereeState:match("%u%l+")
         if foul.possibleRefStates[simpleRefState] and
-                (not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
+                (foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
             foul.occuring() then
             foulTimes[foul] = World.Time
             if not foul.ignore then
