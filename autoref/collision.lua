@@ -23,7 +23,7 @@ local Collision = {}
 local World = require "../base/world"
 local Field = require "../base/field"
 local Refbox = require "../base/refbox"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Parameters = require "../base/parameters"
 
 local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
@@ -31,7 +31,6 @@ local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF",
 local ASSUMED_BREAK_SPEED_DIFF = Parameters.add("collision", "ASSUMED_BREAK_SPEED_DIFF", 0.2)
 
 -- collision between two robots, at least one of them being fast.
--- See the "Decisions" paragraph of section 12.4
 
 Collision.possibleRefStates = {
     Game = true,
@@ -43,7 +42,7 @@ Collision.possibleRefStates = {
     Stop = true,
 }
 
-local collisionCounter = {Blue = 0, Yellow = 0}
+-- TODO: dont ignore the signal for some time after a collision
 function Collision.occuring()
     Collision.ignore = false
     local collisionSpeed = COLLISION_SPEED()
@@ -60,35 +59,21 @@ function Collision.occuring()
                 local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
                         and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
-                    if Field["isIn"..offense.."DefenseArea"](collisionPoint, 0) then
-                        Collision.consequence = "STOP"
-                        Collision.message = "Penalty for "..defense.." as they collided inside their own defense area"
-                        Collision.event = Event("Collision", offRobot.isYellow, nil, {offRobot.id},
-                            "penalty for "..defense..", collision in their defense area with "..defense.." "..defRobot.id)
-                        return true
-                    elseif offSpeed - defSpeed > maxSpeedDiff then
+                    if offSpeed - defSpeed > maxSpeedDiff then
                         collisionCounter[offense] = collisionCounter[offense] + 1
 
                         local speed = math.round(offRobot.speed:length() - breakDiff, 2)
                         local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
-                        Refbox.sendWarning(message)
                         Collision.message = message
-                        Collision.ignore = true
-
-                        if collisionCounter[offense] == 3 or (collisionCounter[offense] > 3 and
-                            (collisionCounter[offense]-3) % 2 == 0) then
-                            Collision.message = "Yellow card for team "..offense..", as they collided "..collisionCounter[offense].." times"
-                            Collision.consequence = "YELLOW_CARD_" .. offense:upper()
-                            Collision.event = Event("Collision", offRobot.isYellow, nil, {}, Collision.message)
-                        end
+                        Collision.event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
                         return true
                     else
                         local message = "Collision by both teams ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")"
-                        Refbox.sendWarning(message)
-                        Collision.message = message
-                        Collision.ignore = true
+                        -- TODO: angle is not provided
+                        Collision.event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
+                            collisionPoint, speedDiff)
                         return true
                     end
                 end

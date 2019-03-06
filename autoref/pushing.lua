@@ -31,7 +31,7 @@ local Field = require "../base/field"
 local Referee = require "../base/referee"
 local Parameters = require "../base/parameters"
 local geom = require "../base/geom"
-local Event = require "event"
+local Event = require "gameevent2019"
 local debug = require "../base/debug"
 
 
@@ -76,11 +76,8 @@ function Pushing.occuring()
 				-- disable multipledefender, don't issue anything
 				debug.set("Pushing/not yet clear")
 			else
-				Pushing.consequence = "INDIRECT_FREE_"..offense:upper()
-				Pushing.freekickPosition = World.Ball.pos
-				Pushing.executingTeam = World[defense.."ColorStr"]
 				Pushing.message = offense.." "..offRobot.id.." pushed "..defense.." "..defRobot.id.." into the defense area"
-				Pushing.event = Event("DefensePushing", offRobot.isYellow, nil, {offRobot}, defense.." "..defRobot.id.." into the defense area")
+				Pushing.event = Event.pushing(offRobot.isYellow, offRobot.id, defRobot.id, World.Ball.pos, pushLengths[offense])
 				return true
 			end
 		end
@@ -111,12 +108,9 @@ function Pushing.occuring()
 
 		-- check length
 		if pushLengths[offense] > MAX_PUSH_DIST() then
-			--[[Pushing.consequence = "INDIRECT_FREE_"..offense:upper()
-			Pushing.freekickPosition = World.Ball.pos
-			Pushing.executingTeam = World[defense.."ColorStr"]
 			Pushing.message = offense.." "..offRobot.id.." pushed "..defense.." "..defRobot.id.." fo 20 cm"
-			Pushing.event = Event("Pushing", offRobot.isYellow, nil, {offRobot}, defense.." "..defRobot.id.." for 20 cm")
-			return true]]
+			Pushing.event = Event.pushing(offRobot.isYellow, offRobot.id, defRobot.id, World.Ball.pos, pushLengths[offense])
+			return true
 		end
 
 		lastRobotPositions[offense] = offRobot.pos
