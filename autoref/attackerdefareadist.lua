@@ -22,24 +22,31 @@ local AttackerDefAreaDist = {}
 
 local Field = require "../base/field"
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 
 AttackerDefAreaDist.possibleRefStates = {
-    Game = true,
+    Stop = true,
     Indirect = true,
     Direct = true,
 }
 
+local BUFFER_TIME = 2 -- as given by the rules
+
 local offender
--- the distance has to be respected only "at the time enters play"
--- therefore we wait for the switch from a freekick to game state
-local wasFreeKickBefore = {
-    Blue = false,
-    Yellow = false
-}
+local wasGameBefore = false
+local startTime = 0
 function AttackerDefAreaDist.occuring()
     offender = nil
     local offenderDistance
+
+    if wasGameBefore then
+        startTime = WorldTime
+        wasGameBefore = false
+    end
+
+    if World.Time - startTime < BUFFER_TIME then
+        return false
+    end
 
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
         if wasFreeKickBefore[offense] and World.RefereeState == "Game" then
@@ -48,32 +55,24 @@ function AttackerDefAreaDist.occuring()
                 if distance <= 0.2 then
                     offender = robot
                     offenderDistance = distance
-                    AttackerDefAreaDist.consequence = "INDIRECT_FREE_"..defense:upper()
-                    AttackerDefAreaDist.freekickPosition = World.Ball.pos:copy()
-                    AttackerDefAreaDist.executingTeam = World[defense.."ColorStr"]
                     break
                 end
             end
         end
     end
 
-    if World.RefereeState == "DirectBlue" or World.RefereeState == "IndirectBlue" then
-        wasFreeKickBefore.Blue = true
-    elseif World.RefereeState == "DirectYellow" or World.RefereeState == "IndirectYellow" then
-        wasFreeKickBefore.Yellow = true
-    else -- both cannot remain true because there has to be a STOP between free kicks
-        wasFreeKickBefore.Blue = false
-        wasFreeKickBefore.Yellow = false
-    end
-
     if offender then
         local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
         AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
             .. color .. " " .. offender.id
-        AttackerDefAreaDist.event = Event("DefenseAreaDist", offender.isYellow, offender.pos, {offender.id},
-            string.format("distance: %2d cm", offenderDistance*100))
+
+        AttackerDefAreaDist.event = Event.attackerDefAreaDist(offender.isYellow, offender.id, offender.pos, offenderDistance)
         return true
     end
+end
+
+function AttackerDefAreaDist.reset()
+    wasGameBefore = true
 end
 
 return AttackerDefAreaDist
