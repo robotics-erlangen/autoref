@@ -31,11 +31,11 @@ local function toTeam(teamIsYellow)
 end
 
 local function toLocation(location)
-	return {x: location.x, y: location.y }
+	return {x = location.x, y = location.y }
 end
 
 local function createFromStandardInfo(teamIsYellow, botId, location)
-	local event = { by_team: toTeam(teamIsYellow) }
+	local event = { by_team = toTeam(teamIsYellow) }
 	if botId then
 		event.by_bot = botId
 	end
@@ -49,9 +49,9 @@ end
 function Events.ballLeftField(teamIsYellow, botId, location, goalLine)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if goalLine then
-		return { ball_left_field_goal_line: event }
+		return { ball_left_field_goal_line = event }
 	else
-		return { ball_left_field_touch_line: event }
+		return { ball_left_field_touch_line = event }
 	end
 end
 
@@ -60,7 +60,7 @@ function Events.aimlessKick(teamIsYellow, botId, location, kickLocation)
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
 	end
-	return { aimless_kick: event }
+	return { aimless_kick = event }
 end
 
 function Events.goal(teamIsYellow, botId, location, kickLocation, unsureGoal)
@@ -69,9 +69,9 @@ function Events.goal(teamIsYellow, botId, location, kickLocation, unsureGoal)
 		event.kick_location = toLocation(kickLocation)
 	end
 	if unsureGoal then
-		return { possible_goal: event }
+		return { possible_goal = event }
 	else
-		return { goal: event }
+		return { goal = event }
 	end
 end
 
@@ -80,7 +80,7 @@ function Events.indirectGoal(teamIsYellow, botId, location, kickLocation)
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
 	end
-	return { indirect_goal: event }
+	return { indirect_goal = event }
 end
 
 function Events.chippedGoal(teamIsYellow, botId, location, kick_location, maxBallHeight)
@@ -91,7 +91,7 @@ function Events.chippedGoal(teamIsYellow, botId, location, kick_location, maxBal
 	if maxBallHeight then
 		event.max_ball_height = maxBallHeight
 	end
-	return { chipped_goal: event }
+	return { chipped_goal = event }
 end
 
 function Events.stopSpeed(teamIsYellow, botId, location, speed)
@@ -99,7 +99,7 @@ function Events.stopSpeed(teamIsYellow, botId, location, speed)
 	if speed then
 		event.speed = speed
 	end
-	return { bot_too_fast_in_stop: event }
+	return { bot_too_fast_in_stop = event }
 end
 
 function Events.freeKickDistance(teamIsYellow, botId, location, distance)
@@ -107,7 +107,7 @@ function Events.freeKickDistance(teamIsYellow, botId, location, distance)
 	if speed then
 		event.distance = distance
 	end
-	return { defender_too_close_to_kick_point: event }
+	return { defender_too_close_to_kick_point = event }
 end
 
 -- speed: the calculated crash speed [m/s] of the two bots
@@ -129,11 +129,11 @@ function Events.botCrashBoth(botIdYellow, botIdBlue, location, speed, speedDiff,
 	if angle then
 		event.crash_angle = angle
 	end
-	return { bot_crash_drawn: event }
+	return { bot_crash_drawn = event }
 end
 
 function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, speed, speedDiff, angle, skipped)
-	local event = { by_team: toTeam(teamIsYellow), violator: botIdViolator, victim: botIdVictim }
+	local event = { by_team = toTeam(teamIsYellow), violator = botIdViolator, victim = botIdVictim }
 	event.location = toLocation(location)
 	if speed then
 		event.crash_speed = speed
@@ -145,48 +145,48 @@ function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, spe
 		event.crash_angle = angle
 	end
 	if skipped then
-		return { bot_crash_unique_skipped: event }
+		return { bot_crash_unique_skipped = event }
 	else
-		return { bot_crash_unique: event }
+		return { bot_crash_unique = event }
 	end
 end
 
-function Event.pushing(teamIsYellow, botIdViolator, botIdVictim, location, distance, skipped)
-	local event = { by_team: toTeam(teamIsYellow), violator: botIdViolator, victim: botIdVictim }
+function Events.pushing(teamIsYellow, botIdViolator, botIdVictim, location, distance, skipped)
+	local event = { by_team = toTeam(teamIsYellow), violator = botIdViolator, victim = botIdVictim }
 	event.location = toLocation(location)
 	if distance then
 		event.pushed_distance = distance
 	end
 	if skipped then
-		return { bot_pushed_bot_skipped: event }
+		return { bot_pushed_bot_skipped = event }
 	else
-		return { bot_pushed_bot: event }
+		return { bot_pushed_bot = event }
 	end
 end
 
 -- TODO: bot tipped over?
 
-function Event.multipleDefender(teamIsYellow, botId, location, distance, partial)
+function Events.multipleDefender(teamIsYellow, botId, location, distance, partial)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if distance then
 		event.distance = distance
 	end
 	if partial then
-		return { defender_in_defense_area_partially: event }
+		return { defender_in_defense_area_partially = event }
 	else
-		return { defender_in_defense_area: event }
+		return { defender_in_defense_area = event }
 	end
 end
 
-function Event.attackerInDefenseArea(teamIsYellow, botId, location, distance)
+function Events.attackerInDefenseArea(teamIsYellow, botId, location, distance)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if distance then
 		event.distance = distance
 	end
-	return { attacker_in_defense_area: event }
+	return { attacker_in_defense_area = event }
 end
 
-function Event.fastShot(teamIsYellow, botId, location, kickSpeed, maxBallHeight)
+function Events.fastShot(teamIsYellow, botId, location, kickSpeed, maxBallHeight)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if kickSpeed then
 		event.initial_ball_speed = kickSpeed
@@ -194,68 +194,69 @@ function Event.fastShot(teamIsYellow, botId, location, kickSpeed, maxBallHeight)
 	if maxBallHeight then
 		event.max_ball_height = maxBallHeight
 	end
-	return { bot_kicked_ball_too_fast: event }
+	return { bot_kicked_ball_too_fast = event }
 end
 
-function Event.dribbling(teamIsYellow, botId, startLocation, endLocation)
+function Events.dribbling(teamIsYellow, botId, startLocation, endLocation)
 	local event = createFromStandardInfo(teamIsYellow, botId)
 	if startLocation then
 		event.start = toLocation(startLocation)
 	end
 	if endLocation then
-	event["end"] = toLocation(endLocation)
-	return { bot_dribbled_ball_too_far: event }
+		event["end"] = toLocation(endLocation)
+	end
+	return { bot_dribbled_ball_too_far = event }
 end
 
-function Event.attackerTouchKeeper(teamIsYellow, botId, location)
-	return { attacker_touched_keeper: createFromStandardInfo(teamIsYellow, botId, location) }
+function Events.attackerTouchKeeper(teamIsYellow, botId, location)
+	return { attacker_touched_keeper = createFromStandardInfo(teamIsYellow, botId, location) }
 end
 
-function Event.doubleTouch(teamIsYellow, botId, location)
-	return { attacker_double_touched_ball: createFromStandardInfo(teamIsYellow, botId, location) }
+function Events.doubleTouch(teamIsYellow, botId, location)
+	return { attacker_double_touched_ball = createFromStandardInfo(teamIsYellow, botId, location) }
 end
 
-function Event.attackerDefAreaDist(teamIsYellow, botId, location, distance)
+function Events.attackerDefAreaDist(teamIsYellow, botId, location, distance)
 	local event = createFromStandardInfo(teamIsYellow, botId)
 	if distance then
 		event.distance = distance
 	end
-	return { attacker_too_close_to_defense_area: event }
+	return { attacker_too_close_to_defense_area = event }
 end
 
-function Event.ballHolding(teamIsYellow, botId, location, duration)
+function Events.ballHolding(teamIsYellow, botId, location, duration)
 	local event = createFromStandardInfo(teamIsYellow, botId)
 	if duration then
 		event.duration = duration
 	end
-	return { bot_held_ball_deliberately: event }
+	return { bot_held_ball_deliberately = event }
 end
 
-function Event.ballPlacementInterference(teamIsYellow, botId, location)
-	return { bot_interfered_placement: createFromStandardInfo(teamIsYellow, botId, location) }
+function Events.ballPlacementInterference(teamIsYellow, botId, location)
+	return { bot_interfered_placement = createFromStandardInfo(teamIsYellow, botId, location) }
 end
 
-function Event.penaltyFromYellowCards(teamIsYellow)
-	return { multiple_cards: { by_team: toTeam(teamIsYellow) } }
+function Events.penaltyFromYellowCards(teamIsYellow)
+	return { multiple_cards = { by_team = toTeam(teamIsYellow) } }
 end
 
-function Event.yellowCardFromMultipleFouls(teamIsYellow)
-	return { multiple_fouls: { by_team: toTeam(teamIsYellow) } }
+function Events.yellowCardFromMultipleFouls(teamIsYellow)
+	return { multiple_fouls = { by_team = toTeam(teamIsYellow) } }
 end
 
-function Event.multiplePlacementFailure(teamIsYellow)
-	return { multiple_placement_failures: { by_team: toTeam(teamIsYellow) } }
+function Events.multiplePlacementFailure(teamIsYellow)
+	return { multiple_placement_failures = { by_team = toTeam(teamIsYellow) } }
 end
 
-function Event.kickTimeout(teamIsYellow, time)
+function Events.kickTimeout(teamIsYellow, time)
 	local event = createFromStandardInfo(teamIsYellow)
 	if time then
 		event.time = time
 	end
-	local { kick_timeout: event }
+	return { kick_timeout = event }
 end
 
-function Event.noProgress(location, time)
+function Events.noProgress(location, time)
 	local event = {}
 	if location then
 		event.location = toLocation(location)
@@ -263,34 +264,34 @@ function Event.noProgress(location, time)
 	if time then
 		event.time = time
 	end
-	return { no_progress_in_game: event }
+	return { no_progress_in_game = event }
 end
 
-function Event.placementFailedTeamInFavor(teamIsYellow, remainingDistance)
+function Events.placementFailedTeamInFavor(teamIsYellow, remainingDistance)
 	local event = createFromStandardInfo(teamIsYellow)
 	if remainingDistance then
 		event.remaining_distance = remainingDistance
 	end
-	return { placement_failed_by_team_in_favor: event }
+	return { placement_failed_by_team_in_favor = event }
 end
 
-function Event.placementFailedOpponent(teamIsYellow, remainingDistance)
+function Events.placementFailedOpponent(teamIsYellow, remainingDistance)
 	local event = createFromStandardInfo(teamIsYellow)
 	if remainingDistance then
 		event.remaining_distance = remainingDistance
 	end
-	return { placement_failed_by_opponent: event }
+	return { placement_failed_by_opponent = event }
 end
 
-function Event.keeperBallHolding(teamIsYellow, location, duration)
+function Events.keeperBallHolding(teamIsYellow, location, duration)
 	local event = createFromStandardInfo(teamIsYellow, location)
 	if duration then
 		event.duration = duration
 	end
-	return { keeper_held_ball: event }
+	return { keeper_held_ball = event }
 end
 
-function Event.placementSuccess(teamIsYellow, timeTaken, precision, distance)
+function Events.placementSuccess(teamIsYellow, timeTaken, precision, distance)
 	local event = createFromStandardInfo(teamIsYellow)
 	if timeTaken then
 		event.time_taken = timeTaken
@@ -301,15 +302,15 @@ function Event.placementSuccess(teamIsYellow, timeTaken, precision, distance)
 	if distance then
 		event.distance = distance
 	end
-	return { placement_succeeded: event }
+	return { placement_succeeded = event }
 end
 
-function Event.prepared(timeTaken)
-	return { prepared: { time_taken: timeTaken } }
+function Events.prepared(timeTaken)
+	return { prepared = { time_taken = timeTaken } }
 end
 
-function Event.numberOfRobots(teamIsYellow)
-	return { too_many_robots: { by_team: toTeam(teamIsYellow) } }
+function Events.numberOfRobots(teamIsYellow)
+	return { too_many_robots = { by_team = toTeam(teamIsYellow) } }
 end
 
 return Events
