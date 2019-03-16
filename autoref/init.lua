@@ -52,7 +52,6 @@ local descriptionToFileNames = {
     ["No progress"] = "noprogress",
     ["Pushing"] = "pushing",
     ["Attacker touches Keeper"] = "attackertouchkeeper"
-    --["Distance to ball during stop"] = "stopballdistance"
 }
 local optionnames = {
     " Yellow team can place ball",
@@ -96,7 +95,7 @@ local function main(version)
 
     GameController.update()
 
-    ballPlacement.update()
+    --ballPlacement.update()
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
     elseif ballWasValidBefore then
@@ -106,9 +105,9 @@ local function main(version)
         return
     end
 
-    if ballPlacement.active() then
-        ballPlacement.run()
-    end
+    --if ballPlacement.active() then
+    --    ballPlacement.run()
+    --end
     sendCardIfPending()
     if fouls == nil then
         fouls = { require("chooseteamsides") }
@@ -131,31 +130,17 @@ local function main(version)
                 (foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
             foul.occuring() then
             foulTimes[foul] = World.Time
-            if not foul.ignore then
-                assert(foul.consequence, "an occuring foul must define a consequence")
+            -- TODO: sanity checks on occuring events
+            if foul.message then
+                log(foul.message)
             end
-            assert(foul.message, "an occuring foul must define a message")
-            log(foul.message)
             debugMessage = foul.message
             debugNextEvent = debugConsequences[foul.consequence]
+
             if foul.ignore then
                 debug.set("ignore") -- just for the empty if branche
-            elseif foul.freekickPosition and foul.executingTeam then
-                if foul.card then
-                    table.insert(cardsToSend, foul.card)
-                    table.insert(events, foul.event)
-                end
-                ballPlacement.start(foul)
-            elseif foul.consequence:match("(%a+)_CARD_(%a+)") or foul.consequence == "STOP" then
-                table.insert(cardsToSend, foul.consequence)
-                    table.insert(events, foul.event)
-                if World.RefereeState ~= "Stop" then
-                    Refbox.send("STOP", nil, foul.event) -- Stop is required for sending cards
-                end
-            elseif foul.consequence == "NORMAL_START" then
-                Refbox.send(foul.consequence, nil, nil)
             else
-                error("A foul must either send a card, STOP, or define a freekick position and executing team")
+                -- TODO: send to game controller
             end
         elseif not foul.possibleRefStates[simpleRefState] then
             if foul.reset then
@@ -191,6 +176,7 @@ end
     BallOwner.lastRobot()
 end)]]
 
+-- TODO: with the game controller, there is no difference in entrypoint
 Entrypoints.add("2018: Division A", function()
     main("2018: Division A")
     debug.resetStack()
