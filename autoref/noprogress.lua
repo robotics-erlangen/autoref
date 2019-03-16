@@ -22,7 +22,7 @@ local NoProgress = {}
 
 local World = require "../base/world"
 local Parameters = require "../base/parameters"
-local Event = require "event"
+local Event = require "gameevent2019"
 
 NoProgress.possibleRefStates = {
     Game = true,
@@ -39,11 +39,9 @@ function NoProgress.occuring()
         startTime = World.Time
     end
     if World.Time -  startTime > NO_PROGRESS_TIME() then
-        NoProgress.consequence = "FORCE_START"
-        NoProgress.freekickPosition = World.Ball.pos
-        NoProgress.executingTeam = math.random(2) == 1 and "YellowColorStr" or "BlueColorStr"
         NoProgress.message = "No progress for more than 10 seconds"
-        NoProgress.event = Event("NoProgress")
+        -- TODO: dont hardcode time
+        NoProgress.event = Event.noProgress(World.Ball.pos, 10)
         return true
     end
     return false

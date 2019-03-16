@@ -23,7 +23,7 @@ local BallHolding = {}
 local World = require "../base/world"
 local Field = require "../base/field"
 local Parameters = require "../base/parameters"
-local Event = require "event"
+local Event = require "gameevent2019"
 
 BallHolding.possibleRefStates = {
     Game = true,
@@ -57,15 +57,8 @@ function BallHolding._updateHolding(robot)
     end
     if ballHoldingTimes[robot] and World.Time - ballHoldingTimes[robot] > MAX_HOLDING_TIME() then
         ballHoldingTimes[robot] = nil
-        BallHolding.executingTeam = World.YellowColorStr
-        BallHolding.consequence = "INDIRECT_FREE_YELLOW"
-        if robot.isYellow then
-            BallHolding.executingTeam = World.BlueColorStr
-            BallHolding.consequence = "INDIRECT_FREE_BLUE"
-        end
-        BallHolding.freekickPosition = World.Ball.pos
         BallHolding.message = (robot.isYellow and "Yellow" or "Blue").." keeper held the ball longer than 15 seconds in its defense area"
-        BallHolding.event = Event("KeeperBallHolding", robot.isYellow, robot.pos, {robot.id})
+        BallHolding.event = Event.ballHolding(robot.isYellow, robot.id, World.Ball.pos, World.Time - ballHoldingTimes[robot])
         return true
     end
     return false

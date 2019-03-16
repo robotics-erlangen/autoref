@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2019 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -21,11 +21,12 @@
 local NumberOfPlayers = {}
 
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
 
 local MAX_PLAYERS = Ruleset.numPlayers
 
+-- TODO: no too many robots?
 NumberOfPlayers.possibleRefStates = {
     Stop = true,
     Game = true,
@@ -35,8 +36,10 @@ NumberOfPlayers.possibleRefStates = {
     Indirect = true,
 }
 
+-- TODO: only do this if the number is exceeded for more than just one frame
 function NumberOfPlayers.occuring()
     if #World.YellowRobots > MAX_PLAYERS then
+        -- TODO: just discount one robot here
         for _, robot in ipairs(World.YellowRobots) do
             for _, otherRobot in ipairs(World.YellowRobots) do
                 if robot~= otherRobot and robot.pos:distanceTo(otherRobot.pos) < 0.07 then
@@ -45,9 +48,8 @@ function NumberOfPlayers.occuring()
                 end
             end
         end
-        NumberOfPlayers.consequence = "STOP"
         NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
-        NumberOfPlayers.event = Event("NumberOfPlayers", true, nil, nil, #World.YellowRobots .. " players on the field")
+        NumberOfPlayers.event = Event.numberOfRobots(true)
         return true
     elseif #World.BlueRobots > MAX_PLAYERS then
         for _, robot in ipairs(World.BlueRobots) do
@@ -58,9 +60,8 @@ function NumberOfPlayers.occuring()
                 end
             end
         end
-        NumberOfPlayers.consequence = "STOP"
         NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
-        NumberOfPlayers.event = Event("NumberOfPlayers", false, nil, nil, #World.BlueRobots .. " players on the field" )
+        NumberOfPlayers.event = Event.numberOfRobots(false)
         return true
     end
 

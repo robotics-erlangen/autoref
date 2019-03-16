@@ -21,7 +21,7 @@
 local KickoffStart = {}
 
 local World = require "../base/world"
-local Event = require "event"
+local Event = require "gameevent2019"
 
 KickoffStart.possibleRefStates = {
     Kickoff = true
@@ -64,9 +64,9 @@ function KickoffStart.occuring()
     end
     allCorretTime = nil
 
-    KickoffStart.consequence = "NORMAL_START"
     KickoffStart.message = "Starting kickoff as both teams were ready after kickoff prepare"
-    KickoffStart.event = Event("Unknown", true)
+    -- TODO: this time is currently wrong
+    KickoffStart.event = Event.prepared(0)
     return true
 end
 
