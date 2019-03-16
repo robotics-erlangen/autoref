@@ -192,6 +192,9 @@ function amun._hideFunctions()
 	local sendCommand = amun.sendCommand
 	local sendNetworkRefereeCommand = amun.sendNetworkRefereeCommand
 	local sendAutorefEvent = amun.sendAutorefEvent
+	local connectGameController = amun.connectGameController
+	local sendGameController = amun.sendGameControllerMessage
+	local receiveGameController = amun.getGameControllerMessage
 
 	-- overwrite global amun
 	amun = {
@@ -200,7 +203,10 @@ function amun._hideFunctions()
 		sendAutorefEvent = sendAutorefEvent,
 		getCurrentTime = function ()
 			return getCurrentTime() * 1E-9
-		end
+		end,
+		connectGameController = connectGameController,
+		sendGameControllerMessage = sendGameController,
+		getGameControllerMessage = receiveGameController
 	}
 	if isDebug then
 		amun.sendCommand = sendCommand
