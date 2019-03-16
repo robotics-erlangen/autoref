@@ -40,7 +40,7 @@ function AttackerDefAreaDist.occuring()
     local offenderDistance
 
     if wasGameBefore then
-        startTime = WorldTime
+        startTime = World.Time
         wasGameBefore = false
     end
 
@@ -49,8 +49,7 @@ function AttackerDefAreaDist.occuring()
     end
 
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
-        if wasFreeKickBefore[offense] and World.RefereeState == "Game" then
-            for _, robot in ipairs(World[offense.."Robots"]) do
+        for _, robot in ipairs(World[offense.."Robots"]) do
                 local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
                 if distance <= 0.2 then
                     offender = robot
@@ -58,9 +57,9 @@ function AttackerDefAreaDist.occuring()
                     break
                 end
             end
-        end
     end
 
+    -- TODO: send one offense per robot, not just one in total
     if offender then
         local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
         AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
