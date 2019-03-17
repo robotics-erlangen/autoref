@@ -111,7 +111,7 @@ local function main(version)
     sendCardIfPending()
     if fouls == nil then
         fouls = { require("chooseteamsides") }
-        for _, option in ipairs(World.SelectedOptions) do
+        --[[for _, option in ipairs(World.SelectedOptions) do
             if option == " Yellow team can place ball" then
                 ballPlacement.setYellowTeamCapable()
             elseif option == " Blue team can place ball" then
@@ -119,9 +119,13 @@ local function main(version)
             elseif descriptionToFileNames[option] then
                 table.insert(fouls, require(descriptionToFileNames[option]))
             end
+        end]]
+        for description, filename in pairs(descriptionToFileNames) do
+            table.insert(fouls, require(filename))
         end
     end
     Parameters.update()
+    local eventsToSend = {}
     for _, foul in ipairs(fouls) do
         -- take the referee state until the second upper case letter, thereby
         -- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
@@ -140,6 +144,7 @@ local function main(version)
             if foul.ignore then
                 debug.set("ignore") -- just for the empty if branche
             else
+                table.insert(eventsToSend, foul.event)
                 -- TODO: send to game controller
             end
         elseif not foul.possibleRefStates[simpleRefState] then
@@ -152,6 +157,11 @@ local function main(version)
             vis.addCircle("event position", foul.freekickPosition, 0.1, vis.colors.blue, true)
         end
     end
+    debug.pushtop()
+    -- Do not change this, as it is used for replay tests
+    debug.set("GAME_CONTROLLER_EVENTS", eventsToSend)
+    debug.pop()
+
     debug.pushtop()
     debug.set("AUTOREF_EVENT", debugMessage)
     debug.set("AUTOREF_NEXT", debugNextEvent)
