@@ -42,8 +42,8 @@ function AttackerTouchKeeper.occuring()
             if keeper and keeper.pos:distanceTo(robot.pos) <= keeper.radius+robot.radius then
                 local pointOfContact = keeper.pos + (robot.pos-keeper.pos):normalize()*keeper.radius
                 if Field["isIn"..defense.."DefenseArea"](pointOfContact, 0) then
-                    local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-                    AttackerTouchKeeper.message = color .. " " .. offender.id ..
+                    local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+                    AttackerTouchKeeper.message = color .. " " .. robot.id ..
                         " touched goalie inside defense area"
                     AttackerTouchKeeper.event = Event.attackerTouchKeeper(robot.isYellow, robot.id, pointOfContact)
                     return true
