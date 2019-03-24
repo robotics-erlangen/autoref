@@ -121,7 +121,11 @@ local function main(version)
             end
         end]]
         for description, filename in pairs(descriptionToFileNames) do
-            table.insert(fouls, require(filename))
+            local foul = require(filename)
+            if foul.reset then
+                foul.reset()
+            end
+            table.insert(fouls, foul)
         end
     end
     Parameters.update()
