@@ -49,7 +49,7 @@ function DoubleTouch.occuring()
         lastBallPosInStop = World.Ball.pos:copy()
     end
 
-    if simpleRefState == "Indirect" or simpleRefState == "Direct" then
+    if simpleRefState == "Indirect" or simpleRefState == "Direct" or simpleRefState == "Kickoff" then
         -- lastTouchingRobotInFreekick = nil
         local r = Referee.robotAndPosOfLastBallTouch()
         if r and r.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
