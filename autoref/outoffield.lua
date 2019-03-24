@@ -94,7 +94,7 @@ function OutOfField.occuring()
                 outOfFieldEvent = "Corner Kick"
             end
             OutOfField.message = outOfFieldEvent .. " " .. OutOfField.executingTeam
-            OutOfField.event = Event.ballLeftField(lastRo.isYellow, ballLeftField.id, outOfFieldPos, true)
+            OutOfField.event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, outOfFieldPos, true)
 
             -- positive y position means blue side of field, negative yellow
             local icing = ((outOfFieldPos.y > 0 and lastTeam == World.YellowColorStr)
