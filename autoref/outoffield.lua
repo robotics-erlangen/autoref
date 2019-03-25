@@ -41,6 +41,12 @@ local outOfFieldPos = nil
 local outOfFieldPosZ = 0
 local waitingForDecision = false
 
+-- Field.isInField considers the inside of the goal as in the field, this is not what we want here
+local function isBallInField()
+    return math.abs(World.Ball.pos.y) < World.Geometry.FieldHeightHalf + World.Ball.radius and
+            math.abs(World.Ball.pos.x) < World.Geometry.FieldWidthHalf + World.Ball.radius
+end
+
 function OutOfField.occuring()
     debug.set("bounce", World.Ball.isBouncing)
     local ballPos = World.Ball.pos
@@ -58,7 +64,7 @@ function OutOfField.occuring()
     end
 
     if not waitingForDecision then
-        if Field.isInField(ballPos, World.Ball.radius) then
+        if isBallInField() then
             wasInFieldBefore = true
         elseif wasInFieldBefore  then
             outOfFieldTime = World.Time
