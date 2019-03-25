@@ -18,7 +18,7 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local BallOwner = require "../base/ballowner"
+local Referee = require "../base/referee"
 local World = require "../base/world"
 local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
@@ -26,7 +26,7 @@ local plot = require "../base/plot"
 
 local FastShot = {}
 
-local MAX_SHOOT_SPEED = Ruleset.shootSpeed
+local MAX_SHOOT_SPEED = 6.5
 
 local MAX_FRAME_DISTANCE = 1.5
 local MAX_INVISIBLE_TIME = 0.8
@@ -95,14 +95,14 @@ function FastShot.occuring()
         if maxVal ~= 0 then
             maxSpeed = maxVal
             lastSpeeds = {}
-            local lastBallOwner = BallOwner.lastRobot()
-            if lastBallOwner then
-                local color = lastBallOwner.isYellow and World.YellowColorStr or World.BlueColorStr
-                FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastBallOwner.id ..
+            local lastTouchingRobot, shootPosition = Referee.robotAndPosOfLastBallTouch()
+            log("Last robot: "..tostring(lastTouchingRobot.id))
+            if lastTouchingRobot then
+                local color = lastTouchingRobot.isYellow and World.YellowColorStr or World.BlueColorStr
+                FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastTouchingRobot.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
-                -- TODO: the position is not the kicking position?
                 -- TODO: max ball height is not set
-                FastShot.event = Event.fastShot(lastBallOwner.isYellow, lastBallOwner.id, lastBallOwner.pos, maxSpeed)
+                FastShot.event = Event.fastShot(lastTouchingRobot.isYellow, lastTouchingRobot.id, shootPosition, maxSpeed)
                 maxSpeed = 0
                 return true
             end
