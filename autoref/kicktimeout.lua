@@ -31,6 +31,9 @@ KickTimeout.possibleRefStates = {
 
 local stateStartTime = World.Time
 function KickTimeout.occuring()
+    if World.Time - stateStartTime < 1 then
+        return false
+    end
     if World.ActionTimeRemaining < 0 then
         local isYellow = World.RefereeState == "KickoffYellow" or World.RefereeState == "DirectYellow" or World.RefereeState == "IndirectYellow"
         KickTimeout.event = Event.kickTimeout(isYellow, World.Ball.pos, World.Time - stateStartTime)
