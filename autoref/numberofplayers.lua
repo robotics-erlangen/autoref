@@ -24,8 +24,6 @@ local World = require "../base/world"
 local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
 
-local MAX_PLAYERS = Ruleset.numPlayers
-
 -- TODO: no too many robots?
 NumberOfPlayers.possibleRefStates = {
     Stop = true,
@@ -38,7 +36,7 @@ NumberOfPlayers.possibleRefStates = {
 
 -- TODO: only do this if the number is exceeded for more than just one frame
 function NumberOfPlayers.occuring()
-    if #World.YellowRobots > MAX_PLAYERS then
+    if #World.YellowRobots > World.YellowRobotsNumberAllowed then
         -- TODO: just discount one robot here
         for _, robot in ipairs(World.YellowRobots) do
             for _, otherRobot in ipairs(World.YellowRobots) do
@@ -48,10 +46,10 @@ function NumberOfPlayers.occuring()
                 end
             end
         end
-        NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
+        NumberOfPlayers.message = World.YellowColorStr .. " team has more than<br>"..World.YellowRobotsNumberAllowed.." players on the field!"
         NumberOfPlayers.event = Event.numberOfRobots(true)
         return true
-    elseif #World.BlueRobots > MAX_PLAYERS then
+    elseif #World.BlueRobots > World.BlueRobotsNumberAllowed then
         for _, robot in ipairs(World.BlueRobots) do
             for _, otherRobot in ipairs(World.BlueRobots) do
                 if robot~= otherRobot and robot.pos:distanceTo(otherRobot.pos) < 0.07 then
@@ -60,7 +58,7 @@ function NumberOfPlayers.occuring()
                 end
             end
         end
-        NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>"..MAX_PLAYERS.." players on the field!"
+        NumberOfPlayers.message = World.BlueColorStr .. " team has more than<br>"..World.BlueRobotsNumberAllowed.." players on the field!"
         NumberOfPlayers.event = Event.numberOfRobots(false)
         return true
     end

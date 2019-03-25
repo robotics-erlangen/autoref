@@ -37,9 +37,11 @@ local Robot = require "../base/robot"
 -- @field YellowInvisibleRobots Robot[] - Own robots which currently aren't tracked
 -- @field YellowRobotsById Robot[] - List of own robots with robot id as index
 -- @field YellowKeeper Robot - Own keeper if on field or nil
+-- @field YellowRobotsNumberAllowed number - number of yellow robots that are allowed on the field
 -- @field BlueRobots Robot[] - List of opponent robots in an arbitary order
 -- @field BlueRobotsById Robot[] - List of opponent robots with robot id as index
 -- @field BlueKeeper Robot - Opponent keeper if on field or nil
+-- @field BlueRobotsNumberAllowed number - number of blue robots that are allowed on the field
 -- @field Robots Robot[] - Every visible robot in an arbitary order
 -- @field TeamIsBlue bool - True if we are the blue team, otherwise we're yellow
 -- @field IsSimulated bool - True if the world is simulated
@@ -300,6 +302,9 @@ function World._updateGameState(state)
 
 	World.YellowKeeper = friendlyKeeper
 	World.BlueKeeper = opponentKeeper
+
+	World.YellowRobotsNumberAllowed = friendlyTeamInfo.max_allowed_bots or 8
+	World.BlueRobotsNumberAllowed = opponentTeamInfo.max_allowed_bots or 8
 
 	World.StageTimeLeft = state.stage_time_left/1000000 -- in seconds
 
