@@ -31,7 +31,7 @@ function GameController.update()
 	if amun.connectGameController() then
 		if state == STATE_UNCONNECTED then
 			state = STATE_CONNECTED
-			amun.sendGameController("AutoRefRegistration", {identifier="ER-Force"})
+			amun.sendGameControllerMessage("AutoRefRegistration", {identifier="ER-Force"})
 		end
 
 	else
@@ -41,7 +41,7 @@ end
 
 function GameController.sendEvent(event)
 	if state == STATE_CONNECTED then
-		amun.sendGameController("AutoRefToController", {game_event=event})
+		amun.sendGameControllerMessage("AutoRefToController", {game_event=event})
 	else
 		log("Not connected to game controller!")
 	end

@@ -137,7 +137,7 @@ local function main(version)
                 debug.set("ignore") -- just for the empty if branche
             else
                 table.insert(eventsToSend, foul.event)
-                -- TODO: send to game controller
+                GameController.sendEvent(foul.event)
             end
         elseif not foul.possibleRefStates[simpleRefState] then
             if foul.reset then
