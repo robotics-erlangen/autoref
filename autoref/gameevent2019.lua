@@ -18,6 +18,8 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
+local Coordinates = require "../base/coordinates"
+
 local Events = {}
 
 local function toTeam(teamIsYellow)
@@ -31,7 +33,9 @@ local function toTeam(teamIsYellow)
 end
 
 local function toLocation(location)
-	return {x = location.x, y = location.y }
+	location = Coordinates.toGlobal(location)
+	-- TODO: flip location when game is flipped
+	return {x = location.y, y = -location.x }
 end
 
 local function createFromStandardInfo(teamIsYellow, botId, location)
@@ -40,7 +44,7 @@ local function createFromStandardInfo(teamIsYellow, botId, location)
 		event.by_bot = botId
 	end
 	if location then
-		event.location = location
+		event.location = toLocation(location)
 	end
 	return event
 end
@@ -104,7 +108,7 @@ end
 
 function Events.freeKickDistance(teamIsYellow, botId, location, distance)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
-	if speed then
+	if distance then
 		event.distance = distance
 	end
 	return { defender_too_close_to_kick_point = event, type = "DEFENDER_TOO_CLOSE_TO_KICK_POINT" }
@@ -217,7 +221,7 @@ function Events.doubleTouch(teamIsYellow, botId, location)
 end
 
 function Events.attackerDefAreaDist(teamIsYellow, botId, location, distance)
-	local event = createFromStandardInfo(teamIsYellow, botId)
+	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if distance then
 		event.distance = distance
 	end
@@ -225,7 +229,7 @@ function Events.attackerDefAreaDist(teamIsYellow, botId, location, distance)
 end
 
 function Events.ballHolding(teamIsYellow, botId, location, duration)
-	local event = createFromStandardInfo(teamIsYellow, botId)
+	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if duration then
 		event.duration = duration
 	end
@@ -270,24 +274,16 @@ function Events.noProgress(location, time)
 	return { no_progress_in_game = event, type = "NO_PROGRESS_IN_GAME" }
 end
 
-function Events.placementFailedTeamInFavor(teamIsYellow, remainingDistance)
+function Events.placementFailed(teamIsYellow, remainingDistance)
 	local event = createFromStandardInfo(teamIsYellow)
 	if remainingDistance then
 		event.remaining_distance = remainingDistance
 	end
-	return { placement_failed_by_team_in_favor = event, type = "PLACEMENT_FAILED" }
-end
-
-function Events.placementFailedOpponent(teamIsYellow, remainingDistance)
-	local event = createFromStandardInfo(teamIsYellow)
-	if remainingDistance then
-		event.remaining_distance = remainingDistance
-	end
-	return { placement_failed_by_opponent = event, type = "PLACEMENT_FAILED" }
+	return { placement_failed = event, type = "PLACEMENT_FAILED" }
 end
 
 function Events.keeperBallHolding(teamIsYellow, location, duration)
-	local event = createFromStandardInfo(teamIsYellow, location)
+	local event = createFromStandardInfo(teamIsYellow, nil, location)
 	if duration then
 		event.duration = duration
 	end
