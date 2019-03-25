@@ -47,11 +47,12 @@ local descriptionToFileNames = {
     ["Attacker distance to defense area"] = "attackerdefareadist",
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
-    ["Start kickoffs"] = "kickoffstart",
+    --["Start kickoffs"] = "kickoffstart",
     ["Keeper ball holding"] = "ballholding",
     ["No progress"] = "noprogress",
     ["Pushing"] = "pushing",
-    ["Attacker touches Keeper"] = "attackertouchkeeper"
+    ["Attacker touches Keeper"] = "attackertouchkeeper",
+    ["Kick timout"] = "kicktimeout"
 }
 local optionnames = {
     " Yellow team can place ball",

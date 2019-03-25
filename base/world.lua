@@ -48,6 +48,7 @@ local Robot = require "../base/robot"
 -- @field IsLargeField bool - True if playing on the large field
 -- @field Time number - Current unix timestamp in seconds (with nanoseconds precision)
 -- @field TimeDiff number - Time since last update
+-- @field ActionTimeRemaining number - Time remaining for the current action (direct, indirect, ...)
 -- @field BallPlacementPos - Position where the ball has to be placed
 -- @field RefereeState string - current refereestate, can be one of these:
 -- Halt, Stop, Game, GameForce,
@@ -307,6 +308,8 @@ function World._updateGameState(state)
 	World.BlueRobotsNumberAllowed = opponentTeamInfo.max_allowed_bots or 8
 
 	World.StageTimeLeft = state.stage_time_left/1000000 -- in seconds
+
+	World.ActionTimeRemaining = (state.current_action_time_remaining or 0) / 1000000 --in seconds
 
 	--[[
     optional sint32 stage_time_left = 2;

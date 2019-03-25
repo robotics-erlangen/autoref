@@ -248,8 +248,11 @@ function Events.multiplePlacementFailure(teamIsYellow)
 	return { multiple_placement_failures = { by_team = toTeam(teamIsYellow) } }
 end
 
-function Events.kickTimeout(teamIsYellow, time)
+function Events.kickTimeout(teamIsYellow, location, time)
 	local event = createFromStandardInfo(teamIsYellow)
+	if location then
+		event.location = toLocation(location)
+	end
 	if time then
 		event.time = time
 	end
