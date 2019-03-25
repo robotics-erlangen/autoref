@@ -51,6 +51,8 @@ if(APPLE)
     SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols <TARGET>")
 endif()
 
+add_custom_target(download)
+
 include(EnvHelper)
 
 find_package(OpenGL REQUIRED)
