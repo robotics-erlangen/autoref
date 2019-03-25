@@ -206,7 +206,8 @@ function amun._hideFunctions()
 		end,
 		connectGameController = connectGameController,
 		sendGameControllerMessage = sendGameController,
-		getGameControllerMessage = receiveGameController
+		getGameControllerMessage = receiveGameController,
+		isFlipped = amun.isFlipped
 	}
 	if isDebug then
 		amun.sendCommand = sendCommand
