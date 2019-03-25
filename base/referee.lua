@@ -97,9 +97,23 @@ function Referee.numTouchingRobotsSinceFreekick()
 	return table.count(touchingRobotsSinceFreekick)
 end
 
+function Referee.numTouchingRobotsSinceFreekickSelective(yellowRobots)
+	local counter = 0
+	for r, _ in pairs(touchingRobotsSinceFreekick) do
+		if (r.isYellow and yellowRobots) or (not r.isYellow and not yellowRobots) then
+			counter = counter + 1
+		end
+	end
+	return counter
+end
+
 function Referee.wasIndirect()
 	return Referee.lastFreekick == "IndirectBlue" or
 		Referee.lastFreekick == "IndirectYellow"
+end
+
+function Referee.wasIndirectYellow()
+	return Referee.lastFreekick == "IndirectYellow"
 end
 
 local lastNonGameState = nil

@@ -89,11 +89,9 @@ function OutOfField.occuring()
              OutOfField.executingTeam = World.BlueColorStr
         end
 
-        local freekickType = "INDIRECT_FREE"
         outOfFieldEvent = "Throw-In"
         vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
         if math.abs(outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
-            freekickType = "DIRECT_FREE"
             if (lastRobot.isYellow and outOfFieldPos.y>0) or (not lastRobot.isYellow and outOfFieldPos.y<0) then
                 outOfFieldEvent = "Goal Kick"
             else
@@ -128,7 +126,7 @@ function OutOfField.occuring()
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
                     -- TODO: max ball height
                     OutOfField.event = Event.chippedGoal(lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
-                elseif Referee.wasIndirect() and Referee.numTouchingRobotsSinceFreekick() <= 1 then
+                elseif Referee.wasIndirect() and Referee.numTouchingRobotsSinceFreekickSelective(Referee.wasIndirectYellow()) <= 1 then
                     OutOfField.message = "<b>No goal</b> for "..scoringTeam..", was shot directly after an indirect"
                     OutOfField.event = Event.indirectGoal(lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
                 elseif closeToGoal or insideGoal
