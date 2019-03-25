@@ -31,7 +31,6 @@ local World = require "../base/world"
 local plot = require "../base/plot"
 local Parameters = require "../base/parameters"
 
-local ballPlacement = require "ballplacement"
 local ruleset = require "ruleset"
 local GameController = require "gamecontroller"
 
@@ -52,7 +51,8 @@ local descriptionToFileNames = {
     ["No progress"] = "noprogress",
     ["Pushing"] = "pushing",
     ["Attacker touches Keeper"] = "attackertouchkeeper",
-    ["Kick timout"] = "kicktimeout"
+    ["Kick timout"] = "kicktimeout",
+    ["Ball placement"] = "ballplacement"
 }
 local optionnames = {
     " Yellow team can place ball",
@@ -96,7 +96,6 @@ local function main(version)
 
     GameController.update()
 
-    --ballPlacement.update()
     if World.Ball:isPositionValid() then
         ballWasValidBefore = true
     elseif ballWasValidBefore then
@@ -106,21 +105,9 @@ local function main(version)
         return
     end
 
-    --if ballPlacement.active() then
-    --    ballPlacement.run()
-    --end
     sendCardIfPending()
     if fouls == nil then
         fouls = { require("chooseteamsides") }
-        --[[for _, option in ipairs(World.SelectedOptions) do
-            if option == " Yellow team can place ball" then
-                ballPlacement.setYellowTeamCapable()
-            elseif option == " Blue team can place ball" then
-                ballPlacement.setBlueTeamCapable()
-            elseif descriptionToFileNames[option] then
-                table.insert(fouls, require(descriptionToFileNames[option]))
-            end
-        end]]
         for description, filename in pairs(descriptionToFileNames) do
             local foul = require(filename)
             if foul.reset then
