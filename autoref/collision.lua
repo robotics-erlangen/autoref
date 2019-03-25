@@ -60,11 +60,10 @@ function Collision.occuring()
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
                         and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
                     if offSpeed - defSpeed > maxSpeedDiff then
-                        collisionCounter[offense] = collisionCounter[offense] + 1
 
                         local speed = math.round(offRobot.speed:length() - breakDiff, 2)
                         local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
-                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s ("..collisionCounter[offense].." collisions)"
+                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
                         Collision.message = message
                         Collision.event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
                         return true
