@@ -19,6 +19,7 @@
 *************************************************************************]]
 
 local Coordinates = require "../base/coordinates"
+local Vector = require "../base/vector"
 
 local Events = {}
 
@@ -34,7 +35,9 @@ end
 
 local function toLocation(location)
 	location = Coordinates.toGlobal(location)
-	-- TODO: flip location when game is flipped
+	if amun.isFlipped() then
+		location = Vector(-location.x , -location.y)
+	end
 	return {x = location.y, y = -location.x }
 end
 
