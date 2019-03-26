@@ -132,8 +132,7 @@ function OutOfField.occuring()
                 elseif closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
                     OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
-                    -- TODO: this will be changed in a newer game controller protocol version
-                    OutOfField.event = Event.goal(scoringTeam==World.YellowColorStr, lastRobot.id, outOfFieldPos, lastPos)
+                    OutOfField.event = Event.goal(scoringTeam==World.YellowColorStr, lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
                     return true
                 else
                     OutOfField.event = nil
