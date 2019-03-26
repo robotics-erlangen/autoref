@@ -171,23 +171,9 @@ local function mainLoopWrapper(func)
     end
 end
 
---[[Entrypoints.add("2017", function()
-    main("2017")
-    debug.resetStack()
-    Referee.update()
-    BallOwner.lastRobot()
-end)]]
-
 -- TODO: with the game controller, there is no difference in entrypoint
-Entrypoints.add("2018: Division A", function()
+Entrypoints.add("2019", function()
     main("2018: Division A")
-    debug.resetStack()
-    Referee.update()
-    BallOwner.lastRobot()
-end)
-
-Entrypoints.add("2018: Division B", function()
-    main("2018: Division B")
     debug.resetStack()
     Referee.update()
     BallOwner.lastRobot()
