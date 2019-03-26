@@ -32,7 +32,6 @@ local World = require "../base/world"
 local plot = require "../base/plot"
 local Parameters = require "../base/parameters"
 
-local ruleset = require "ruleset"
 local GameController = require "gamecontroller"
 
 local descriptionToFileNames = {
@@ -66,10 +65,7 @@ local FOUL_TIMEOUT = Parameters.add("main", "FOUL_TIMEOUT", 3) -- minimum time b
 
 local ballWasValidBefore = false
 local debugMessage = ""
-local function main(version)
-    if ruleset.name == "" then
-        ruleset.setRules(version)
-    end
+local function main()
 
     GameController.update()
 
@@ -146,7 +142,7 @@ local function mainLoopWrapper(func)
 end
 
 Entrypoints.add("2019", function()
-    main("2018: Division A")
+    main()
     debug.resetStack()
     Referee.update()
     BallOwner.lastRobot()

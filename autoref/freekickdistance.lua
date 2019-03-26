@@ -22,9 +22,8 @@ local FreekickDistance = {}
 
 local World = require "../base/world"
 local Event = require "gameevent2019"
-local Ruleset = require "ruleset"
 
-local STOP_BALL_DISTANCE = Ruleset.stopBallDistance
+local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
 
 FreekickDistance.possibleRefStates = {
     Direct = true,

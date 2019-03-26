@@ -22,9 +22,8 @@ local StopBallDistance = {}
 
 local World = require "../base/world"
 local Event = require "event"
-local Ruleset = require "ruleset"
 
-local STOP_BALL_DISTANCE = Ruleset.stopBallDistance
+local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
 local TIME_TO_EVADE_BALL = 2
 
 StopBallDistance.possibleRefStates = {

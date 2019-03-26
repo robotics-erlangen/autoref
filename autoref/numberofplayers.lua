@@ -22,7 +22,6 @@ local NumberOfPlayers = {}
 
 local World = require "../base/world"
 local Event = require "gameevent2019"
-local Ruleset = require "ruleset"
 
 -- TODO: no too many robots?
 NumberOfPlayers.possibleRefStates = {

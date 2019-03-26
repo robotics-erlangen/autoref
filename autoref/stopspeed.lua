@@ -23,9 +23,8 @@ local StopSpeed = {}
 local World = require "../base/world"
 local Parameters = require "../base/parameters"
 local Event = require "gameevent2019"
-local Ruleset = require "ruleset"
 
-local STOP_SPEED = Ruleset.stopSpeed
+local STOP_SPEED = 1.5 -- as specified by the rules
 local GRACE_PERIOD = 2 -- as specified by rules
 local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
 

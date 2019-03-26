@@ -21,7 +21,6 @@
 local Referee = require "../base/referee"
 local World = require "../base/world"
 local Event = require "gameevent2019"
-local Ruleset = require "ruleset"
 local plot = require "../base/plot"
 
 local FastShot = {}
