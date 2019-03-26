@@ -32,17 +32,13 @@ AttackerDefAreaDist.possibleRefStates = {
 
 local BUFFER_TIME = 2 -- as given by the rules
 
-local offender
-local wasGameBefore = false
-local startTime = 0
-function AttackerDefAreaDist.occuring()
-    offender = nil
-    local offenderDistance
+-- dont stop calling the occuring function once the event triggered
+AttackerDefAreaDist.shouldAlwaysExecute = true
 
-    if wasGameBefore then
-        startTime = World.Time
-        wasGameBefore = false
-    end
+local offender
+local startTime = 0
+local closeRobotsInThisState = {}
+function AttackerDefAreaDist.occuring()
 
     if World.Time - startTime < BUFFER_TIME then
         return false
@@ -51,27 +47,24 @@ function AttackerDefAreaDist.occuring()
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
         for _, robot in ipairs(World[offense.."Robots"]) do
                 local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
-                if distance <= 0.2 then
-                    offender = robot
-                    offenderDistance = distance
-                    break
+                if distance <= 0.2 and not closeRobotsInThisState[robot] then
+
+                    local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+                    AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
+                        .. color .. " " .. robot.id
+
+                    AttackerDefAreaDist.event = Event.attackerDefAreaDist(robot.isYellow, robot.id, robot.pos, distance)
+
+                    closeRobotsInThisState[robot] = true
+                    return true
                 end
             end
-    end
-
-    -- TODO: send one offense per robot, not just one in total
-    if offender then
-        local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
-        AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
-            .. color .. " " .. offender.id
-
-        AttackerDefAreaDist.event = Event.attackerDefAreaDist(offender.isYellow, offender.id, offender.pos, offenderDistance)
-        return true
     end
 end
 
 function AttackerDefAreaDist.reset()
-    wasGameBefore = true
+    startTime = World.Time
+    closeRobotsInThisState = {}
 end
 
 return AttackerDefAreaDist
