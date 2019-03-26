@@ -145,7 +145,7 @@ function Events.botCrashBoth(botIdYellow, botIdBlue, location, speed, speedDiff,
 	return { bot_crash_drawn = event, type = "BOT_CRASH_DRAWN" }
 end
 
-function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, speed, speedDiff, angle, skipped)
+function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, speed, speedDiff, angle)
 	local event = { by_team = toTeam(teamIsYellow), violator = botIdViolator, victim = botIdVictim }
 	event.location = toLocation(location)
 	if speed then
@@ -157,24 +157,16 @@ function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, spe
 	if angle then
 		event.crash_angle = angle
 	end
-	if skipped then
-		return { bot_crash_unique_skipped = event, type = "BOT_CRASH_UNIQUE_SKIPPED" }
-	else
-		return { bot_crash_unique = event, type = "BOT_CRASH_UNIQUE" }
-	end
+	return { bot_crash_unique = event, type = "BOT_CRASH_UNIQUE" }
 end
 
-function Events.pushing(teamIsYellow, botIdViolator, botIdVictim, location, distance, skipped)
+function Events.pushing(teamIsYellow, botIdViolator, botIdVictim, location, distance)
 	local event = { by_team = toTeam(teamIsYellow), violator = botIdViolator, victim = botIdVictim }
 	event.location = toLocation(location)
 	if distance then
 		event.pushed_distance = distance
 	end
-	if skipped then
-		return { bot_pushed_bot_skipped = event, type = "BOT_PUSHED_BOT_SKIPPED" }
-	else
-		return { bot_pushed_bot = event, type = "BOT_PUSHED_BOT" }
-	end
+	return { bot_pushed_bot = event, type = "BOT_PUSHED_BOT" }
 end
 
 -- TODO: bot tipped over?
