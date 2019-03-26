@@ -22,7 +22,7 @@ local StopSpeed = {}
 
 local World = require "../base/world"
 local Parameters = require "../base/parameters"
-local Event = require "event"
+local Event = require "gameevent2019"
 local Ruleset = require "ruleset"
 
 local STOP_SPEED = Ruleset.stopSpeed
@@ -31,7 +31,6 @@ local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
 
 StopSpeed.possibleRefStates = {
     Stop = true
-    -- TODO: is this happening in ball placement too?
 }
 
 -- dont stop calling the occuring function once the event triggered
