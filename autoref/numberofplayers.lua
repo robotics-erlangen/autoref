@@ -23,7 +23,6 @@ local NumberOfPlayers = {}
 local World = require "../base/world"
 local Event = require "gameevent2019"
 
--- TODO: no too many robots?
 NumberOfPlayers.possibleRefStates = {
     Stop = true,
     Game = true,
@@ -31,6 +30,7 @@ NumberOfPlayers.possibleRefStates = {
     Penalty = true,
     Direct = true,
     Indirect = true,
+    Ball = true
 }
 
 -- TODO: only do this if the number is exceeded for more than just one frame
