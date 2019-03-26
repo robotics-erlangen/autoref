@@ -1,5 +1,6 @@
 --[[***********************************************************************
-*   Copyright 2018 Alexander Danzer, Michael Eischer, Lukas Wegmann       *
+*   Copyright 2019 Alexander Danzer, Michael Eischer, Lukas Wegmann       *
+*       Andreas Wendler                                                   *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -54,41 +55,17 @@ local descriptionToFileNames = {
     ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement"
 }
-local optionnames = {
-    " Yellow team can place ball",
-    " Blue team can place ball"
-}
+local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
     table.insert(optionnames, description)
 end
-local debugConsequences = {
-    INDIRECT_FREE_BLUE = "Indirect Blue",
-    INDIRECT_FREE_YELLOW = "Indirect Yellow",
-    DIRECT_FREE_BLUE = "Direct Blue",
-    DIRECT_FREE_YELLOW = "Direct Yellow",
-    YELLOW_CARD_BLUE = "Yellow Card<br>for Blue",
-    YELLOW_CARD_YELLOW = "Yewllow Card<br>for Yellow",
-    STOP = "Stop",
-    NORMAL_START = "Normal start"
-}
 
 local fouls = nil
 local foulTimes = {}
 local FOUL_TIMEOUT = Parameters.add("main", "FOUL_TIMEOUT", 3) -- minimum time between subsequent fouls of the same kind
 
-local cardsToSend = {}
-local events = {}
-local function sendCardIfPending()
-    if World.RefereeState == "Stop" and #cardsToSend > 0 then
-        Refbox.send(cardsToSend[1], nil, events[1])
-        table.remove(cardsToSend, 1)
-        table.remove(events, 1)
-    end
-end
-
 local ballWasValidBefore = false
 local debugMessage = ""
-local debugNextEvent = ""
 local function main(version)
     if ruleset.name == "" then
         ruleset.setRules(version)
@@ -105,7 +82,6 @@ local function main(version)
         return
     end
 
-    sendCardIfPending()
     if fouls == nil then
         fouls = { require("chooseteamsides") }
         for description, filename in pairs(descriptionToFileNames) do
@@ -124,14 +100,13 @@ local function main(version)
         local simpleRefState = World.RefereeState:match("%u%l+")
         if foul.possibleRefStates[simpleRefState] and
                 (foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
-            foul.occuring() then
+                foul.occuring() then
             foulTimes[foul] = World.Time
             -- TODO: sanity checks on occuring events
             if foul.message then
                 log(foul.message)
             end
             debugMessage = foul.message
-            debugNextEvent = debugConsequences[foul.consequence]
 
             if foul.ignore then
                 debug.set("ignore") -- just for the empty if branche
@@ -156,7 +131,6 @@ local function main(version)
 
     debug.pushtop()
     debug.set("AUTOREF_EVENT", debugMessage)
-    debug.set("AUTOREF_NEXT", debugNextEvent)
     debug.pop()
     Referee.illustrateRefereeStates()
 end
@@ -171,7 +145,6 @@ local function mainLoopWrapper(func)
     end
 end
 
--- TODO: with the game controller, there is no difference in entrypoint
 Entrypoints.add("2019", function()
     main("2018: Division A")
     debug.resetStack()
