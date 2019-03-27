@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2019 Andreas Wendler                      *
+*   Copyright 2019 Andreas Wendler                                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
