@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2018 Andreas Wendler                                        *
+*   Copyright 2019 Andreas Wendler                                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -18,39 +18,46 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local NoProgress = {}
+local KeeperBallHolding = {}
 
 local World = require "../base/world"
-local Parameters = require "../base/parameters"
+local Field = require "../base/field"
 local Event = require "gameevent2019"
 
-NoProgress.possibleRefStates = {
+-- Rule 8.1.2. Lack Of Progress:
+-- There is also a lack of progress if the ball is inside a team’s defense area for 10 seconds,
+-- since the keeper is the only robot that is allowed to manipulate the ball.
+KeeperBallHolding.possibleRefStates = {
     Game = true,
 }
 
--- have this slightly larger than 10s to ensure that keeper ball holding will trigger first
-local NO_PROGRESS_TIME = Parameters.add("noprogress", "NO_PROGRESS_TIME", 10.1)
-local NO_PROGRESS_RADIUS = Parameters.add("noprogress", "NO_PROGRESS_RADIUS", 0.07)
+local MAX_DEFENSE_AREA_TIME = 10 -- as specified by the rules
 
-local startPos = World.Ball.pos
-local startTime = World.Time
-function NoProgress.occuring()
-    if startPos:distanceTo(World.Ball.pos) > NO_PROGRESS_RADIUS() then
-        startPos = World.Ball.pos
-        startTime = World.Time
+local defenseAreaStartTimes = {}
+function KeeperBallHolding.occuring()
+    for _, side in ipairs {"Yellow", "Blue"} do
+        if not defenseAreaStartTimes[side] then
+            defenseAreaStartTimes[side] = World.Time
+        end
+        
+        if Field["isIn"..side.."DefenseArea"](World.Ball.pos, 0) then
+            local inDefenseAreaTime = World.Time - defenseAreaStartTimes[side]
+            if inDefenseAreaTime > MAX_DEFENSE_AREA_TIME then
+                defenseAreaStartTimes = {}
+                KeeperBallHolding.message = side.." keeper kept the ball longer than 10 seconds in its defense area"
+                KeeperBallHolding.event = Event.keeperBallHolding(side == "Yellow", World.Ball.pos, inDefenseAreaTime)
+                return true
+            end
+        else
+            defenseAreaStartTimes[side] = World.Time
+        end
     end
-    if World.Time -  startTime > NO_PROGRESS_TIME() then
-        NoProgress.message = "No progress for more than 10 seconds"
-        -- TODO: dont hardcode time
-        NoProgress.event = Event.noProgress(World.Ball.pos, 10)
-        return true
-    end
+    
     return false
 end
 
-function NoProgress.reset()
-    startPos = World.Ball.pos
-    startTime = World.Time
+function KeeperBallHolding.reset()
+    defenseAreaStartTimes = {}
 end
 
-return NoProgress
+return KeeperBallHolding
