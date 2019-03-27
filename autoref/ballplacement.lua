@@ -40,10 +40,14 @@ function BallPlacement.occuring()
             return true
         end
         
-        -- TODO: for direct/indirect, the placing teams robot is allowed to be closer
         local noRobotNearBall = true
+        local isYellowFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectYellow" or World.NextRefereeState == "IndirectYellow")
+        local isBlueFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectBlue" or World.NextRefereeState == "IndirectBlue")
+        local allowedYellowDistance = isYellowFreekick and 0.05 or 0.5
+        local allowedBlueDistance = isBlueFreekick and 0.05 or 0.5
         for _, robot in ipairs(World.Robots) do
-            if robot.pos:distanceTo(World.Ball.pos) < 0.5 + robot.shootRadius then
+            local allowedDistance = robot.isYellow and allowedYellowDistance or allowedBlueDistance
+            if robot.pos:distanceTo(World.Ball.pos) < allowedDistance + robot.shootRadius then
                 noRobotNearBall = false
             end
         end

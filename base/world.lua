@@ -56,6 +56,7 @@ local Robot = require "../base/robot"
 -- PenaltyYellowPrepare, PenaltyBluePrepare, PenaltyYellow, PenaltyBlue,
 -- DirectYellow, DirectBlue, IndirectYellow, IndirectBlue,
 -- TimeoutBlue, TimeoutYellow, BallPlacementBlue, BallPlacementYellow
+-- @field NextRefereeState string - next referee state, following the current state
 -- @field GameStage string - current game stage, can be one of these:
 -- FirstHalfPre, FirstHalf, HalfTime, SecondHalfPre, SecondHalf,
 -- ExtraTimeBreak, ExtraFirstHalfPre, ExtraFirstHalf, ExtraHalfTime, ExtraSecondHalfPre, ExtraSecondHalf,
@@ -272,6 +273,8 @@ end
 -- updates referee command and keeper information
 function World._updateGameState(state)
 	World.RefereeState = state.state
+	
+	World.NextRefereeState = state.next_state
 
 	if World.RefereeState == "TimeoutOffensive" or World.RefereeState == "TimeoutDefensive" then
 		World.RefereeState = "Halt"
