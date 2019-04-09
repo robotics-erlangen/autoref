@@ -52,7 +52,8 @@ local descriptionToFileNames = {
     ["Attacker touches Keeper"] = "attackertouchkeeper",
     ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement",
-    ["Ball placement interference"] = "placementinterference"
+    ["Ball placement interference"] = "placementinterference",
+    ["Start penalties when ready"] = "penaltystart"
 }
 local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
@@ -66,7 +67,6 @@ local FOUL_TIMEOUT = Parameters.add("main", "FOUL_TIMEOUT", 3) -- minimum time b
 local ballWasValidBefore = false
 local debugMessage = ""
 local function main()
-
     GameController.update()
 
     if World.Ball:isPositionValid() then
