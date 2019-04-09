@@ -30,7 +30,7 @@ BallPlacementInterference.possibleRefStates = {
 local inRangeStartTimes = {}
 function BallPlacementInterference.occuring()
     if World.BallPlacementPos then
-        local opponent = World.RefereeState == "BallPlacementBlue" and "Blue" or "Yellow"
+        local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
         for _, robot in ipairs(World[opponent.."Robots"]) do
             local dist = robot.pos:distanceToLineSegment(World.Ball.pos, World.BallPlacementPos)
             if dist < 0.5 + robot.radius then
