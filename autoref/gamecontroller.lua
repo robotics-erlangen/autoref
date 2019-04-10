@@ -47,4 +47,23 @@ function GameController.sendEvent(event)
 	end
 end
 
+function GameController.sendWaitingForRobots(robotsToDistace)
+	if state == STATE_CONNECTED then
+		local violators = {}
+		for robot, distance in pairs(robotsToDistace) do
+			local violator = {}
+			violator.bot_id = {
+				id = robot.id,
+				team = robot.isYellow and "YELLOW" or "BLUE"
+			}
+			violator.distance = distance
+			table.insert(violators, violator)
+		end
+		local message = {auto_ref_message = {wait_for_bots = {violators = violators}}}
+		amun.sendGameControllerMessage("AutoRefToController", message)
+	else
+		log("Not connected to game controller!")
+	end
+end
+
 return GameController
