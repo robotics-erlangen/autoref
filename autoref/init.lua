@@ -111,7 +111,9 @@ local function main()
                 table.insert(eventsToSend, foul.event)
                 GameController.sendEvent(foul.event)
             end
-            foul.reset()
+            if foul.reset then
+                foul.reset()
+            end
         elseif not foul.possibleRefStates[simpleRefState] then
             if foul.reset then
                 foul.reset()
