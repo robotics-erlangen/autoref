@@ -40,23 +40,28 @@ function KickoffStart.occuring()
 		return false
 	end
     -- check if all robots are on their own side
+    local waitingForRobots = {} -- robot -> distance to valid position
     for _, robot in ipairs(World.BlueRobots) do
 		if robot.pos.y < robot.radius then
-			return false
+			waitingForRobots[robot] = -robot.pos.y + robot.radius 
 		end
 		if World.RefereeState == "KickoffYellowPrepare" and
 			robot.pos:distanceTo(World.Ball.pos) < 0.5 + robot.radius - 0.01 then
-			return false
+			waitingForRobots[robot] = 0.5 + robot.radius - 0.01 - robot.pos:distanceTo(World.Ball.pos)
 		end
     end
     for _, robot in ipairs(World.YellowRobots) do
 		if robot.pos.y > -robot.radius then
-			return false
+			waitingForRobots[robot] = robot.pos.y + robot.radius
 		end
 		if World.RefereeState == "KickoffBluePrepare" and
 			robot.pos:distanceTo(World.Ball.pos) < 0.5 + robot.radius - 0.01 then
-			return false
+			waitingForRobots[robot] = 0.5 + robot.radius - 0.01 - robot.pos:distanceTo(World.Ball.pos)
 		end
+    end
+    if table.count(waitingForRobots) > 0 then
+    	KickoffStart.waitingForRobots = waitingForRobots
+    	return false
     end
 
     allCorrectTime = allCorrectTime or World.Time
