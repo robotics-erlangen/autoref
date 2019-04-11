@@ -44,10 +44,12 @@ function PenaltyStart.occuring()
 		return false
 	end
     -- check if the keeper (if present) touches the goal line
+    local waitingForRobots = {} -- robot -> distance to valid position
     local defendingKeeper = World[defendingTeam .. "Keeper"]
     if defendingKeeper then
-    	if math.abs(defendingKeeper.pos.y - World.Geometry[defendingTeam .. "Goal"].y) > defendingKeeper.radius then
-    		return false
+        local dist = math.abs(defendingKeeper.pos.y - World.Geometry[defendingTeam .. "Goal"].y)
+    	if dist > defendingKeeper.radius then
+    		waitingForRobots[defendingKeeper] = dist - defendingKeeper.radius
     	end
     end
 
@@ -61,7 +63,9 @@ function PenaltyStart.occuring()
     		if not attackingRobot then
     			attackingRobot = robot
     		else
-    			return false;
+                local dist = distanceLine < 0 and (distanceLine - (robot.pos.y - robot.radius))
+                    or (robot.pos.y + robot.radius - distanceLine)
+                waitingForRobots[robot] = dist
     		end
     	end
     end
@@ -69,9 +73,16 @@ function PenaltyStart.occuring()
     	if robot ~= defendingKeeper then
 	    	if (distanceLine < 0 and robot.pos.y - robot.radius < distanceLine) or
 	    			(distanceLine > 0 and robot.pos.y + robot.radius > distanceLine) then
-	    		return false;
+	    		local dist = distanceLine < 0 and (distanceLine - (robot.pos.y - robot.radius))
+                    or (robot.pos.y + robot.radius - distanceLine)
+                waitingForRobots[robot] = dist
 	    	end
 	    end
+    end
+
+    if table.count(waitingForRobots) > 0 then
+        PenaltyStart.waitingForRobots = waitingForRobots
+        return false
     end
 
     -- check if the shooting robot is standing still
