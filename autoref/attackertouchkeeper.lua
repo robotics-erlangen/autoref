@@ -30,8 +30,6 @@ AttackerTouchKeeper.possibleRefStates = {
     Penalty = true,
     Direct = true,
     Indirect = true,
-    Ball = true,
-    Stop = true,
 }
 
 function AttackerTouchKeeper.occuring()
