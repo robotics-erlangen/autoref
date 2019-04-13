@@ -41,8 +41,19 @@ Collision.possibleRefStates = {
     Stop = true,
 }
 
--- TODO: dont ignore the signal for some time after a collision
+-- dont stop calling the occuring function once the event triggered
+Collision.shouldAlwaysExecute = true
+
+local collidingRobots = {} -- robot -> time
 function Collision.occuring()
+    -- go through old collision times
+    local COLLISION_COUNT_TIME = 3
+    for robot, time in pairs(collidingRobots) do
+        if World.Time - time > COLLISION_COUNT_TIME then
+            collidingRobots[robot] = nil
+        end
+    end
+
     Collision.ignore = false
     local collisionSpeed = COLLISION_SPEED()
     local maxSpeedDiff = COLLISION_SPEED_DIFF()
@@ -57,9 +68,12 @@ function Collision.occuring()
                 local offSpeed = math.max(0, offRobot.speed:length() - breakDiff)
                 local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
-                        and projectedSpeed > collisionSpeed and offSpeed > defSpeed then
+                        and projectedSpeed > collisionSpeed and offSpeed > defSpeed
+                        and not collidingRobots[offRobot] and not collidingRobots[defRobot] then
+                    
+                    collidingRobots[offRobot] = World.Time
+                    collidingRobots[defRobot] = World.Time
                     if offSpeed - defSpeed > maxSpeedDiff then
-
                         local speed = math.round(offRobot.speed:length() - breakDiff, 2)
                         local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
