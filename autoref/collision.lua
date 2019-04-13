@@ -83,6 +83,7 @@ function Collision.occuring()
                     else
                         local message = "Collision by both teams ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")"
+                        Collision.message = message
                         -- TODO: angle is not provided
                         Collision.event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
                             collisionPoint, speedDiff)
