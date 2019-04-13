@@ -53,7 +53,8 @@ local descriptionToFileNames = {
     ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement",
     ["Ball placement interference"] = "placementinterference",
-    ["Start penalties when ready"] = "penaltystart"
+    ["Start penalties when ready"] = "penaltystart",
+    ["Stop ball distance"] = "stopballdistance"
 }
 local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
