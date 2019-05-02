@@ -27,6 +27,8 @@ BallPlacementInterference.possibleRefStates = {
     Ball = true
 }
 
+BallPlacementInterference.resetOnInvisibleBall = true
+
 local inRangeStartTimes = {}
 function BallPlacementInterference.occuring()
     if World.BallPlacementPos then

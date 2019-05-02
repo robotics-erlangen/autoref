@@ -70,15 +70,6 @@ local debugMessage = ""
 local function main()
     GameController.update()
 
-    if World.Ball:isPositionValid() then
-        ballWasValidBefore = true
-    elseif ballWasValidBefore then
-        ballWasValidBefore = false
-        log("Ball is not visible!")
-    else
-        return
-    end
-
     if fouls == nil then
         fouls = { require("chooseteamsides") }
         for description, filename in pairs(descriptionToFileNames) do
@@ -89,6 +80,22 @@ local function main()
             table.insert(fouls, foul)
         end
     end
+
+    for _, foul in ipairs(fouls) do
+        if foul.resetOnInvisibleBall and not World.Ball:isPositionValid() then
+            foul.reset()
+        end
+    end
+
+    if World.Ball:isPositionValid() then
+        ballWasValidBefore = true
+    elseif ballWasValidBefore then
+        ballWasValidBefore = false
+        log("Ball is not visible!")
+    else
+        return
+    end
+
     Parameters.update()
     local eventsToSend = {}
     for _, foul in ipairs(fouls) do
