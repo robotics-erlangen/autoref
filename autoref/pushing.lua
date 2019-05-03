@@ -36,7 +36,7 @@ local debug = require "../base/debug"
 
 
 Pushing.possibleRefStates = {
-    Game = true,
+	Game = true,
 }
 
 local MAX_PUSH_DIST = Parameters.add("pushing", "MAX_PUSH_DIST", 0.2)
@@ -67,7 +67,7 @@ function Pushing.occuring()
 		Pushing.reset()
 		return false
 	end
-    for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
+	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
 		-- TODO: íf the distance is not yet reached, disable multipledefender and continue
 		local offRobot = holding[offense][1]
 		local defRobot = holding[defense][1]
@@ -96,7 +96,7 @@ function Pushing.occuring()
 		local centerAngle = (offRobot.pos - lastRobotPositions[offense]):angle()
 		local isInside = geom.isInTriangle(offRobot.pos, offRobot.pos + Vector.fromAngle(centerAngle + coneAngle),
 			offRobot.pos + Vector.fromAngle(centerAngle - coneAngle), defRobot.pos)
-		if isInside then
+		if not isInside then
 			wrongDirectionFrameCounter[offense] = wrongDirectionFrameCounter[offense] + 1
 			if wrongDirectionFrameCounter[offense] >= RESET_FRAME_COUNT() then
 				pushLengths[offense] = 0
@@ -114,8 +114,8 @@ function Pushing.occuring()
 		end
 
 		lastRobotPositions[offense] = offRobot.pos
-    end
-    return false
+	end
+	return false
 end
 
 function Pushing.reset()
