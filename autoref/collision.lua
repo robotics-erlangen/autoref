@@ -21,7 +21,6 @@
 local Collision = {}
 
 local World = require "../base/world"
-local Field = require "../base/field"
 local Event = require "gameevent2019"
 local Parameters = require "../base/parameters"
 

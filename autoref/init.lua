@@ -72,7 +72,7 @@ local function main()
 
     if fouls == nil then
         fouls = { require("chooseteamsides") }
-        for description, filename in pairs(descriptionToFileNames) do
+        for _, filename in pairs(descriptionToFileNames) do
             local foul = require(filename)
             if foul.reset then
                 foul.reset()
@@ -127,7 +127,7 @@ local function main()
                 foul.reset()
             end
         elseif table.count(foul.waitingForRobots) > 0 then
-            for robot, distance in pairs(foul.waitingForRobots) do
+            for robot in pairs(foul.waitingForRobots) do
                 vis.addCircle("waiting for robot", robot.pos, robot.radius * 1.5, vis.colors.red)
             end
             GameController.sendWaitingForRobots(foul.waitingForRobots)

@@ -21,7 +21,6 @@
 local OutOfField = {}
 
 local Referee = require "../base/referee"
-local Field = require "../base/field"
 local debug = require "../base/debug"
 local vis = require "../base/vis"
 local World = require "../base/world"

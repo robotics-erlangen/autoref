@@ -25,8 +25,6 @@ local STATE_CONNECTED = 2
 
 local state = STATE_UNCONNECTED
 
-local responses = {}
-
 function GameController.update()
 	if amun.connectGameController() then
 		if state == STATE_UNCONNECTED then

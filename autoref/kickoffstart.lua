@@ -60,8 +60,8 @@ function KickoffStart.occuring()
 		end
     end
     if table.count(waitingForRobots) > 0 then
-    	KickoffStart.waitingForRobots = waitingForRobots
-    	return false
+		KickoffStart.waitingForRobots = waitingForRobots
+		return false
     end
 
     allCorrectTime = allCorrectTime or World.Time

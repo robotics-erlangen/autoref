@@ -31,7 +31,6 @@ AttackerInDefenseArea.possibleRefStates = {
 
 function AttackerInDefenseArea.occuring()
     for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-        local keeper = World[defense.."Keeper"]
         for _, robot in ipairs(World[offense.."Robots"]) do
             -- attacker touches ball and is in defense area, even if partially
             if Field["isIn"..defense.."DefenseArea"](robot.pos, robot.radius) then

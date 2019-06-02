@@ -70,7 +70,6 @@ function DoubleTouch.occuring()
         debug.set("distToFreekickPos", distToFreekickPos)
         if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD() then
             if touchingRobot == lastTouchingRobotInFreekick then
-                local defenseTeam = touchingRobot.isYellow and "Blue" or "Yellow"
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
                 -- TODO: it should be position of the ball when it was FIRST touched

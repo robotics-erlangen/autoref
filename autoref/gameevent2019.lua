@@ -96,7 +96,7 @@ function Events.indirectGoal(teamIsYellow, botId, location, kickLocation)
 	return { indirect_goal = event, type = "INDIRECT_GOAL" }
 end
 
-function Events.chippedGoal(teamIsYellow, botId, location, kick_location, maxBallHeight)
+function Events.chippedGoal(teamIsYellow, botId, location, kickLocation, maxBallHeight)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
