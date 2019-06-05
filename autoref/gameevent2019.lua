@@ -70,7 +70,7 @@ function Events.aimlessKick(teamIsYellow, botId, location, kickLocation)
 	return { aimless_kick = event, type = "AIMLESS_KICK" }
 end
 
-function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, location, kickLocation, unsureGoal)
+function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, location, kickLocation)
 	local event = {}
 	event.by_team = toTeam(scoringTeamIsYellow)
 	event.kicking_team = toTeam(shootingTeamIsYellow)
@@ -81,11 +81,7 @@ function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, l
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
 	end
-	if unsureGoal then
-		return { possible_goal = event, type = "POSSIBLE_GOAL" }
-	else
-		return { goal = event, type = "GOAL" }
-	end
+	return { possible_goal = event, type = "POSSIBLE_GOAL" }
 end
 
 function Events.indirectGoal(teamIsYellow, botId, location, kickLocation)
