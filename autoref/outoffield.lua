@@ -33,12 +33,15 @@ OutOfField.possibleRefStates = {
     Game = true,
 }
 
-local wasBouncing = false
+local wasBouncingAfterYellowTouch = false
+local wasBouncingAfterBlueTouch = false
 local wasInFieldBefore = false
 local outOfFieldTime = math.huge
 local outOfFieldPos = nil
 local outOfFieldPosZ = 0
 local waitingForDecision = false
+local lastBlueRobot = nil
+local lastYellowRobot = nil
 
 -- Field.isInField considers the inside of the goal as in the field, this is not what we want here
 local function isBallInField()
@@ -52,25 +55,43 @@ function OutOfField.occuring()
     local outOfFieldEvent -- for event message
 
     local lastTeam = Referee.teamWhichTouchedBallLast()
-    local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
+	local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
+
     if lastTeam and lastRobot then
         -- "match" string to remove the font-tags
         debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
-        vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
+		vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
+
+		if lastRobot.isYellow then
+			lastYellowRobot = lastRobot
+		else
+			lastBlueRobot = lastRobot
+		end
     else
         waitingForDecision = false
         return false
-    end
+	end
 
-    if not waitingForDecision then
+	if not waitingForDecision then
+		if lastPos and lastPos:distanceTo(World.Ball.pos) < 0.003 then
+			-- reset bouncing when the ball is touched
+			if lastRobot.isYellow then
+				wasBouncingAfterYellowTouch = false
+			else
+				wasBouncingAfterBlueTouch = false
+			end
+		elseif isBallInField() then
+			wasBouncingAfterYellowTouch = wasBouncingAfterYellowTouch or World.Ball.isBouncing
+			wasBouncingAfterBlueTouch = wasBouncingAfterBlueTouch or World.Ball.isBouncing
+		end
+
         if isBallInField() then
             wasInFieldBefore = true
-        elseif wasInFieldBefore  then
+        elseif wasInFieldBefore then
             outOfFieldTime = World.Time
             wasInFieldBefore = false
             outOfFieldPos = World.Ball.pos:copy()
             outOfFieldPosZ = World.Ball.posZ
-            wasBouncing = World.Ball.isBouncing
             waitingForDecision = true
         end
     end
@@ -79,7 +100,7 @@ function OutOfField.occuring()
     debug.set("in field before", wasInFieldBefore)
     debug.set("delay time", World.Time - outOfFieldTime)
 
-    if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
+	if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
         outOfFieldTime = math.huge -- reset
         waitingForDecision = false
 
@@ -89,8 +110,8 @@ function OutOfField.occuring()
         end
 
         outOfFieldEvent = "Throw-In"
-        vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
-        if math.abs(outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
+		vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
+		if math.abs(outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
             if (lastRobot.isYellow and outOfFieldPos.y>0) or (not lastRobot.isYellow and outOfFieldPos.y<0) then
                 outOfFieldEvent = "Goal Kick"
             else
@@ -105,7 +126,7 @@ function OutOfField.occuring()
                 and lastPos.y * outOfFieldPos.y < 0
                 and not Referee.wasKickoff() -- last touch was on other side of field
 
-            if math.abs(outOfFieldPos.x) < World.Geometry.GoalWidth/2 then
+			if math.abs(outOfFieldPos.x) < World.Geometry.GoalWidth/2 then
                 local scoringTeam = outOfFieldPos.y>0 and World.YellowColorStr or World.BlueColorStr
                 -- TODO investigate ball position after min_time in order to
                 -- determine goal post collisions: inside goal or defense area
@@ -119,12 +140,17 @@ function OutOfField.occuring()
                 debug.set("insideGoal", insideGoal)
 
                 debug.set("ball.pos.posZ", World.Ball.posZ)
-                debug.set("wasz bounce", wasBouncing)
-                if wasBouncing or (outOfFieldPosZ > 0) then
-                    wasBouncing = false
+				debug.set("wasz bounce (yellow bot)", wasBouncingAfterYellowTouch)
+				debug.set("wasz bounce (blue bot)", wasBouncingAfterBlueTouch)
+				local bounceCheck = (outOfFieldPos.y < 0 and wasBouncingAfterBlueTouch) or
+					(outOfFieldPos.y > 0 and wasBouncingAfterYellowTouch)
+                if bounceCheck or (outOfFieldPosZ > 0.15) then
+                    wasBouncingAfterYellowTouch = false
+					wasBouncingAfterBlueTouch = false
+					local attackingRobot = side == "Yellow" and lastBlueRobot or lastYellowRobot
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
-                    -- TODO: max ball height
-                    OutOfField.event = Event.chippedGoal(lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
+					-- TODO: max ball height
+                    OutOfField.event = Event.chippedGoal(attackingRobot.isYellow, attackingRobot.id, outOfFieldPos, lastPos)
                 elseif Referee.wasIndirect() and Referee.numTouchingRobotsSinceFreekickSelective(Referee.wasIndirectYellow()) <= 1 then
                     OutOfField.message = "<b>No goal</b> for "..scoringTeam..", was shot directly after an indirect"
                     OutOfField.event = Event.indirectGoal(lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
