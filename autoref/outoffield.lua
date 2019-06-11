@@ -34,7 +34,9 @@ OutOfField.possibleRefStates = {
 }
 
 local wasBouncingAfterYellowTouch = false
+local maxHeightAfterYellowTouch = 0
 local wasBouncingAfterBlueTouch = false
+local maxHeightAfterBlueTouch = 0
 local wasInFieldBefore = false
 local outOfFieldTime = math.huge
 local outOfFieldPos = nil
@@ -77,12 +79,16 @@ function OutOfField.occuring()
 			-- reset bouncing when the ball is touched
 			if lastRobot.isYellow then
 				wasBouncingAfterYellowTouch = false
+				maxHeightAfterYellowTouch = 0
 			else
 				wasBouncingAfterBlueTouch = false
+				maxHeightAfterBlueTouch = 0
 			end
 		elseif isBallInField() then
 			wasBouncingAfterYellowTouch = wasBouncingAfterYellowTouch or World.Ball.isBouncing
 			wasBouncingAfterBlueTouch = wasBouncingAfterBlueTouch or World.Ball.isBouncing
+			maxHeightAfterYellowTouch = math.max(maxHeightAfterYellowTouch, World.Ball.posZ)
+			maxHeightAfterBlueTouch = math.max(maxHeightAfterBlueTouch, World.Ball.posZ)
 		end
 
         if isBallInField() then
@@ -151,9 +157,10 @@ function OutOfField.occuring()
                     wasBouncingAfterYellowTouch = false
 					wasBouncingAfterBlueTouch = false
 					local attackingRobot = side == "Yellow" and lastBlueRobot or lastYellowRobot
+					local ballHeight = side == "Yellow" and maxHeightAfterBlueTouch or maxHeightAfterYellowTouch
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
 					-- TODO: max ball height
-                    OutOfField.event = Event.chippedGoal(attackingRobot.isYellow, attackingRobot.id, outOfFieldPos, lastPos)
+                    OutOfField.event = Event.chippedGoal(attackingRobot.isYellow, attackingRobot.id, outOfFieldPos, lastPos, ballHeight)
 				elseif wasIndirect then
 					local attackingRobot = Referee.wasIndirectYellow() and lastYellowRobot or lastBlueRobot
                     OutOfField.message = "<b>No goal</b> for "..scoringTeam..", was shot directly after an indirect"
