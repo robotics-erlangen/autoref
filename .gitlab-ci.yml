@@ -12,13 +12,51 @@ compile-autoref:
     # Increase the number in the cache key to start with
     # a fresh build cache. This is only useful in case of
     # build system bug and/or updates of ExternalProjects!
-    key: "default-2"
+    key: "default-4"
     paths:
       - build/
   artifacts:
     paths:
       - build/bin/
     expire_in: 1 day
+  image: ubuntu-18.04-no-v8
+
+compile-framework:
+  script:
+    - cd src/framework
+    - mkdir -p build
+    - cd build
+    - cmake -GNinja ..
+    - cmake --build .
+  stage: build
+  cache:
+    # Increase the number in the cache key to start with
+    # a fresh build cache. This is only useful in case of
+    # build system bug and/or updates of ExternalProjects!
+    key: "default-4"
+    paths:
+      - src/framework/build/
+  artifacts:
+    paths:
+      - src/framework/build/bin/
+      - src/framework/build/run_replay_tests.py
+    expire_in: 1 day
+  only:
+    - schedules
+  image: ubuntu-18.04-no-v8
+
+run_replay_tests:
+  script:
+    - "echo running replay tests"
+    - "cd src/framework/build"
+    - "git lfs clone https://github.com/robotics-erlangen/autoreftests.git"
+    - "python3 run_replay_tests.py autoreftests ../../../autoref/init.lua"
+  stage: test
+  dependencies:
+    - compile-framework
+  only:
+    - schedules
+  image: ubuntu-18.04-no-v8
 
 .test: &test_template
   script:
