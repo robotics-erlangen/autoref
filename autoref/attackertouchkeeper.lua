@@ -18,13 +18,13 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local AttackerTouchKeeper = {}
+local AttackerTouchRobotInDefenseArea = {}
 
 local Field = require "../base/field"
 local World = require "../base/world"
 local Event = require "gameevent2019"
 
-AttackerTouchKeeper.possibleRefStates = {
+AttackerTouchRobotInDefenseArea.possibleRefStates = {
     Game = true,
     Kickoff = true,
     Penalty = true,
@@ -32,23 +32,24 @@ AttackerTouchKeeper.possibleRefStates = {
     Indirect = true,
 }
 
-function AttackerTouchKeeper.occuring()
-    for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-        local keeper = World[defense.."Keeper"]
-        for _, robot in ipairs(World[offense.."Robots"]) do
-            -- attacker touches keeper, while point of contact is in defense area
-            if keeper and keeper.pos:distanceTo(robot.pos) <= keeper.radius+robot.radius then
-                local pointOfContact = keeper.pos + (robot.pos-keeper.pos):normalize()*keeper.radius
-                if Field["isIn"..defense.."DefenseArea"](pointOfContact, 0) then
-                    local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-                    AttackerTouchKeeper.message = color .. " " .. robot.id ..
-                        " touched goalie inside defense area"
-                    AttackerTouchKeeper.event = Event.attackerTouchKeeper(robot.isYellow, robot.id, pointOfContact)
-                    return true
-                end
-            end
-        end
+function AttackerTouchRobotInDefenseArea.occuring()
+	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
+		for _, defender in ipairs(World[defense .. "Robots"]) do
+			if Field["isIn" .. defense .. "DefenseArea"](defender.pos, defender.radius + 0.02) then
+				for _, offender in ipairs(World[offense .. "Robots"]) do
+					local dist = offender.pos:distanceTo(defender.pos)
+					if dist < defender.radius + offender.radius then
+						local pointOfContact = offender.pos + (defender.pos - offender.pos):setLength(dist / 2)
+						local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
+						AttackerTouchRobotInDefenseArea.message = color .. " " .. offender.id ..
+							" touched goalie inside defense area"
+							AttackerTouchRobotInDefenseArea.event = Event.attackerTouchOpponentInDefenseArea(offender.isYellow, offender.id, pointOfContact, defender.id)
+						return true
+					end
+				end
+			end
+		end
     end
 end
 
-return AttackerTouchKeeper
+return AttackerTouchRobotInDefenseArea
