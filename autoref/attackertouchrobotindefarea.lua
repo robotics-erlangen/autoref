@@ -35,14 +35,14 @@ AttackerTouchRobotInDefenseArea.possibleRefStates = {
 function AttackerTouchRobotInDefenseArea.occuring()
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
 		for _, defender in ipairs(World[defense .. "Robots"]) do
-			if Field["isIn" .. defense .. "DefenseArea"](defender.pos, defender.radius + 0.02) then
+			if Field["isIn" .. defense .. "DefenseArea"](defender.pos, defender.radius - 0.01) then
 				for _, offender in ipairs(World[offense .. "Robots"]) do
 					local dist = offender.pos:distanceTo(defender.pos)
 					if dist < defender.radius + offender.radius then
 						local pointOfContact = offender.pos + (defender.pos - offender.pos):setLength(dist / 2)
 						local color = offender.isYellow and World.YellowColorStr or World.BlueColorStr
 						AttackerTouchRobotInDefenseArea.message = color .. " " .. offender.id ..
-							" touched goalie inside defense area"
+							" touched an opponent inside its defense area"
 							AttackerTouchRobotInDefenseArea.event = Event.attackerTouchOpponentInDefenseArea(offender.isYellow, offender.id, pointOfContact, defender.id)
 						return true
 					end
