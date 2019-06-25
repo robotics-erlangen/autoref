@@ -184,7 +184,7 @@ function Events.attackerInDefenseArea(teamIsYellow, botId, location, distance)
 	if distance then
 		event.distance = distance
 	end
-	return { attacker_in_defense_area = event, type = "ATTACKER_IN_DEFENSE_AREA" }
+	return { attacker_touched_ball_in_defense_area = event, type = "ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA" }
 end
 
 function Events.fastShot(teamIsYellow, botId, location, kickSpeed, maxBallHeight)
@@ -209,8 +209,12 @@ function Events.dribbling(teamIsYellow, botId, startLocation, endLocation)
 	return { bot_dribbled_ball_too_far = event, type = "BOT_DRIBBLED_BALL_TOO_FAR" }
 end
 
-function Events.attackerTouchKeeper(teamIsYellow, botId, location)
-	return { attacker_touched_keeper = createFromStandardInfo(teamIsYellow, botId, location), type = "ATTACKER_TOUCHED_KEEPER" }
+function Events.attackerTouchOpponentInDefenseArea(teamIsYellow, botId, location, victimId)
+	local event = createFromStandardInfo(teamIsYellow, botId, location)
+	if victimId then
+		event.victim = victimId
+	end
+	return { attacker_touched_opponent_in_defense_area = event, type = "ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA" }
 end
 
 function Events.doubleTouch(teamIsYellow, botId, location)
