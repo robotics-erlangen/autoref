@@ -44,6 +44,7 @@ local outOfFieldPosZ = 0
 local waitingForDecision = false
 local lastBlueRobot = nil
 local lastYellowRobot = nil
+local lastTouchPosition = nil
 
 -- Field.isInField considers the inside of the goal as in the field, this is not what we want here
 local function isBallInField()
@@ -56,8 +57,11 @@ function OutOfField.occuring()
     local ballPos = World.Ball.pos
     local outOfFieldEvent -- for event message
 
+    local previousPos = lastTouchPosition
+
     local lastTeam = Referee.teamWhichTouchedBallLast()
 	local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
+    lastTouchPosition = lastPos
 
     if lastTeam and lastRobot then
         -- "match" string to remove the font-tags
@@ -75,7 +79,7 @@ function OutOfField.occuring()
 	end
 
 	if not waitingForDecision then
-		if lastPos and lastPos:distanceTo(World.Ball.pos) < 0.003 then
+		if lastPos and lastPos ~= previousPos then
 			-- reset bouncing when the ball is touched
 			if lastRobot.isYellow then
 				wasBouncingAfterYellowTouch = false
