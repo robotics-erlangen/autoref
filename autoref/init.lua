@@ -91,7 +91,7 @@ local function main()
         ballWasValidBefore = true
     elseif ballWasValidBefore then
         ballWasValidBefore = false
-        log("Ball is not visible!")
+        -- log("Ball is not visible!")
     else
         return
     end
