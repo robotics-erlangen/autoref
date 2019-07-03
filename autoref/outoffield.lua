@@ -45,11 +45,13 @@ local waitingForDecision = false
 local lastBlueRobot = nil
 local lastYellowRobot = nil
 local lastTouchPosition = nil
+local rawOutOfFieldCounter = 0
 
 -- Field.isInField considers the inside of the goal as in the field, this is not what we want here
-local function isBallInField()
-    return math.abs(World.Ball.pos.y) < World.Geometry.FieldHeightHalf + World.Ball.radius and
-            math.abs(World.Ball.pos.x) < World.Geometry.FieldWidthHalf + World.Ball.radius
+local function isBallInField(ballPos)
+    ballPos = ballPos or World.Ball.pos
+    return math.abs(ballPos.y) < World.Geometry.FieldHeightHalf + World.Ball.radius and
+            math.abs(ballPos.x) < World.Geometry.FieldWidthHalf + World.Ball.radius
 end
 
 function OutOfField.occuring()
@@ -106,11 +108,25 @@ function OutOfField.occuring()
         end
     end
 
+    if waitingForDecision then
+        for _, pos in ipairs(World.Ball.rawPositions) do
+            if not isBallInField(pos) then
+                rawOutOfFieldCounter = rawOutOfFieldCounter + 1
+            end
+        end
+    end
+    if isBallInField() and not waitingForDecision then
+        rawOutOfFieldCounter = 0
+    end
+
     debug.set("wait decision", waitingForDecision)
     debug.set("in field before", wasInFieldBefore)
     debug.set("delay time", World.Time - outOfFieldTime)
 
-	if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
+    if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
+        if rawOutOfFieldCounter < 5 then
+            return false
+        end
         outOfFieldTime = math.huge -- reset
         waitingForDecision = false
 
