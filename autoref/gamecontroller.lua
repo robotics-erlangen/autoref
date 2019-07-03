@@ -38,6 +38,7 @@ function GameController.update()
 end
 
 function GameController.sendEvent(event)
+	event.origin = "ER-Force"
 	if state == STATE_CONNECTED then
 		amun.sendGameControllerMessage("AutoRefToController", {game_event=event})
 	else
