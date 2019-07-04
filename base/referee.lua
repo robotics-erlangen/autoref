@@ -107,7 +107,7 @@ function Referee.numTouchingRobotsSinceFreekickSelective(yellowRobots)
 		end
 	end
 	local counter = 1
-	for r, time in pairs(touchingRobotsSinceFreekick) do
+	for _, time in pairs(touchingRobotsSinceFreekick) do
 		if time < lastTouchTime then
 			counter = counter + 1
 		end
