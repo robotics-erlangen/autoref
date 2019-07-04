@@ -26,10 +26,6 @@ local Event = require "gameevent2019"
 
 AttackerTouchRobotInDefenseArea.possibleRefStates = {
     Game = true,
-    Kickoff = true,
-    Penalty = true,
-    Direct = true,
-    Indirect = true,
 }
 
 function AttackerTouchRobotInDefenseArea.occuring()
