@@ -70,6 +70,11 @@ local debugMessage = ""
 local function main()
     GameController.update()
 
+    if World.BallPlacementPos then
+        vis.addPath("ball placement", {World.Ball.pos, World.BallPlacementPos}, vis.colors.redHalf, true, nil, 0.5)
+        vis.addCircle("ball placement", World.BallPlacementPos, 0.6, vis.colors.green, false)
+    end
+
     if fouls == nil then
         fouls = { require("chooseteamsides") }
         for _, filename in pairs(descriptionToFileNames) do
