@@ -87,7 +87,7 @@ function Referee.updateFreekickstate()
 	else
 		for _, robot in ipairs(World.Robots) do
 			if robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
-				touchingRobotsSinceFreekick[robot] = true
+				touchingRobotsSinceFreekick[robot] = World.Time
 			end
 		end
 	end
@@ -98,9 +98,17 @@ function Referee.numTouchingRobotsSinceFreekick()
 end
 
 function Referee.numTouchingRobotsSinceFreekickSelective(yellowRobots)
-	local counter = 0
-	for r, _ in pairs(touchingRobotsSinceFreekick) do
+	local lastTouchTime = 0
+	for r, time in pairs(touchingRobotsSinceFreekick) do
 		if (r.isYellow and yellowRobots) or (not r.isYellow and not yellowRobots) then
+			if time > lastTouchTime then
+				lastTouchTime = time
+			end
+		end
+	end
+	local counter = 1
+	for r, time in pairs(touchingRobotsSinceFreekick) do
+		if time < lastTouchTime then
 			counter = counter + 1
 		end
 	end
