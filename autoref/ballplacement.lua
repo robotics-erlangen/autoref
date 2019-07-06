@@ -28,7 +28,9 @@ BallPlacement.possibleRefStates = {
 }
 
 local ACCEPTABLE_RADIUS = 0.15 - World.Ball.radius
-local SLOW_BALL_SPEED = 0.1
+local SLOW_BALL_SPEED = 0.2
+local inRadiusTime = nil
+local IN_RADIUS_WAIT_TIME = 0.7
 
 local startingBallPos = World.Ball.pos
 local startTime = World.Time
@@ -52,9 +54,16 @@ function BallPlacement.occuring()
             end
         end
         if ballDistance < ACCEPTABLE_RADIUS and World.Ball.speed:length() < SLOW_BALL_SPEED and noRobotNearBall then
-            BallPlacement.event = Event.placementSuccess(World.RefereeState == "BallPlacementYellow", World.Time - startTime,
-                ballDistance, startingBallPos:distanceTo(World.Ball.pos))
-            return true
+            if not inRadiusTime then
+                inRadiusTime = World.Time
+            end
+            if World.Time - inRadiusTime > IN_RADIUS_WAIT_TIME then
+                BallPlacement.event = Event.placementSuccess(World.RefereeState == "BallPlacementYellow", World.Time - startTime,
+                    ballDistance, startingBallPos:distanceTo(World.Ball.pos))
+                return true
+            end
+        else
+            inRadiusTime = nil
         end
     end
     return false
@@ -63,6 +72,7 @@ end
 function BallPlacement.reset()
     startingBallPos = World.Ball.pos
     startTime = World.Time
+    inRadiusTime = nil
 end
 
 return BallPlacement
