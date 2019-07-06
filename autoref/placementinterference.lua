@@ -27,9 +27,11 @@ BallPlacementInterference.possibleRefStates = {
     Ball = true
 }
 
+BallPlacementInterference.shouldAlwaysExecute = true
 BallPlacementInterference.resetOnInvisibleBall = true
 
 local inRangeStartTimes = {}
+local robotsInThisStop = {}
 function BallPlacementInterference.occuring()
     if World.BallPlacementPos then
         local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
@@ -40,8 +42,9 @@ function BallPlacementInterference.occuring()
                     inRangeStartTimes[robot] = World.Time
                 else
                     local time = World.Time - inRangeStartTimes[robot]
-                    if time > 2 then
-                        BallPlacementInterference.message = "Ball placement interference!"
+                    if time > 2 and not robotsInThisStop[robot] then
+                        robotsInThisStop[robot] = true
+                        BallPlacementInterference.message = "Ball placement interference " .. (table.count(robotsInThisStop))
                         BallPlacementInterference.event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
                         return true
                     end
@@ -55,7 +58,11 @@ function BallPlacementInterference.occuring()
 end
 
 function BallPlacementInterference.reset()
-    inRangeStartTimes = {}
+    local simpleRefState = World.RefereeState:match("%u%l+")
+    if simpleRefState ~= "Ball" then
+        inRangeStartTimes = {}
+        robotsInThisStop = {}
+    end
 end
 
 return BallPlacementInterference
