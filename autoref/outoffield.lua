@@ -192,6 +192,7 @@ function OutOfField.occuring()
                     return true
                 else
                     OutOfField.event = nil
+                    return false
                 end
             elseif icing then
                 outOfFieldEvent = "<b>Icing</b>"
