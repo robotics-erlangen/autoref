@@ -42,6 +42,7 @@ Collision.possibleRefStates = {
 
 -- dont stop calling the occuring function once the event triggered
 Collision.shouldAlwaysExecute = true
+Collision.runOnInvisibleBall = true
 
 local collidingRobots = {} -- robot -> time
 function Collision.occuring()

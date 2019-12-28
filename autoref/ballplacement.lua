@@ -27,6 +27,8 @@ BallPlacement.possibleRefStates = {
     Ball = true
 }
 
+BallPlacement.runOnInvisibleBall = true
+
 local ACCEPTABLE_RADIUS = 0.15 - World.Ball.radius
 local SLOW_BALL_SPEED = 0.2
 local inRadiusTime = nil
@@ -40,7 +42,11 @@ function BallPlacement.occuring()
         if World.ActionTimeRemaining < 0 then
             BallPlacement.event = Event.placementFailed(World.RefereeState == "BallPlacementYellow", ballDistance)
             return true
-        end
+		end
+		
+		if not World.Ball:isPositionValid() then
+			return false
+		end
         
         local noRobotNearBall = true
         local isYellowFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectYellow" or World.NextRefereeState == "IndirectYellow")

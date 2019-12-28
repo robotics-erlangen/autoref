@@ -34,6 +34,7 @@ local BUFFER_TIME = 2 -- as given by the rules
 
 -- dont stop calling the occuring function once the event triggered
 AttackerDefAreaDist.shouldAlwaysExecute = true
+AttackerDefAreaDist.runOnInvisibleBall = true
 
 local startTime = 0
 local closeRobotsInThisState = {}

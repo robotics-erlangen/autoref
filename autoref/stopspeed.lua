@@ -34,6 +34,7 @@ StopSpeed.possibleRefStates = {
 
 -- dont stop calling the occuring function once the event triggered
 StopSpeed.shouldAlwaysExecute = true
+StopSpeed.runOnInvisibleBall = true
 
 local enterStopTime = World.Time
 local fastRobotsInThisStop = {}
