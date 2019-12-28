@@ -28,13 +28,27 @@ NoProgress.possibleRefStates = {
     Game = true,
 }
 
+NoProgress.runOnInvisibleBall = true
+
 -- have this slightly larger than 10s to ensure that keeper ball holding will trigger first
 local NO_PROGRESS_TIME = Parameters.add("noprogress", "NO_PROGRESS_TIME", 10.1)
 local NO_PROGRESS_RADIUS = Parameters.add("noprogress", "NO_PROGRESS_RADIUS", 0.07)
 
 local startPos = World.Ball.pos
 local startTime = World.Time
+local invisibleStartTime = World.Time
 function NoProgress.occuring()
+	if World.Ball:isPositionValid() then
+		invisibleStartTime = World.Time
+	else
+		if World.Time - invisibleStartTime > NO_PROGRESS_TIME() then
+			NoProgress.message = "No progress (invisible ball)"
+			NoProgress.event = Event.noProgress(World.Ball.pos, NO_PROGRESS_TIME())
+			return true
+		end
+		return false
+	end
+
     if startPos:distanceTo(World.Ball.pos) > NO_PROGRESS_RADIUS() then
         startPos = World.Ball.pos
         startTime = World.Time
