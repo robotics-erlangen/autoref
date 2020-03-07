@@ -124,11 +124,12 @@ function OutOfField.occuring()
     debug.set("delay time", World.Time - outOfFieldTime)
 
     if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
+        outOfFieldTime = math.huge -- reset
+        waitingForDecision = false
+
         if rawOutOfFieldCounter < 5 then
             return false
         end
-        outOfFieldTime = math.huge -- reset
-        waitingForDecision = false
 
         OutOfField.executingTeam = World.YellowColorStr
         if Referee.teamWhichTouchedBallLast() == World.YellowColorStr then
