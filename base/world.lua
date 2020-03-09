@@ -130,7 +130,7 @@ end
 -- Creates generation specific robot object for own team
 function World._updateTeam()
 	local friendlyRobotsById = {}
-	for id = 0, 15 do
+	for id = 0, 21 do
 		friendlyRobotsById[id] = Robot(id, true, World.Geometry)
 	end
 	World.YellowRobotsById = friendlyRobotsById
