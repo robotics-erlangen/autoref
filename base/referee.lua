@@ -28,14 +28,14 @@ local fieldWidthHalf = World.Geometry.FieldWidthHalf
 local noBallTouchStates = {
 	Halt = true,
 	Stop = true,
-	KickoffOffensivePrepare = true,
-	KickoffDefensivePrepare = true,
-	PenaltyOffensivePrepare = true,
-	PenaltyDefensivePrepare = true,
-	TimeoutOffensive = true,
-	TimeoutDefensive = true,
-	BallPlacementDefensive = true,
-	BallPlacementOffensive = true
+	KickoffBluePrepare = true,
+	KickoffYellowPrepare = true,
+	PenaltyYellowPrepare = true,
+	PenaltyBluePrepare = true,
+	TimeoutBlue = true,
+	TimeoutYellow = true,
+	BallPlacementBlue = true,
+	BallPlacementYellow = true
 }
 
 Referee.touchDist = touchDist
