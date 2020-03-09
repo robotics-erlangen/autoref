@@ -307,8 +307,8 @@ function World._updateGameState(state)
 	World.YellowKeeper = friendlyKeeper
 	World.BlueKeeper = opponentKeeper
 
-	World.YellowRobotsNumberAllowed = friendlyTeamInfo.max_allowed_bots or 8
-	World.BlueRobotsNumberAllowed = opponentTeamInfo.max_allowed_bots or 8
+	World.YellowRobotsNumberAllowed = friendlyTeamInfo.max_allowed_bots or 11
+	World.BlueRobotsNumberAllowed = opponentTeamInfo.max_allowed_bots or 11
 
 	World.StageTimeLeft = state.stage_time_left/1000000 -- in seconds
 
