@@ -50,7 +50,7 @@ function MultipleDefender.occuring()
     if World.Ball.pos.y > 0 then -- on blue side of field
         defense = "Blue"
     end
-    return checkOccupation(defense, "entirely") or checkOccupation(defense, "partially")
+    return checkOccupation(defense, "entirely") -- or checkOccupation(defense, "partially")
 end
 
 return MultipleDefender

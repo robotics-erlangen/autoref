@@ -49,7 +49,7 @@ local descriptionToFileNames = {
     ["Keeper ball holding"] = "keeperballholding",
     ["No progress"] = "noprogress",
     -- ["Pushing"] = "pushing",
-    ["Attacker touches Robot in opponent Defense Area"] = "attackertouchrobotindefarea",
+    -- ["Attacker touches Robot in opponent Defense Area"] = "attackertouchrobotindefarea",
     ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement",
     ["Ball placement interference"] = "placementinterference",
@@ -137,7 +137,7 @@ local function main()
 
 	Parameters.update()
     eventsToSend = {}
-	
+
 	-- check events that should always be executed first
 	for _, foul in ipairs(fouls) do
 		if foul.runOnInvisibleBall then
