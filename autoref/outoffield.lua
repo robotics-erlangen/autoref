@@ -171,9 +171,6 @@ function OutOfField.occuring()
 				debug.set("wasz bounce (blue bot)", wasBouncingAfterBlueTouch)
 				local bounceCheck = (outOfFieldPos.y < 0 and wasBouncingAfterBlueTouch) or
 					(outOfFieldPos.y > 0 and wasBouncingAfterYellowTouch)
-				local wasIndirect = Referee.wasIndirect() and
-					Referee.numTouchingRobotsSinceFreekickSelective(Referee.wasIndirectYellow()) <= 1 and
-					Referee.wasIndirectYellow() == (side == "Blue")
                 if bounceCheck or (outOfFieldPosZ > 0.15) then
                     wasBouncingAfterYellowTouch = false
 					wasBouncingAfterBlueTouch = false
@@ -182,11 +179,7 @@ function OutOfField.occuring()
                     OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
 					-- TODO: max ball height
                     OutOfField.event = Event.chippedGoal(attackingRobot.isYellow, attackingRobot.id, outOfFieldPos, lastPos, ballHeight)
-				elseif wasIndirect then
-					local attackingRobot = Referee.wasIndirectYellow() and lastYellowRobot or lastBlueRobot
-                    OutOfField.message = "<b>No goal</b> for "..scoringTeam..", was shot directly after an indirect"
-                    OutOfField.event = Event.indirectGoal(Referee.wasIndirectYellow(), attackingRobot.id, outOfFieldPos, lastPos)
-                elseif closeToGoal or insideGoal
+				elseif closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
                     OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
                     OutOfField.event = Event.goal(scoringTeam==World.YellowColorStr, lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
