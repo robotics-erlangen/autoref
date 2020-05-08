@@ -18,6 +18,7 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
+local World = require "../base/world";
 local Coordinates = require "../base/coordinates"
 local Vector = require "../base/vector"
 
@@ -70,7 +71,8 @@ function Events.aimlessKick(teamIsYellow, botId, location, kickLocation)
 	return { aimless_kick = event, type = "AIMLESS_KICK" }
 end
 
-function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, location, kickLocation)
+function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, location,
+		kickLocation, kickSpeed, maxBallHeight)
 	local event = {}
 	event.by_team = toTeam(scoringTeamIsYellow)
 	event.kicking_team = toTeam(shootingTeamIsYellow)
@@ -81,26 +83,13 @@ function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, l
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
 	end
-	return { possible_goal = event, type = "POSSIBLE_GOAL" }
-end
-
-function Events.indirectGoal(teamIsYellow, botId, location, kickLocation)
-	local event = createFromStandardInfo(teamIsYellow, botId, location)
-	if kickLocation then
-		event.kick_location = toLocation(kickLocation)
-	end
-	return { indirect_goal = event, type = "INDIRECT_GOAL" }
-end
-
-function Events.chippedGoal(teamIsYellow, botId, location, kickLocation, maxBallHeight)
-	local event = createFromStandardInfo(teamIsYellow, botId, location)
-	if kickLocation then
-		event.kick_location = toLocation(kickLocation)
+	if kickSpeed then
+		event.kick_speed = kickSpeed
 	end
 	if maxBallHeight then
 		event.max_ball_height = maxBallHeight
 	end
-	return { chipped_goal = event, type = "CHIPPED_GOAL" }
+	return { possible_goal = event, type = "POSSIBLE_GOAL" }
 end
 
 function Events.stopSpeed(teamIsYellow, botId, location, speed)
@@ -156,27 +145,12 @@ function Events.botCrash(teamIsYellow, botIdViolator, botIdVictim, location, spe
 	return { bot_crash_unique = event, type = "BOT_CRASH_UNIQUE" }
 end
 
-function Events.pushing(teamIsYellow, botIdViolator, botIdVictim, location, distance)
-	local event = { by_team = toTeam(teamIsYellow), violator = botIdViolator, victim = botIdVictim }
-	event.location = toLocation(location)
-	if distance then
-		event.pushed_distance = distance
-	end
-	return { bot_pushed_bot = event, type = "BOT_PUSHED_BOT" }
-end
-
--- TODO: bot tipped over?
-
-function Events.multipleDefender(teamIsYellow, botId, location, distance, partial)
+function Events.multipleDefender(teamIsYellow, botId, location, distance)
 	local event = createFromStandardInfo(teamIsYellow, botId, location)
 	if distance then
 		event.distance = distance
 	end
-	if partial then
-		return { defender_in_defense_area_partially = event, type = "DEFENDER_IN_DEFENSE_AREA_PARTIALLY" }
-	else
-		return { defender_in_defense_area = event, type = "DEFENDER_IN_DEFENSE_AREA" }
-	end
+	return { defender_in_defense_area = event, type = "DEFENDER_IN_DEFENSE_AREA" }
 end
 
 function Events.attackerInDefenseArea(teamIsYellow, botId, location, distance)
@@ -184,6 +158,7 @@ function Events.attackerInDefenseArea(teamIsYellow, botId, location, distance)
 	if distance then
 		event.distance = distance
 	end
+	event.ball_location = toLocation(World.Ball.pos)
 	return { attacker_touched_ball_in_defense_area = event, type = "ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA" }
 end
 
@@ -193,7 +168,7 @@ function Events.fastShot(teamIsYellow, botId, location, kickSpeed, maxBallHeight
 		event.initial_ball_speed = kickSpeed
 	end
 	if maxBallHeight then
-		event.max_ball_height = maxBallHeight
+		event.chipped = maxBallHeight > 0
 	end
 	return { bot_kicked_ball_too_fast = event, type = "BOT_KICKED_BALL_TOO_FAST" }
 end
@@ -209,14 +184,6 @@ function Events.dribbling(teamIsYellow, botId, startLocation, endLocation)
 	return { bot_dribbled_ball_too_far = event, type = "BOT_DRIBBLED_BALL_TOO_FAR" }
 end
 
-function Events.attackerTouchOpponentInDefenseArea(teamIsYellow, botId, location, victimId)
-	local event = createFromStandardInfo(teamIsYellow, botId, location)
-	if victimId then
-		event.victim = victimId
-	end
-	return { attacker_touched_opponent_in_defense_area = event, type = "ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA" }
-end
-
 function Events.doubleTouch(teamIsYellow, botId, location)
 	return { attacker_double_touched_ball = createFromStandardInfo(teamIsYellow, botId, location), type = "ATTACKER_DOUBLE_TOUCHED_BALL" }
 end
@@ -226,69 +193,12 @@ function Events.attackerDefAreaDist(teamIsYellow, botId, location, distance)
 	if distance then
 		event.distance = distance
 	end
+	event.location = toLocation(World.Ball.pos)
 	return { attacker_too_close_to_defense_area = event, type = "ATTACKER_TOO_CLOSE_TO_DEFENSE_AREA" }
-end
-
-function Events.ballHolding(teamIsYellow, botId, location, duration)
-	local event = createFromStandardInfo(teamIsYellow, botId, location)
-	if duration then
-		event.duration = duration
-	end
-	return { bot_held_ball_deliberately = event, type = "BOT_HELD_BALL_DELIBERATELY" }
 end
 
 function Events.ballPlacementInterference(teamIsYellow, botId, location)
 	return { bot_interfered_placement = createFromStandardInfo(teamIsYellow, botId, location), type = "BOT_INTERFERED_PLACEMENT" }
-end
-
-function Events.penaltyFromYellowCards(teamIsYellow)
-	return { multiple_cards = { by_team = toTeam(teamIsYellow) }, type = "MULTIPLE_CARDS" }
-end
-
-function Events.yellowCardFromMultipleFouls(teamIsYellow)
-	return { multiple_fouls = { by_team = toTeam(teamIsYellow) }, type = "MULTIPLE_FOULS" }
-end
-
-function Events.multiplePlacementFailure(teamIsYellow)
-	return { multiple_placement_failures = { by_team = toTeam(teamIsYellow) }, type = "MULTIPLE_PLACEMENT_FAILURES" }
-end
-
-function Events.kickTimeout(teamIsYellow, location, time)
-	local event = createFromStandardInfo(teamIsYellow)
-	if location then
-		event.location = toLocation(location)
-	end
-	if time then
-		event.time = time
-	end
-	return { kick_timeout = event, type = "KICK_TIMEOUT" }
-end
-
-function Events.noProgress(location, time)
-	local event = {}
-	if location then
-		event.location = toLocation(location)
-	end
-	if time then
-		event.time = time
-	end
-	return { no_progress_in_game = event, type = "NO_PROGRESS_IN_GAME" }
-end
-
-function Events.placementFailed(teamIsYellow, remainingDistance)
-	local event = createFromStandardInfo(teamIsYellow)
-	if remainingDistance then
-		event.remaining_distance = remainingDistance
-	end
-	return { placement_failed = event, type = "PLACEMENT_FAILED" }
-end
-
-function Events.keeperBallHolding(teamIsYellow, location, duration)
-	local event = createFromStandardInfo(teamIsYellow, nil, location)
-	if duration then
-		event.duration = duration
-	end
-	return { keeper_held_ball = event, type = "KEEPER_HELD_BALL" }
 end
 
 function Events.placementSuccess(teamIsYellow, timeTaken, precision, distance)
@@ -305,12 +215,40 @@ function Events.placementSuccess(teamIsYellow, timeTaken, precision, distance)
 	return { placement_succeeded = event, type = "PLACEMENT_SUCCEEDED" }
 end
 
+-- the following events normally covered by the game controller, use only them for the internal autoref
+function Events.keeperBallHolding(teamIsYellow, location, duration)
+	local event = createFromStandardInfo(teamIsYellow, nil, location)
+	if duration then
+		event.duration = duration
+	end
+	return { keeper_held_ball = event, type = "KEEPER_HELD_BALL" }
+end
+
+function Events.noProgress(location, time)
+	local event = {}
+	if location then
+		event.location = toLocation(location)
+	end
+	if time then
+		event.time = time
+	end
+	return { no_progress_in_game = event, type = "NO_PROGRESS_IN_GAME" }
+end
+
 function Events.prepared(timeTaken)
 	return { prepared = { time_taken = timeTaken }, type = "PREPARED" }
 end
 
 function Events.numberOfRobots(teamIsYellow)
 	return { too_many_robots = { by_team = toTeam(teamIsYellow) }, type = "TOO_MANY_ROBOTS" }
+end
+
+function Events.placementFailed(teamIsYellow, remainingDistance)
+	local event = createFromStandardInfo(teamIsYellow)
+	if remainingDistance then
+		event.remaining_distance = remainingDistance
+	end
+	return { placement_failed = event, type = "PLACEMENT_FAILED" }
 end
 
 return Events
