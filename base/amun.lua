@@ -178,6 +178,15 @@ separator for luadoc]]--
 -- @name sendNetworkRefereeCommand
 -- @param command SSL_Referee
 
+--[[
+separator for luadoc]]--
+
+--- Returns true if and only if this strategy is the internal autoref embedded in a Ra instance
+-- it returns false if this is the actual autoref running a dedicated program
+-- @class function
+-- @name isInternalAutoref
+-- @return isAutoref boolean
+
 -- luacheck: globals amun log
 require "amun"
 log = amun.log
@@ -195,10 +204,12 @@ function amun._hideFunctions()
 	local connectGameController = amun.connectGameController
 	local sendGameController = amun.sendGameControllerMessage
 	local receiveGameController = amun.getGameControllerMessage
+	local isInternalAutoref = amun.isInternalAutoref
 
 	-- overwrite global amun
 	amun = {
 		isDebug = isDebug,
+		isInternalAutoref = isInternalAutoref,
 		strategyPath = strategyPath,
 		sendAutorefEvent = sendAutorefEvent,
 		getCurrentTime = function ()

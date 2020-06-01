@@ -45,17 +45,27 @@ local descriptionToFileNames = {
     ["Attacker distance to defense area"] = "attackerdefareadist",
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
-    ["Start kickoffs"] = "kickoffstart", -- only for the internal autoref
-    ["Keeper ball holding"] = "keeperballholding", -- only for the internal autoref
-    ["No progress"] = "noprogress", -- only for the internal autoref
     -- ["Pushing"] = "pushing",
     -- ["Attacker touches Robot in opponent Defense Area"] = "attackertouchrobotindefarea",
     -- ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement",
     ["Ball placement interference"] = "placementinterference",
-    ["Start penalties when ready"] = "penaltystart", -- only for the internal autoref
     ["Stop ball distance"] = "stopballdistance"
 }
+
+local internalAutorefOnlyRules = {
+    ["Start kickoffs"] = "kickoffstart",
+    ["Keeper ball holding"] = "keeperballholding",
+    ["No progress"] = "noprogress",
+    ["Start penalties when ready"] = "penaltystart",
+}
+
+if amun.isInternalAutoref and amun.isInternalAutoref() then
+    for description, filename in pairs(internalAutorefOnlyRules) do
+        descriptionToFileNames[description] = filename
+    end
+end
+
 local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
     table.insert(optionnames, description)
