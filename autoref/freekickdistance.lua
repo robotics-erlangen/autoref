@@ -27,12 +27,13 @@ local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
 
 FreekickDistance.possibleRefStates = {
     Direct = true,
-    Indirect = true
+    Indirect = true,
+    Kickoff = true
 }
 
 local stopBallPos
 function FreekickDistance.occuring()
-    local defense = World.RefereeState:match("irect(%a+)") == "Yellow" and "Blue" or "Yellow"
+    local defense = string.byte(World.RefereeState, -1) == string.byte("w", 1) and "Blue" or "Yellow"
     for _, robot in ipairs(World[defense.."Robots"]) do
         local d = robot.pos:distanceTo(stopBallPos)-robot.shootRadius
         if d < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
