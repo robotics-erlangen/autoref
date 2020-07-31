@@ -39,10 +39,6 @@ local startTime = World.Time
 function BallPlacement.occuring()
     if World.BallPlacementPos then
         local ballDistance = World.BallPlacementPos:distanceTo(World.Ball.pos)
-        if World.ActionTimeRemaining < 0 then
-            BallPlacement.event = Event.placementFailed(World.RefereeState == "BallPlacementYellow", ballDistance)
-            return true
-		end
 		
 		if not World.Ball:isPositionValid() then
 			return false
