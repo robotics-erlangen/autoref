@@ -72,7 +72,7 @@ function Events.aimlessKick(teamIsYellow, botId, location, kickLocation)
 end
 
 function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, location,
-		kickLocation, kickSpeed, maxBallHeight)
+		kickLocation, maxBallHeight)
 	local event = {}
 	event.by_team = toTeam(scoringTeamIsYellow)
 	event.kicking_team = toTeam(shootingTeamIsYellow)
@@ -83,12 +83,14 @@ function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, l
 	if kickLocation then
 		event.kick_location = toLocation(kickLocation)
 	end
-	if kickSpeed then
-		event.kick_speed = kickSpeed
-	end
 	if maxBallHeight then
 		event.max_ball_height = maxBallHeight
 	end
+    if scoringTeamIsYellow then
+        event.num_robots_by_team = #World.YellowRobots
+    else
+        event.num_robots_by_team = #World.BlueRobots
+    end
 	return { possible_goal = event, type = "POSSIBLE_GOAL" }
 end
 

@@ -33,17 +33,12 @@ OutOfField.possibleRefStates = {
     Game = true,
 }
 
-local wasBouncingAfterYellowTouch = false
 local maxHeightAfterYellowTouch = 0
-local wasBouncingAfterBlueTouch = false
 local maxHeightAfterBlueTouch = 0
 local wasInFieldBefore = false
 local outOfFieldTime = math.huge
 local outOfFieldPos = nil
-local outOfFieldPosZ = 0
 local waitingForDecision = false
-local lastBlueRobot = nil
-local lastYellowRobot = nil
 local lastTouchPosition = nil
 local rawOutOfFieldCounter = 0
 
@@ -55,7 +50,6 @@ local function isBallInField(ballPos)
 end
 
 function OutOfField.occuring()
-    debug.set("bounce", World.Ball.isBouncing)
     local ballPos = World.Ball.pos
     local outOfFieldEvent -- for event message
 
@@ -69,12 +63,6 @@ function OutOfField.occuring()
         -- "match" string to remove the font-tags
         debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
 		vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
-
-		if lastRobot.isYellow then
-			lastYellowRobot = lastRobot
-		else
-			lastBlueRobot = lastRobot
-		end
     else
         waitingForDecision = false
         return false
@@ -84,15 +72,11 @@ function OutOfField.occuring()
 		if lastPos and lastPos ~= previousPos then
 			-- reset bouncing when the ball is touched
 			if lastRobot.isYellow then
-				wasBouncingAfterYellowTouch = false
 				maxHeightAfterYellowTouch = 0
 			else
-				wasBouncingAfterBlueTouch = false
 				maxHeightAfterBlueTouch = 0
 			end
 		elseif isBallInField() then
-			wasBouncingAfterYellowTouch = wasBouncingAfterYellowTouch or World.Ball.isBouncing
-			wasBouncingAfterBlueTouch = wasBouncingAfterBlueTouch or World.Ball.isBouncing
 			maxHeightAfterYellowTouch = math.max(maxHeightAfterYellowTouch, World.Ball.posZ)
 			maxHeightAfterBlueTouch = math.max(maxHeightAfterBlueTouch, World.Ball.posZ)
 		end
@@ -103,7 +87,6 @@ function OutOfField.occuring()
             outOfFieldTime = World.Time
             wasInFieldBefore = false
             outOfFieldPos = World.Ball.pos:copy()
-            outOfFieldPosZ = World.Ball.posZ
             waitingForDecision = true
         end
     end
@@ -163,26 +146,13 @@ function OutOfField.occuring()
                     and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
 
                 local closeToGoal = (World.Geometry[side.."Goal"]):distanceTo(World.Ball.pos) < 0.8
-                debug.set("closeToGoal", closeToGoal)
-                debug.set("insideGoal", insideGoal)
 
-                debug.set("ball.pos.posZ", World.Ball.posZ)
-				debug.set("wasz bounce (yellow bot)", wasBouncingAfterYellowTouch)
-				debug.set("wasz bounce (blue bot)", wasBouncingAfterBlueTouch)
-				local bounceCheck = (outOfFieldPos.y < 0 and wasBouncingAfterBlueTouch) or
-					(outOfFieldPos.y > 0 and wasBouncingAfterYellowTouch)
-                if bounceCheck or (outOfFieldPosZ > 0.15) then
-                    wasBouncingAfterYellowTouch = false
-					wasBouncingAfterBlueTouch = false
-					local attackingRobot = side == "Yellow" and lastBlueRobot or lastYellowRobot
-					local ballHeight = side == "Yellow" and maxHeightAfterBlueTouch or maxHeightAfterYellowTouch
-                    OutOfField.message =  "<b>No Goal</b> for " .. scoringTeam .. ", ball was not in contact with the ground"
-					-- TODO: max ball height
-                    OutOfField.event = Event.chippedGoal(attackingRobot.isYellow, attackingRobot.id, outOfFieldPos, lastPos, ballHeight)
-				elseif closeToGoal or insideGoal
+                if closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
                     OutOfField.message =  "<b>Goal</b> for " .. scoringTeam
-                    OutOfField.event = Event.goal(scoringTeam==World.YellowColorStr, lastRobot.isYellow, lastRobot.id, outOfFieldPos, lastPos)
+                    local forYellow = scoringTeam == World.YellowColorStr
+                    OutOfField.event = Event.goal(forYellow, lastRobot.isYellow, lastRobot.id,
+                        outOfFieldPos, lastPos, forYellow and maxHeightAfterYellowTouch or maxHeightAfterBlueTouch)
                     return true
                 else
                     OutOfField.event = nil
