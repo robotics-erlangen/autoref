@@ -120,6 +120,17 @@ local function runEvent(foul)
 	end
 end
 
+local function debugEvents(events)
+    debug.pushtop()
+    -- Do not change this, as it is used for replay tests
+    debug.set("GAME_CONTROLLER_EVENTS", events)
+    debug.pop()
+    
+    debug.pushtop()
+    debug.set("AUTOREF_EVENT", debugMessage)
+    debug.pop()
+end
+
 local function main()
     GameController.update()
 
@@ -162,6 +173,7 @@ local function main()
         ballWasValidBefore = false
         -- log("Ball is not visible!")
     else
+        debugEvents(eventsToSend)
         return
     end
 
@@ -171,14 +183,9 @@ local function main()
 			runEvent(foul)
 		end
     end
-    debug.pushtop()
-    -- Do not change this, as it is used for replay tests
-    debug.set("GAME_CONTROLLER_EVENTS", eventsToSend)
-    debug.pop()
+    
+    debugEvents(eventsToSend)
 
-    debug.pushtop()
-    debug.set("AUTOREF_EVENT", debugMessage)
-    debug.pop()
     Referee.illustrateRefereeStates()
 end
 
@@ -192,7 +199,7 @@ local function mainLoopWrapper(func)
     end
 end
 
-Entrypoints.add("2019", function()
+Entrypoints.add("2020", function()
     main()
     debug.resetStack()
     Referee.update()
