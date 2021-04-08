@@ -1,0 +1,9 @@
+/bin
+/build*
+/.git
+/.idea
+/Dockerfile
+/.dockerignore
+/README.md
+/COMPILE.md
+/hooks

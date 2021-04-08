@@ -1,8 +1,38 @@
 # Autoref
+This repository contains the autoref implementation by ER-Force.
+
+## Table of Contents
+- [Compilation](#compilation)
+- [Docker](#docker)
+- [Usage](#usage)
+- [Features](#features)
+- [Advanced usage](#advanced-usage)
+  * [User interface](#user-interface)
+  * [Log recorder](#log-recorder)
+  * [Ball speed plotter](#ball-speed-plotter)
+  * [Implementing rules](#implementing-rules)
 
 ## Compilation
 Follow the instructions in [COMPILE.md](COMPILE.md). Building the framework
 separately is **not** neccesary!
+
+## Docker
+A Docker image is provided at [`roboticserlangen/autoref`](https://hub.docker.com/repository/docker/roboticserlangen/autoref).
+
+The available tags are `latest` and `commit-<hash>`, where `<hash>` are the
+first 12 characters of the commit hash the image was built from.
+
+The image can also be built locally using standard Docker commands.
+```
+$ docker build -t <sometag> .
+```
+
+When you run the image in a container, it exposes a **VNC server** on port
+**5900**. Connect using any VNC client, e.g. TigerVNC.
+
+**Important** the autoref will only start once the first VNC connection has
+been established. It will however continue running once the connection
+terminates.
 
 ## Usage
 In order to use the Autoref, run the previously built binary `autoref`.
