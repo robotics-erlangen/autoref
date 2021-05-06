@@ -50,13 +50,11 @@ int main(int argc, char* argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Autoref");
     parser.addHelpOption();
-    QCommandLineOption activeModeOption({"a", "active"}, "Start in active mode");
-    parser.addOption(activeModeOption);
     QCommandLineOption infoBoardOption({"i", "info"}, "Show the info board");
     parser.addOption(infoBoardOption);
     parser.process(app);
 
-    MainWindow window(parser.isSet(infoBoardOption), parser.isSet(activeModeOption));
+    MainWindow window(parser.isSet(infoBoardOption));
     window.show();
 
     return app.exec();

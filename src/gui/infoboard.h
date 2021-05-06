@@ -41,7 +41,6 @@ public:
     explicit InfoBoard(QWidget *parent=0);
     ~InfoBoard() override;
     FieldWidget* field;
-    void setAutorefIsActive(bool active);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
@@ -62,7 +61,6 @@ private:
     QString m_refState;
     QString m_foulEvent;
     QString m_nextAction;
-    bool m_autorefIsActive;
     bool m_autorefMsgInvalidated;
 
     void updateGameStage(const amun::GameState &game_state);

@@ -178,10 +178,7 @@ void InfoBoard::updateRefstate(const Status &status)
     if (change) {
         m_blinkTimer->start(700);
 
-        if (status->time() - m_eventMsgTime > 10000 * 1E6 && !m_autorefIsActive) {
-            // eventMsg older than 10s in passive mode
-            m_autorefMsgInvalidated = true;
-        } else if (status->time() - m_eventMsgTime > 150 * 1E6 && m_autorefIsActive &&
+        if (status->time() - m_eventMsgTime > 150 * 1E6 &&
                 m_refState != "Stop" && m_refState != "BallPlacementBlue" && m_refState != "BallPlacementYellow") {
             // we wait 150ms because the eventMsg may arrive before the ref message
             m_autorefMsgInvalidated = true;
@@ -200,16 +197,6 @@ void InfoBoard::updateRefstate(const Status &status)
                     .arg((int)(fontSize*0.45))
                     .arg(fontSize)
                     .arg(refStateNice);
-        } else if (!m_autorefIsActive) { // passive autoref, no next action
-            uint fontSize = ui->refState->height() / 6.4;
-            displayText = QString(
-                    "<p style=\"font-size: %1px;\">%4</p><br>" // (foul) event message
-                    "<p style=\"font-size: %1px; color: gray;\">Ref State</p>"
-                    "<div style=\"font-size: %2px;\">%3</div>")
-                .arg((int)(fontSize*0.65))
-                .arg(fontSize)
-                .arg(refStateNice)
-                .arg(m_foulEvent);
         } else {
             uint fontSize = ui->refState->height() / 6.4;
             displayText = QString(
@@ -266,8 +253,4 @@ void InfoBoard::mouseDoubleClickEvent(QMouseEvent *event) {
     } else {
         setWindowState(Qt::WindowFullScreen);
     }
-}
-
-void InfoBoard::setAutorefIsActive(bool active) {
-    m_autorefIsActive = active;
 }
