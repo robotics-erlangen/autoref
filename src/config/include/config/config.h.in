@@ -24,9 +24,27 @@
 #ifdef _WIN32
 static const char* const ERFORCE_DATADIR = "./data/";
 static const char* const AUTOREF_DATADIR = "./data/";
+
+static const char* const ERFORCE_CONFDIR = "./config";
 #else // _WIN32
 static const char* const ERFORCE_DATADIR = "${CMAKE_SOURCE_DIR}/src/framework/data/";
 static const char* const AUTOREF_DATADIR = "${CMAKE_SOURCE_DIR}/data/";
+
+static const char* const ERFORCE_CONFDIR = "${CMAKE_SOURCE_DIR}/config";
 #endif // _WIN32
+
+// colors
+static const char* const UI_YELLOW_COLOR_LIGHT = "yellow";
+static const char* const UI_YELLOW_COLOR_DARK = "#303010";
+static const char* const UI_BLUE_COLOR_LIGHT = "dodgerblue";
+static const char* const UI_BLUE_COLOR_DARK = "#05223d";
+static const char* const UI_AUTOREF_COLOR_LIGHT = "lightgray";
+static const char* const UI_AUTOREF_COLOR_DARK = "#161616";
+
+// pathfinding
+static const char* const SAVE_PATHFINDING_INPUT_ALL = "Save pathfinding input: all inputs";
+static const char* const SAVE_PATHFINDING_INPUT_STANDARDSAMPLER = "Save pathfinding input: standard sampler inputs";
+static const char* const SAVE_PATHFINDING_INPUT_ENDINOBSTACLE = "Save pathfinding input: end in obstacle inputs";
+static const char* const SAVE_PATHFINDING_INPUT_ESCAPEOBSTACLE = "Save pathfinding input: escape obstacle inputs";
 
 #endif // CONFIG_H
