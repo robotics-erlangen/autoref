@@ -83,7 +83,7 @@ void Amun::start()
 {
     // create processor
     Q_ASSERT(m_processor == NULL);
-    m_processor = new Processor(m_timer);
+    m_processor = new Processor(m_timer, false);
     m_processor->moveToThread(m_processorThread);
     connect(m_processorThread, SIGNAL(finished()), m_processor, SLOT(deleteLater()));
     // route commands to processor
