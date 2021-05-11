@@ -60,11 +60,11 @@ endif(APPLE)
 
 target_link_libraries(autoref
     autoref::backend
+    amun::seshat
     shared::core
     shared::config
     shared::protobuf
     ra::guihelper
-    ra::logfile
     ra::plotter
     ra::widgets
     ${OPENGL_LIBRARIES}

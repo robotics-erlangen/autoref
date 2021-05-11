@@ -28,11 +28,11 @@ add_subdirectory(framework/src/protobuf)
 add_subdirectory(framework/src/amun/processor)
 add_subdirectory(framework/src/amun/strategy)
 add_subdirectory(framework/src/amun/gamecontroller)
+add_subdirectory(framework/src/amun/seshat)
 add_subdirectory(framework/src/visionlog)
 add_subdirectory(backend)
 
 # apps
-add_subdirectory(framework/src/ra/logfile)
 add_subdirectory(framework/src/ra/guihelper)
 add_subdirectory(framework/src/ra/plotter)
 add_subdirectory(framework/src/ra/widgets)

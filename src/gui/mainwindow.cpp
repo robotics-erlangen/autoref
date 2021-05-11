@@ -24,7 +24,7 @@
 #include "configdialog.h"
 #include "core/timer.h"
 #include "infoboard.h"
-#include "logfile/logfilewriter.h"
+#include "seshat/logfilewriter.h"
 #include "robotselectionwidget.h"
 #include "widgets/refereestatuswidget.h"
 #include <QDateTime>
