@@ -27,6 +27,7 @@ add_subdirectory(framework/src/core)
 add_subdirectory(framework/src/protobuf)
 add_subdirectory(framework/src/amun/processor)
 add_subdirectory(framework/src/amun/strategy)
+add_subdirectory(framework/src/amun/gamecontroller)
 add_subdirectory(framework/src/visionlog)
 add_subdirectory(backend)
 

@@ -23,6 +23,8 @@
 
 #include "protobuf/command.h"
 #include "protobuf/status.h"
+#include "gamecontroller/gamecontrollerconnection.h"
+#include <memory>
 #include <QObject>
 
 class NetworkInterfaceWatcher;
@@ -76,6 +78,8 @@ private:
     Timer *m_timer = nullptr;
 
     NetworkInterfaceWatcher *m_networkInterfaceWatcher = nullptr;
+
+    std::shared_ptr<GameControllerConnection> m_gameControllerConnection;
 };
 
 #endif // AMUN_H

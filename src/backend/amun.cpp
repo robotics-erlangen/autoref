@@ -91,9 +91,14 @@ void Amun::start()
     // relay tracking, geometry, referee, controller and accelerator information
     connect(m_processor, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
 
+    m_gameControllerConnection.reset(new GameControllerConnection(true));
+    m_gameControllerConnection->switchInternalGameController(false);
+    m_gameControllerConnection->moveToThread(m_autorefThread);
+    connect(this, &Amun::gotRefereeHost, m_gameControllerConnection.get(), &GameControllerConnection::handleRefereeHost);
+
     // start strategy threads
     Q_ASSERT(m_autoref == nullptr);
-    m_autoref = new Strategy(m_timer, StrategyType::AUTOREF, nullptr, false);
+    m_autoref = new Strategy(m_timer, StrategyType::AUTOREF, nullptr, nullptr, m_gameControllerConnection, false);
     m_autoref->moveToThread(m_autorefThread);
     connect(m_autorefThread, SIGNAL(finished()), m_autoref, SLOT(deleteLater()));
 
