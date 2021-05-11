@@ -20,12 +20,13 @@
 
 #include "configdialog.h"
 #include "ui_configdialog.h"
+#include "core/sslprotocols.h"
 #include <QPushButton>
 #include <QSettings>
 
 const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
-const uint DEFAULT_VISION_PORT = 10006;
-const uint DEFAULT_REFEREE_PORT = 10003;
+const uint DEFAULT_VISION_PORT = SSL_VISION_PORT;
+const uint DEFAULT_REFEREE_PORT = SSL_GAME_CONTROLLER_PORT;
 
 const bool DEFAULT_PLOTTER_IN_EXTRA_WINDOW = false;
 

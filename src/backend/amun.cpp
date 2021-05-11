@@ -22,6 +22,7 @@
 #include "receiver.h"
 #include "optionsmanager.h"
 #include "core/timer.h"
+#include "core/sslprotocols.h"
 #include "processor/processor.h"
 #include "strategy/strategy.h"
 #include "networkinterfacewatcher.h"
@@ -124,14 +125,14 @@ void Amun::start()
     m_autoref->setFlipped(m_processor->getIsFlipped());
 
     // create referee
-    setupReceiver(m_referee, QHostAddress("224.5.23.1"), 10007);
+    setupReceiver(m_referee, QHostAddress(SSL_GAME_CONTROLLER_ADDRESS), SSL_GAME_CONTROLLER_PORT);
     connect(this, &Amun::updateRefereePort, m_referee, &Receiver::updatePort);
     // move referee packets to processor
     connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64, QString)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
     connect(m_referee, SIGNAL(gotPacket(QByteArray,qint64,QString)), SLOT(handleRefereePacket(QByteArray,qint64,QString)));
 
     // create vision
-    setupReceiver(m_vision, QHostAddress("224.5.23.2"), 10002);
+    setupReceiver(m_vision, QHostAddress(SSL_VISION_ADDRESS), SSL_VISION_PORT);
     // allow updating the port used to listen for ssl vision
     connect(this, &Amun::updateVisionPort, m_vision, &Receiver::updatePort);
     // connect
