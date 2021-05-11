@@ -112,7 +112,6 @@ void Amun::start()
             m_autoref, SLOT(handleCommand(Command)));
     // relay status and debug information of strategy
     connect(m_autoref, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
-    connect(this, SIGNAL(gotRefereeHost(QString)), m_autoref, SLOT(handleRefereeHost(QString)));
     connect(m_processor, SIGNAL(setFlipped(bool)), m_autoref, SLOT(setFlipped(bool)));
     m_autoref->setFlipped(m_processor->getIsFlipped());
 
