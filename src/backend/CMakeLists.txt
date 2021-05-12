@@ -28,6 +28,8 @@ add_library(backend
     ../framework/src/amun/networkinterfacewatcher.h
     ../framework/src/amun/receiver.cpp
     ../framework/src/amun/receiver.h
+    ../framework/src/amun/optionsmanager.h
+    ../framework/src/amun/optionsmanager.cpp
 )
 target_link_libraries(backend
     PRIVATE shared::core

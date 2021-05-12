@@ -20,6 +20,7 @@
 
 #include "amun.h"
 #include "receiver.h"
+#include "optionsmanager.h"
 #include "core/timer.h"
 #include "processor/processor.h"
 #include "strategy/strategy.h"
@@ -91,6 +92,11 @@ void Amun::start()
     // relay tracking, geometry, referee, controller and accelerator information
     connect(m_processor, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
 
+    m_optionsManager = new OptionsManager;
+    m_optionsManager->moveToThread(thread());
+    connect(this, &Amun::gotCommand, m_optionsManager, &OptionsManager::handleCommand);
+    connect(m_optionsManager, &OptionsManager::sendStatus, this, &Amun::handleStatus);
+
     m_gameControllerConnection.reset(new GameControllerConnection(true));
     m_gameControllerConnection->switchInternalGameController(false);
     m_gameControllerConnection->moveToThread(m_autorefThread);
@@ -106,12 +112,14 @@ void Amun::start()
     // send tracking, geometry and referee to strategy
     connect(m_processor, SIGNAL(sendStrategyStatus(Status)),
             m_autoref, SLOT(handleStatus(Status)));
+    connect(m_optionsManager, &OptionsManager::sendStatus, m_autoref, &Strategy::handleStatus);
     // route commands from and to strategy
     connect(m_autoref, SIGNAL(gotCommand(Command)), SLOT(handleCommand(Command)));
     connect(this, SIGNAL(gotCommand(Command)),
             m_autoref, SLOT(handleCommand(Command)));
     // relay status and debug information of strategy
     connect(m_autoref, SIGNAL(sendStatus(Status)), SLOT(handleStatus(Status)));
+    connect(m_autoref, &Strategy::sendStatus, m_optionsManager, &OptionsManager::handleStatus);
     connect(m_processor, SIGNAL(setFlipped(bool)), m_autoref, SLOT(setFlipped(bool)));
     m_autoref->setFlipped(m_processor->getIsFlipped());
 
@@ -154,11 +162,14 @@ void Amun::stop()
     m_networkThread->wait();
     m_autorefThread->wait();
 
+    delete m_optionsManager;
+
     // worker objects are destroyed on thread shutdown
     m_vision = NULL;
     m_referee = NULL;
     m_autoref = NULL;
     m_processor = NULL;
+    m_optionsManager = nullptr;
 }
 
 void Amun::handleRefereePacket(QByteArray, qint64, QString host)

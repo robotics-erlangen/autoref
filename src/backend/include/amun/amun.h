@@ -33,6 +33,7 @@ class Receiver;
 class Strategy;
 class Timer;
 class QHostAddress;
+class OptionsManager;
 
 class Amun : public QObject
 {
@@ -74,6 +75,7 @@ private:
     Receiver *m_referee = nullptr;
     Receiver *m_vision = nullptr;
     Strategy *m_autoref = nullptr;
+    OptionsManager *m_optionsManager = nullptr;
     qint64 m_lastTime;
     Timer *m_timer = nullptr;
 
