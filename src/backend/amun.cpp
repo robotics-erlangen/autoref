@@ -46,11 +46,7 @@
  * \param parent Parent object
  */
 Amun::Amun(bool simulatorOnly, QObject *parent) :
-    QObject(parent),
-    m_processor(nullptr),
-    m_referee(nullptr),
-    m_vision(nullptr),
-    m_autoref(nullptr)
+    QObject(parent)
 {
     qRegisterMetaType<QNetworkInterface>("QNetworkInterface");
     qRegisterMetaType<Command>("Command");

@@ -64,18 +64,18 @@ signals:
 
 private:
     void setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port);
-    QThread *m_processorThread;
-    QThread *m_networkThread;
-    QThread *m_autorefThread;
+    QThread *m_processorThread = nullptr;
+    QThread *m_networkThread = nullptr;
+    QThread *m_autorefThread = nullptr;
 
-    Processor *m_processor;
-    Receiver *m_referee;
-    Receiver *m_vision;
-    Strategy *m_autoref;
+    Processor *m_processor = nullptr;
+    Receiver *m_referee = nullptr;
+    Receiver *m_vision = nullptr;
+    Strategy *m_autoref = nullptr;
     qint64 m_lastTime;
-    Timer *m_timer;
+    Timer *m_timer = nullptr;
 
-    NetworkInterfaceWatcher *m_networkInterfaceWatcher;
+    NetworkInterfaceWatcher *m_networkInterfaceWatcher = nullptr;
 };
 
 #endif // AMUN_H
