@@ -58,9 +58,11 @@ function DoubleTouch.occuring()
         end
     elseif World.RefereeState == "Game" and lastTouchingRobotInFreekick then
         local touchingRobot
-        for _, robot in ipairs(World.Robots) do
-            if robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
-                touchingRobot = robot
+        if World.Ball.posZ == 0 then
+            for _, robot in ipairs(World.Robots) do
+                if robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
+                    touchingRobot = robot
+                end
             end
         end
 
