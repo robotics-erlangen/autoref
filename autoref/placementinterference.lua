@@ -50,7 +50,7 @@ function BallPlacementInterference.occuring()
                     end
                 end
             else
-                inRangeStartTimes[robot] = World.Time
+                inRangeStartTimes[robot] = nil
             end
         end
     end
