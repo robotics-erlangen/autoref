@@ -195,7 +195,6 @@ function Events.attackerDefAreaDist(teamIsYellow, botId, location, distance)
 	if distance then
 		event.distance = distance
 	end
-	event.location = toLocation(World.Ball.pos)
 	return { attacker_too_close_to_defense_area = event, type = "ATTACKER_TOO_CLOSE_TO_DEFENSE_AREA" }
 end
 
