@@ -74,8 +74,7 @@ function DoubleTouch.occuring()
             if touchingRobot == lastTouchingRobotInFreekick then
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
-                -- TODO: it should be position of the ball when it was FIRST touched
-                DoubleTouch.event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, World.Ball.pos)
+                DoubleTouch.event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, lastBallPosInStop)
                 return true
             else
                 lastTouchingRobotInFreekick = nil
@@ -83,6 +82,7 @@ function DoubleTouch.occuring()
         end
     else
         lastTouchingRobotInFreekick = nil
+        lastBallPosInStop = World.Ball.pos:copy()
     end
     return false
 end
