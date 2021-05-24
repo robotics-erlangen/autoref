@@ -18,42 +18,33 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Dribbling = {}
+local AttackerInDefenseArea = {}
 
+local Field = require "../base/field"
 local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "gameevent2019"
+local Event = require "rules/gameevent2019"
 
-local MAX_DRIBBLING_DIST = 1 -- as specified by the rules
-
-Dribbling.possibleRefStates = {
+AttackerInDefenseArea.possibleRefStates = {
     Game = true
 }
 
-local dribblingStart
-function Dribbling.occuring()
-    local currentTouchingRobot
-    for _, robot in ipairs(World.Robots) do
-        if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
-            currentTouchingRobot = robot
-            break
-        end
-    end
-    if currentTouchingRobot then
-        if not dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
-            dribblingStart = currentTouchingRobot.pos:copy()
-        end
-        if currentTouchingRobot.pos:distanceTo(dribblingStart) > MAX_DRIBBLING_DIST then
-            local lastRobot = Referee.robotAndPosOfLastBallTouch()
-            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
-                .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
-            -- TODO: should it be the ball position or the robot position
-            Dribbling.event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, dribblingStart, currentTouchingRobot.pos)
-            return true
-        end
-    else
-        dribblingStart = nil
+function AttackerInDefenseArea.occuring()
+	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
+		if Field["isIn"..defense.."DefenseArea"](World.Ball.pos, World.Ball.radius) then
+			for _, robot in ipairs(World[offense.."Robots"]) do
+				-- attacker touches ball while the ball is in the defense area
+				if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
+					local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+					AttackerInDefenseArea.message = color .. " " .. robot.id ..
+						" touched the ball in defense area"
+					-- TODO: distance in defense area
+					AttackerInDefenseArea.event = Event.attackerInDefenseArea(robot.isYellow, robot.id, robot.pos)
+					return true
+				end
+			end
+		end
     end
 end
 
-return Dribbling
+return AttackerInDefenseArea

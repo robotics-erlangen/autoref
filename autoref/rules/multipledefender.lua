@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
+*   Copyright 2019 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -18,46 +18,39 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local StopSpeed = {}
+local MultipleDefender = {}
 
+local Field = require "../base/field"
+local Referee = require "../base/referee"
 local World = require "../base/world"
-local Parameters = require "../base/parameters"
-local Event = require "gameevent2019"
+local Event = require "rules/gameevent2019"
 
-local STOP_SPEED = 1.5 -- as specified by the rules
-local GRACE_PERIOD = 2 -- as specified by rules
-local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
-
-StopSpeed.possibleRefStates = {
-    Stop = true
+MultipleDefender.possibleRefStates = {
+    Game = true
 }
 
--- dont stop calling the occuring function once the event triggered
-StopSpeed.shouldAlwaysExecute = true
-StopSpeed.runOnInvisibleBall = true
-
-local enterStopTime = World.Time
-local fastRobotsInThisStop = {}
-function StopSpeed.occuring()
-    if World.Time - enterStopTime < GRACE_PERIOD then
-        return false
-    end
-
-    for _, robot in ipairs(World.Robots) do
-        local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and not fastRobotsInThisStop[robot] then
-            StopSpeed.message = teamStr.." bot "..robot.id.." was too fast during stop"
-            StopSpeed.event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
-            fastRobotsInThisStop[robot] = true
+local function checkOccupation(team, occupation)
+    for _, robot in ipairs(World[team.."Robots"]) do
+        local distThreshold = occupation == "partially" and robot.radius or -robot.radius
+        if robot ~= World[team.."Keeper"]
+                and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
+                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
+            MultipleDefender.message = team .. " " .. robot.id ..
+                " touched the ball<br>while being located <b>" ..
+                occupation .. "</b><br>within its own defense area"
+            MultipleDefender.event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil, occupation == "partially")
             return true
         end
     end
     return false
 end
 
-function StopSpeed.reset()
-    fastRobotsInThisStop = {}
-    enterStopTime = World.Time
+function MultipleDefender.occuring()
+    local defense = "Yellow"
+    if World.Ball.pos.y > 0 then -- on blue side of field
+        defense = "Blue"
+    end
+    return checkOccupation(defense, "entirely") -- or checkOccupation(defense, "partially")
 end
 
-return StopSpeed
+return MultipleDefender

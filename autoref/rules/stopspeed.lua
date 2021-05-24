@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2018 Alexander Danzer, Andreas Wendler                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -18,33 +18,46 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local AttackerInDefenseArea = {}
+local StopSpeed = {}
 
-local Field = require "../base/field"
-local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "gameevent2019"
+local Parameters = require "../base/parameters"
+local Event = require "rules/gameevent2019"
 
-AttackerInDefenseArea.possibleRefStates = {
-    Game = true
+local STOP_SPEED = 1.5 -- as specified by the rules
+local GRACE_PERIOD = 2 -- as specified by rules
+local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
+
+StopSpeed.possibleRefStates = {
+    Stop = true
 }
 
-function AttackerInDefenseArea.occuring()
-	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-		if Field["isIn"..defense.."DefenseArea"](World.Ball.pos, World.Ball.radius) then
-			for _, robot in ipairs(World[offense.."Robots"]) do
-				-- attacker touches ball while the ball is in the defense area
-				if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
-					local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-					AttackerInDefenseArea.message = color .. " " .. robot.id ..
-						" touched the ball in defense area"
-					-- TODO: distance in defense area
-					AttackerInDefenseArea.event = Event.attackerInDefenseArea(robot.isYellow, robot.id, robot.pos)
-					return true
-				end
-			end
-		end
+-- dont stop calling the occuring function once the event triggered
+StopSpeed.shouldAlwaysExecute = true
+StopSpeed.runOnInvisibleBall = true
+
+local enterStopTime = World.Time
+local fastRobotsInThisStop = {}
+function StopSpeed.occuring()
+    if World.Time - enterStopTime < GRACE_PERIOD then
+        return false
     end
+
+    for _, robot in ipairs(World.Robots) do
+        local teamStr = robot.isYellow and "yellow" or "blue"
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and not fastRobotsInThisStop[robot] then
+            StopSpeed.message = teamStr.." bot "..robot.id.." was too fast during stop"
+            StopSpeed.event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
+            fastRobotsInThisStop[robot] = true
+            return true
+        end
+    end
+    return false
 end
 
-return AttackerInDefenseArea
+function StopSpeed.reset()
+    fastRobotsInThisStop = {}
+    enterStopTime = World.Time
+end
+
+return StopSpeed

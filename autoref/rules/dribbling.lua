@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer, Lukas Wegmann                        *
+*   Copyright 2015 Alexander Danzer                                       *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -18,35 +18,42 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local FreekickDistance = {}
+local Dribbling = {}
 
+local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "gameevent2019"
+local Event = require "rules/gameevent2019"
 
-local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
+local MAX_DRIBBLING_DIST = 1 -- as specified by the rules
 
-FreekickDistance.possibleRefStates = {
-    Direct = true,
-    Indirect = true,
-    Kickoff = true
+Dribbling.possibleRefStates = {
+    Game = true
 }
 
-local stopBallPos
-function FreekickDistance.occuring()
-    local defense = string.byte(World.RefereeState, -1) == string.byte("w", 1) and "Blue" or "Yellow"
-    for _, robot in ipairs(World[defense.."Robots"]) do
-        local d = robot.pos:distanceTo(stopBallPos)-robot.shootRadius
-        if d < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
-            local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
-            FreekickDistance.event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
+local dribblingStart
+function Dribbling.occuring()
+    local currentTouchingRobot
+    for _, robot in ipairs(World.Robots) do
+        if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
+            currentTouchingRobot = robot
+            break
+        end
+    end
+    if currentTouchingRobot then
+        if not dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
+            dribblingStart = currentTouchingRobot.pos:copy()
+        end
+        if currentTouchingRobot.pos:distanceTo(dribblingStart) > MAX_DRIBBLING_DIST then
+            local lastRobot = Referee.robotAndPosOfLastBallTouch()
+            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
+                .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
+            -- TODO: should it be the ball position or the robot position
+            Dribbling.event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, dribblingStart, currentTouchingRobot.pos)
             return true
         end
+    else
+        dribblingStart = nil
     end
 end
 
-function FreekickDistance.reset()
-    stopBallPos = World.Ball.pos
-end
-
-return FreekickDistance
+return Dribbling

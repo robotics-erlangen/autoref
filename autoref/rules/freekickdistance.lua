@@ -1,5 +1,5 @@
 --[[***********************************************************************
-*   Copyright 2019 Alexander Danzer, Andreas Wendler                      *
+*   Copyright 2015 Alexander Danzer, Lukas Wegmann                        *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -18,39 +18,35 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local MultipleDefender = {}
+local FreekickDistance = {}
 
-local Field = require "../base/field"
-local Referee = require "../base/referee"
 local World = require "../base/world"
-local Event = require "gameevent2019"
+local Event = require "rules/gameevent2019"
 
-MultipleDefender.possibleRefStates = {
-    Game = true
+local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
+
+FreekickDistance.possibleRefStates = {
+    Direct = true,
+    Indirect = true,
+    Kickoff = true
 }
 
-local function checkOccupation(team, occupation)
-    for _, robot in ipairs(World[team.."Robots"]) do
-        local distThreshold = occupation == "partially" and robot.radius or -robot.radius
-        if robot ~= World[team.."Keeper"]
-                and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
-                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
-            MultipleDefender.message = team .. " " .. robot.id ..
-                " touched the ball<br>while being located <b>" ..
-                occupation .. "</b><br>within its own defense area"
-            MultipleDefender.event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil, occupation == "partially")
+local stopBallPos
+function FreekickDistance.occuring()
+    local defense = string.byte(World.RefereeState, -1) == string.byte("w", 1) and "Blue" or "Yellow"
+    for _, robot in ipairs(World[defense.."Robots"]) do
+        local d = robot.pos:distanceTo(stopBallPos)-robot.shootRadius
+        if d < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
+            local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+            FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
+            FreekickDistance.event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
             return true
         end
     end
-    return false
 end
 
-function MultipleDefender.occuring()
-    local defense = "Yellow"
-    if World.Ball.pos.y > 0 then -- on blue side of field
-        defense = "Blue"
-    end
-    return checkOccupation(defense, "entirely") -- or checkOccupation(defense, "partially")
+function FreekickDistance.reset()
+    stopBallPos = World.Ball.pos
 end
 
-return MultipleDefender
+return FreekickDistance

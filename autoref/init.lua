@@ -118,7 +118,7 @@ local function main()
     if fouls == nil then
         fouls = { }
         for _, filename in pairs(descriptionToFileNames) do
-            local foul = require(filename)
+            local foul = require("rules/" .. filename)
             if foul.reset then
                 foul.reset()
             end

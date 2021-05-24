@@ -19,7 +19,7 @@
 *************************************************************************]]
 
 local World = require "../base/world"
-local Event = require "gameevent2019"
+local Event = require "rules/gameevent2019"
 
 local BallPlacement = {}
 
