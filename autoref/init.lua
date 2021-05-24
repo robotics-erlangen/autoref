@@ -46,7 +46,6 @@ local descriptionToFileNames = {
     ["Double touch after free kick"] = "doubletouch",
     ["Ball placement"] = "ballplacement",
     ["Ball placement interference"] = "placementinterference",
-    ["Stop ball distance"] = "stopballdistance"
 }
 
 local optionnames = { }
@@ -67,7 +66,6 @@ local function runEvent(foul)
 	-- take the referee state until the second upper case letter, thereby
 	-- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
 	local simpleRefState = World.RefereeState:match("%u%l+")
-	foul.waitingForRobots = {}
 	if foul.possibleRefStates[simpleRefState] and
 			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
 			foul.occuring() then
@@ -91,11 +89,6 @@ local function runEvent(foul)
 		if foul.reset then
 			foul.reset()
 		end
-	elseif table.count(foul.waitingForRobots) > 0 then
-		for robot in pairs(foul.waitingForRobots) do
-			vis.addCircle("waiting for robot", robot.pos, robot.radius * 1.5, vis.colors.red)
-		end
-		GameController.sendWaitingForRobots(foul.waitingForRobots)
 	end
 
 	if foulTimes[foul] and foul.freekickPosition and foulTimes[foul] > World.Time - 1 then
