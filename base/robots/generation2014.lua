@@ -1,5 +1,10 @@
+--[[
+--- Provides robot generations specific classes
+module "Robot.Generation.Gen2014_3"
+]]--
+
 --[[***********************************************************************
-*   Copyright 2018 Andreas Wendler                                        *
+*   Copyright 2015 Alexander Danzer, Michael Eischer                      *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -17,5 +22,15 @@
 *   You should have received a copy of the GNU General Public License     *
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
--- for the purposes of the autoref, ignore this file
-return require ((require "../base/basedir").."robots/generation2014")
+
+local Robot = require "../base/robot"
+local Gen2014 = (require "../base/class")("Robot.Generation.Gen2014_"..Robot.GENERATION_2014_ID, Robot)
+
+--- Robot specific constants
+-- @class table
+-- @name Gen2014_3.constants
+Gen2014.constants = {
+	dribblerSpinupTime = 0.4
+}
+
+return Gen2014

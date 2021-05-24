@@ -62,7 +62,7 @@ local Robot = require "../base/robot"
 -- ExtraTimeBreak, ExtraFirstHalfPre, ExtraFirstHalf, ExtraHalfTime, ExtraSecondHalfPre, ExtraSecondHalf,
 -- PenaltyShootoutBreak, PenaltyShootout, PostGame
 
-local World = require ((require "../base/basedir").."world")
+local World = {}
 
 World.Ball = Ball()
 World.YellowRobots = {}
@@ -127,6 +127,21 @@ function World._init()
 	World._updateTeam()
 end
 
+--- Update world state.
+-- Has to be called once each frame
+-- @name update
+-- @return bool - false if no vision data was received since strategy start
+function World.update()
+	if World.SelectedOptions == nil then
+		World.SelectedOptions = amun.getSelectedOptions()
+	end
+	local hasVisionData = World._updateWorld(amun.getWorldState())
+	World._updateGameState(amun.getGameState())
+	World._updateUserInput(amun.getUserInput())
+	World.IsReplay = amun.isReplay and amun.isReplay() or false
+	return hasVisionData
+end
+
 -- Creates generation specific robot object for own team
 function World._updateTeam()
 	local friendlyRobotsById = {}
@@ -137,9 +152,7 @@ function World._updateTeam()
 end
 
 -- Setup field geometry
-local updateBefore = World._updateGeometry
 function World._updateGeometry(geom)
-	updateBefore(geom)
 	local wgeom = World.Geometry
 	wgeom.FieldWidth = geom.field_width
 	wgeom.FieldWidthHalf = geom.field_width / 2
@@ -184,9 +197,7 @@ function World._updateGeometry(geom)
 	World.IsLargeField = wgeom.FieldWidth > 5 and wgeom.FieldHeight > 7
 end
 
-local oldUpdate = World._updateWorld
 function World._updateWorld(state)
-	oldUpdate(state)
 	-- Get time
 	if World.Time then
 		World.TimeDiff = state.time * 1E-9 - World.Time
@@ -269,6 +280,34 @@ function World._updateWorld(state)
 	-- no vision data only if the parameter is false
 	return state.has_vision_data ~= false
 end
+
+-- Get rule version from geometry
+function World._updateRuleVersion(geom)
+	if not geom.type or geom.type == "TYPE_2014" then
+		World.RULEVERSION = "2017"
+	else
+		World.RULEVERSION = "2018"
+	end
+end
+
+World.gameStageMapping = {
+	NORMAL_FIRST_HALF_PRE = "FirstHalfPre",
+	NORMAL_FIRST_HALF = "FirstHalf",
+	NORMAL_HALF_TIME = "HalfTime",
+	NORMAL_SECOND_HALF_PRE = "SecondHalfPre",
+	NORMAL_SECOND_HALF = "SecondHalf",
+
+	EXTRA_TIME_BREAK = "ExtraTimeBreak",
+	EXTRA_FIRST_HALF_PRE = "ExtraFirstHalfPre",
+	EXTRA_FIRST_HALF = "ExtraFirstHalf",
+	EXTRA_HALF_TIME = "ExtraHalfTime",
+	EXTRA_SECOND_HALF_PRE = "ExtraSecondHalfPre",
+	EXTRA_SECOND_HALF = "ExtraSecondHalf",
+
+	PENALTY_SHOOTOUT_BREAK = "PenaltyShootoutBreak",
+	PENALTY_SHOOTOUT = "PenaltyShootout",
+	POST_GAME = "PostGame"
+}
 
 -- updates referee command and keeper information
 function World._updateGameState(state)
