@@ -27,7 +27,7 @@ module "vis"
 local vis = {}
 
 local amun = amun
-local Coordinates = require "../base/coordinates"
+local Coordinates = require "base/coordinates"
 
 
 local gcolor = {}

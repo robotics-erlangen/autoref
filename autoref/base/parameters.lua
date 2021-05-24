@@ -1,7 +1,7 @@
 local Parameters = {}
 
-local IO = require "../base/io"
-local debug = require "../base/debug"
+local IO = require "base/io"
+local debug = require "base/debug"
 
 local defaultValues = {}
 function Parameters.add(modulename, name, defaultValue)

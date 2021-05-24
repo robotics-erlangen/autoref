@@ -19,17 +19,17 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-require("../base/globalschecker").enable()
-require "../base/base"
+require("base/globalschecker").enable()
+require "base/base"
 
-local Entrypoints = require "../base/entrypoints"
-local debug = require "../base/debug"
-local Referee = require "../base/referee"
-local vis = require "../base/vis"
-local BallOwner = require "../base/ballowner"
-local World = require "../base/world"
-local plot = require "../base/plot"
-local Parameters = require "../base/parameters"
+local Entrypoints = require "base/entrypoints"
+local debug = require "base/debug"
+local Referee = require "base/referee"
+local vis = require "base/vis"
+local BallOwner = require "base/ballowner"
+local World = require "base/world"
+local plot = require "base/plot"
+local Parameters = require "base/parameters"
 
 local GameController = require "gamecontroller"
 

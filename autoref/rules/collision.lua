@@ -20,9 +20,9 @@
 
 local Collision = {}
 
-local World = require "../base/world"
+local World = require "base/world"
 local Event = require "rules/gameevent2019"
-local Parameters = require "../base/parameters"
+local Parameters = require "base/parameters"
 
 local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
 local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF", 0.3)

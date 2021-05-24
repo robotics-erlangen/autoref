@@ -20,7 +20,7 @@
 
 local FreekickDistance = {}
 
-local World = require "../base/world"
+local World = require "base/world"
 local Event = require "rules/gameevent2019"
 
 local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules

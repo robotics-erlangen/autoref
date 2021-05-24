@@ -1,10 +1,11 @@
 --[[
---- Typecheck helper
--- module "Typecheck"
+--- Is run be the processor before / after each strategy run.
+-- Subclass the class to create a new process
+module "Process"
 ]]--
 
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer                                       *
+*   Copyright 2015 Alexander Danzer, Michael Eischer, Christian Lobmeier  *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -23,36 +24,20 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Class = require "../base/class"
+local Process = (require "base/class")("Process")
 
---- tests a given value for a type
--- if the value is not of the requested Type, the function crashes with an error
--- @param value - the value to test
--- @param requestedType - the type value should have
--- @return value - if test was successfull
-return function(value, requestedType)
-	local tval = type(value)
-	if type(requestedType) == "string" then
-		if requestedType == "vector" then
-			if not Vector.isVector(value) then
-				error("Expected vector got " .. tval)
-			end
-		elseif requestedType == "class" then
-			if not value or Class.toClass(value, true) ~= value then
-				error("Expected class got " .. tval)
-			end
-		elseif tval ~= requestedType then
-			error("Expected type " .. requestedType .. " got " .. tval)
-		end
-	elseif type(requestedType) == "table" and Class.toClass(requestedType, true) then
-		if tval ~= "table" or not Class.toClass(value, true) then
-			error("Expected instance of class "..Class.name(requestedType).. " got type " .. tval)
-		end
-		if not Class.instanceOf(value, requestedType) then
-			error("Expected instance of class "..Class.name(requestedType).." got class "..Class.name(value))
-		end
-	else
-		error("Can't handle requestedType")
-	end
-	return value
+--- Execute the process actions here
+-- @name run
+function Process:run()
+	error("stub")
 end
+
+--- Tells whether the process is finished.
+-- Is called after each call to run
+-- @name run
+-- @return bool - Process is removed if true
+function Process:isFinished()
+	error("stub")
+end
+
+return Process

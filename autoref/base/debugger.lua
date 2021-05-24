@@ -24,13 +24,13 @@ module "debugger"
 *************************************************************************]]
 
 local debugger = {}
-local Class = require "../base/class"
+local Class = require "base/class"
 local amun, debug = amun, debug
 local strategyPath = amun.getStrategyPath()
 local baseDebug
 
 function debugger._loadBaseDebug()
-	baseDebug = require "../base/debug"
+	baseDebug = require "base/debug"
 end
 
 

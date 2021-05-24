@@ -20,8 +20,8 @@
 
 local StopSpeed = {}
 
-local World = require "../base/world"
-local Parameters = require "../base/parameters"
+local World = require "base/world"
+local Parameters = require "base/parameters"
 local Event = require "rules/gameevent2019"
 
 local STOP_SPEED = 1.5 -- as specified by the rules

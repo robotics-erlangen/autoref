@@ -18,7 +18,7 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local World = require "../base/world"
+local World = require "base/world"
 local Event = require "rules/gameevent2019"
 
 local BallPlacement = {}

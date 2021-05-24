@@ -27,7 +27,7 @@ local luaDebug = debug
 local debug = {}
 
 local amun = amun
-local Class = require "../base/class"
+local Class = require "base/class"
 
 
 local debugStack = { "" }

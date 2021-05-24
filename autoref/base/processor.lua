@@ -1,11 +1,10 @@
 --[[
---- Is run be the processor before / after each strategy run.
--- Subclass the class to create a new process
-module "Process"
+--- Allows running an analysis module before / after each strategy run
+module "Processor"
 ]]--
 
 --[[***********************************************************************
-*   Copyright 2015 Alexander Danzer, Michael Eischer, Christian Lobmeier  *
+*   Copyright 2015 Michael Eischer, Christian Lobmeier                    *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -24,20 +23,56 @@ module "Process"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Process = (require "../base/class")("Process")
+local Processor = {}
 
---- Execute the process actions here
--- @name run
-function Process:run()
-	error("stub")
+local Class = require "base/class"
+local Process = require "base/process"
+
+
+local preprocs = {}
+local postprocs = {}
+
+local function add(procs, proc)
+	assert(proc and Class.instanceOf(proc, Process), "no valid process!")
+	table.insert(procs, proc)
 end
 
---- Tells whether the process is finished.
--- Is called after each call to run
--- @name run
--- @return bool - Process is removed if true
-function Process:isFinished()
-	error("stub")
+--- Adds a process for runnning before the strategy
+-- @name addPre
+-- @param proc Process - Process object to be run
+function Processor.addPre(proc)
+	add(preprocs, proc)
 end
 
-return Process
+--- Adds a process for runnning after the strategy
+-- @name addPost
+-- @param proc Process - Process object to be run
+function Processor.addPost(proc)
+	add(postprocs, proc)
+end
+
+local function run(procs)
+	for i = #procs,1,-1 do
+		local proc = procs[i]
+		proc:run()
+		if proc:isFinished() then
+			table.remove(procs, i)
+		end
+	end
+end
+
+--- Runs all proccess object scheduled before the strategy.
+-- Should be called by the entrypoint wrapper
+-- @name pre
+function Processor.pre()
+	run(preprocs)
+end
+
+--- Runs all proccess object scheduled after the strategy.
+-- Should be called by the entrypoint wrapper
+-- @name post
+function Processor.post()
+	run(postprocs)
+end
+
+return Processor

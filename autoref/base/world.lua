@@ -25,9 +25,9 @@ module "World"
 *************************************************************************]]
 
 local amun = amun
-local Ball = require "../base/ball"
-local Constants = require "../base/constants"
-local Robot = require "../base/robot"
+local Ball = require "base/ball"
+local Constants = require "base/constants"
+local Robot = require "base/robot"
 
 --- Ball and team informations.
 -- @class table

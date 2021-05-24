@@ -18,10 +18,10 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Referee = require "../base/referee"
-local World = require "../base/world"
+local Referee = require "base/referee"
+local World = require "base/world"
 local Event = require "rules/gameevent2019"
-local plot = require "../base/plot"
+local plot = require "base/plot"
 
 local FastShot = {}
 

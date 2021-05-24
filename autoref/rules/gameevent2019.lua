@@ -18,9 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local World = require "../base/world";
-local Coordinates = require "../base/coordinates"
-local Vector = require "../base/vector"
+local World = require "base/world";
+local Coordinates = require "base/coordinates"
+local Vector = require "base/vector"
 
 local Events = {}
 

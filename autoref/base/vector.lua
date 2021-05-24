@@ -359,7 +359,7 @@ function Vector.random(sigma, mean)
 end
 
 function Vector._loadGeom()
-	geom = require "../base/geom"
+	geom = require "base/geom"
 end
 
 --- Check whether a given value is a vector

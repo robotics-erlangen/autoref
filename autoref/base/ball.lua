@@ -23,11 +23,11 @@ module "Ball"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Ball = (require "../base/class")("Ball")
+local Ball = (require "base/class")("Ball")
 
-local Constants = require "../base/constants"
-local Coordinates = require "../base/coordinates"
-local plot = require "../base/plot"
+local Constants = require "base/constants"
+local Coordinates = require "base/coordinates"
+local plot = require "base/plot"
 
 
 --- Values provided by Ball

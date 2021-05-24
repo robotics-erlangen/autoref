@@ -26,10 +26,10 @@ module "Field"
 
 local Field = {}
 
-local geom = require "../base/geom"
-local math = require "../base/math"
-local Referee = require "../base/referee"
-local World = require "../base/world"
+local geom = require "base/geom"
+local math = require "base/math"
+local Referee = require "base/referee"
+local World = require "base/world"
 
 local G = World.Geometry
 

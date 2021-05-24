@@ -1,4 +1,4 @@
-local World = require "../base/world"
+local World = require "base/world"
 
 local BallOwner = {}
 

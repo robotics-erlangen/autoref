@@ -1,10 +1,10 @@
 --[[
---- Allows running an analysis module before / after each strategy run
-module "Processor"
+--- Typecheck helper
+-- module "Typecheck"
 ]]--
 
 --[[***********************************************************************
-*   Copyright 2015 Michael Eischer, Christian Lobmeier                    *
+*   Copyright 2015 Alexander Danzer                                       *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -23,56 +23,36 @@ module "Processor"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Processor = {}
+local Class = require "base/class"
 
-local Class = require "../base/class"
-local Process = require "../base/process"
-
-
-local preprocs = {}
-local postprocs = {}
-
-local function add(procs, proc)
-	assert(proc and Class.instanceOf(proc, Process), "no valid process!")
-	table.insert(procs, proc)
-end
-
---- Adds a process for runnning before the strategy
--- @name addPre
--- @param proc Process - Process object to be run
-function Processor.addPre(proc)
-	add(preprocs, proc)
-end
-
---- Adds a process for runnning after the strategy
--- @name addPost
--- @param proc Process - Process object to be run
-function Processor.addPost(proc)
-	add(postprocs, proc)
-end
-
-local function run(procs)
-	for i = #procs,1,-1 do
-		local proc = procs[i]
-		proc:run()
-		if proc:isFinished() then
-			table.remove(procs, i)
+--- tests a given value for a type
+-- if the value is not of the requested Type, the function crashes with an error
+-- @param value - the value to test
+-- @param requestedType - the type value should have
+-- @return value - if test was successfull
+return function(value, requestedType)
+	local tval = type(value)
+	if type(requestedType) == "string" then
+		if requestedType == "vector" then
+			if not Vector.isVector(value) then
+				error("Expected vector got " .. tval)
+			end
+		elseif requestedType == "class" then
+			if not value or Class.toClass(value, true) ~= value then
+				error("Expected class got " .. tval)
+			end
+		elseif tval ~= requestedType then
+			error("Expected type " .. requestedType .. " got " .. tval)
 		end
+	elseif type(requestedType) == "table" and Class.toClass(requestedType, true) then
+		if tval ~= "table" or not Class.toClass(value, true) then
+			error("Expected instance of class "..Class.name(requestedType).. " got type " .. tval)
+		end
+		if not Class.instanceOf(value, requestedType) then
+			error("Expected instance of class "..Class.name(requestedType).." got class "..Class.name(value))
+		end
+	else
+		error("Can't handle requestedType")
 	end
+	return value
 end
-
---- Runs all proccess object scheduled before the strategy.
--- Should be called by the entrypoint wrapper
--- @name pre
-function Processor.pre()
-	run(preprocs)
-end
-
---- Runs all proccess object scheduled after the strategy.
--- Should be called by the entrypoint wrapper
--- @name post
-function Processor.post()
-	run(postprocs)
-end
-
-return Processor

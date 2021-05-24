@@ -1,6 +1,6 @@
 local IO = {}
 
-require "../base/amun"
+require "base/amun"
 
 
 local pathToStrategy = amun.strategyPath.."/"

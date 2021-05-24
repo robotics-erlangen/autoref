@@ -1,7 +1,3 @@
-add_test(NAME luacheck-base
-    COMMAND luacheck -q .
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/base")
-
 add_test(NAME luacheck-autoref
     COMMAND luacheck -q .
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/autoref")

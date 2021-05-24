@@ -23,10 +23,10 @@ module "Robot"
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Robot = (require "../base/class")("Robot")
+local Robot = (require "base/class")("Robot")
 
-local Constants = require "../base/constants"
-local Coordinates = require "../base/coordinates"
+local Constants = require "base/constants"
+local Coordinates = require "base/coordinates"
 
 
 --- Values provided by a robot object.
@@ -161,7 +161,7 @@ function Robot:hasBall(ball, sideOffset, manualHasBallDistance)
 	relpos.x = relpos.x - self.shootRadius - ball.radius
 	-- calculate position on the dribbler that would have been hit
 	local offset = math.abs(relpos.y - relpos.x * latencyCompensation.y / latencyCompensation.x)
-	-- local debug = require "../base/debug"
+	-- local debug = require "base/debug"
 	-- debug.set("latencyCompensation", latencyCompensation)
 	-- debug.set("offset", offset)
 
