@@ -36,7 +36,6 @@ local debugger = require "../base/debugger" -- preload debugger to allow trigger
 if math.mod ~= nil then
 	log("Warning: Using LuaJIT without lua 5.2 compatibility mode. Strategy behaviour on replay may be unstable")
 end
-require "../base/path"
 -- amun.isDebug must already be set, thus load after amun
 require("../base/globalschecker")._init(amun.isDebug)
 require("../base/class")._setDebug(amun.isDebug)
@@ -48,7 +47,6 @@ Vector._loadGeom()
 -- preload classes that require access to the amun API
 require("../base/coordinates")._setIsBlue(amun.isBlue())
 require "../base/debug"
-require "../base/debugcommands"
 require "../base/plot"
 require "../base/robot"
 require "../base/vis"

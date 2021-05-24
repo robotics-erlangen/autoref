@@ -137,7 +137,6 @@ function World.update()
 	end
 	local hasVisionData = World._updateWorld(amun.getWorldState())
 	World._updateGameState(amun.getGameState())
-	World._updateUserInput(amun.getUserInput())
 	World.IsReplay = amun.isReplay and amun.isReplay() or false
 	return hasVisionData
 end
@@ -146,7 +145,7 @@ end
 function World._updateTeam()
 	local friendlyRobotsById = {}
 	for id = 0, 21 do
-		friendlyRobotsById[id] = Robot(id, true, World.Geometry)
+		friendlyRobotsById[id] = Robot(id, true)
 	end
 	World.YellowRobotsById = friendlyRobotsById
 end
@@ -211,8 +210,6 @@ function World._updateWorld(state)
 		Constants.switchSimulatorConstants(World.IsSimulated)
 	end
 
-	local radioResponses = state.radio_response
-
 	-- update ball if available
 	if state.ball then
 		World.Ball:_update(state.ball, World.Time)
@@ -230,17 +227,7 @@ function World._updateWorld(state)
 		World.YellowRobots = {}
 		World.YellowInvisibleRobots = {}
 		for _, robot in pairs(World.YellowRobotsById) do
-			-- get responses for the current robot
-			-- these are identified by the robot generation and id
-			local robotResponses = {}
-			for _, response in ipairs(radioResponses) do
-				if response.generation == robot.generation
-						and response.id == robot.id then
-					table.insert(robotResponses, response)
-				end
-			end
-
-			robot:_update(dataById[robot.id], World.Time, robotResponses)
+			robot:_update(dataById[robot.id], World.Time)
 			-- sort robot into visible / not visible
 			if robot.isVisible then
 				table.insert(World.YellowRobots, robot)
@@ -374,21 +361,6 @@ function World._updateGameState(state)
 		// The number of microseconds of timeout this team can use.
 		required uint32 timeout_time = 7;
 	}]]
-end
-
--- update and handle user inputs set for own robots
-function World._updateUserInput(input)
-	if input.radio_command then
-		for _, robot in pairs(World.YellowRobotsById) do
-			robot:_updateUserControl(nil) -- clear
-		end
-		for _, cmd in ipairs(input.radio_command) do
-			local robot = World.YellowRobotsById[cmd.id]
-			if robot then
-				robot:_updateUserControl(cmd.command)
-			end
-		end
-	end
 end
 
 World._init()
