@@ -41,30 +41,13 @@ local descriptionToFileNames = {
     ["Dribbling over 1m"] = "dribbling",
     ["Attacker in defense area"] = "attackerindefensearea",
     ["Robot speed during Stop"] = "stopspeed",
-    -- ["Number of players on the field"] = "numberofplayers",
     ["Attacker distance to defense area"] = "attackerdefareadist",
     ["Distance during free kicks"] = "freekickdistance",
     ["Double touch after free kick"] = "doubletouch",
-    -- ["Pushing"] = "pushing",
-    -- ["Attacker touches Robot in opponent Defense Area"] = "attackertouchrobotindefarea",
-    -- ["Kick timout"] = "kicktimeout",
     ["Ball placement"] = "ballplacement",
     ["Ball placement interference"] = "placementinterference",
     ["Stop ball distance"] = "stopballdistance"
 }
-
-local internalAutorefOnlyRules = {
-    ["Start kickoffs"] = "kickoffstart",
-    ["Keeper ball holding"] = "keeperballholding",
-    ["No progress"] = "noprogress",
-    ["Start penalties when ready"] = "penaltystart",
-}
-
-if amun.isInternalAutoref and amun.isInternalAutoref() then
-    for description, filename in pairs(internalAutorefOnlyRules) do
-        descriptionToFileNames[description] = filename
-    end
-end
 
 local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
@@ -199,7 +182,7 @@ local function mainLoopWrapper(func)
     end
 end
 
-Entrypoints.add("2020", function()
+Entrypoints.add("2021", function()
     main()
     debug.resetStack()
     Referee.update()
