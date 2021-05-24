@@ -123,7 +123,7 @@ local function main()
     end
 
     if fouls == nil then
-        fouls = { require("chooseteamsides") }
+        fouls = { }
         for _, filename in pairs(descriptionToFileNames) do
             local foul = require(filename)
             if foul.reset then
