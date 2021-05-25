@@ -49,6 +49,7 @@ COPY --chown=default:default --from=build-stage /home/default/build/bin build/bi
 # the outer one as well
 RUN chown default:default build/
 COPY --chown=default:default --from=build-stage /home/default/data data/
+COPY --chown=default:default --from=build-stage /home/default/config config/
 COPY --chown=default:default docker-entry.bash /
 
 USER default
