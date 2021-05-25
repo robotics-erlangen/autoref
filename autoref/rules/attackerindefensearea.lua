@@ -34,7 +34,7 @@ function AttackerInDefenseArea.occuring()
 		if Field["isIn"..defense.."DefenseArea"](World.Ball.pos, World.Ball.radius) then
 			for _, robot in ipairs(World[offense.."Robots"]) do
 				-- attacker touches ball while the ball is in the defense area
-				if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
+				if World.Ball.posZ == 0 and robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
 					local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
 					AttackerInDefenseArea.message = color .. " " .. robot.id ..
 						" touched the ball in defense area"

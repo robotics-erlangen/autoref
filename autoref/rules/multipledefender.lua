@@ -34,7 +34,8 @@ local function checkOccupation(team, occupation)
         local distThreshold = occupation == "partially" and robot.radius or -robot.radius
         if robot ~= World[team.."Keeper"]
                 and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
-                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
+                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
+                and World.Ball.posZ == 0 then
             MultipleDefender.message = team .. " " .. robot.id ..
                 " touched the ball<br>while being located <b>" ..
                 occupation .. "</b><br>within its own defense area"
