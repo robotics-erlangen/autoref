@@ -55,6 +55,7 @@ Amun::Amun(bool simulatorOnly, QObject *parent) :
     qRegisterMetaType< QList<robot::RadioCommand> >("QList<robot::RadioCommand>");
     qRegisterMetaType< QList<robot::RadioResponse> >("QList<robot::RadioResponse>");
     qRegisterMetaType<Status>("Status");
+    qRegisterMetaType<amun::CommandReferee>("amun::CommandReferee");
 
     // global timer, which can be slowed down / sped up
     m_timer = new Timer;
