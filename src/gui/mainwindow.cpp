@@ -48,7 +48,6 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     ui->setupUi(this);
 
     // setup icons
-    ui->actionSidesFlipped->setIcon(QIcon("icon:32/change-ends.png"));
     ui->actionRecord->setIcon(QIcon("icon:32/media-record.png"));
     ui->actionConfiguration->setIcon(QIcon("icon:32/preferences-system.png"));
 
@@ -93,7 +92,6 @@ MainWindow::MainWindow(bool showInfoboard, QWidget *parent) :
     ui->log->hideLogToggles();
 
     // connect the menu actions
-    connect(ui->actionSidesFlipped, SIGNAL(toggled(bool)), SLOT(setFlipped(bool)));
     connect(ui->actionConfiguration, SIGNAL(triggered()), SLOT(showConfigDialog()));
     connect(ui->actionRecord, SIGNAL(toggled(bool)), SLOT(setRecording(bool)));
     connect(ui->actionShowOptions, &QAction::triggered, [=]() {
@@ -176,10 +174,6 @@ void MainWindow::handleStatus(const Status &status)
 
         const SSL_Referee_TeamInfo &teamYellow = state.yellow();
         m_yellowTeamName = QString::fromStdString(teamYellow.name());
-
-        if (state.has_goals_flipped()) {
-            ui->actionSidesFlipped->setChecked(state.goals_flipped());
-        }
     }
 
     // keep team configurations for the logfile
@@ -213,14 +207,6 @@ void MainWindow::handleStatus(const Status &status)
 void MainWindow::sendCommand(const Command &command)
 {
     m_amun.sendCommand(command);
-}
-
-void MainWindow::setFlipped(bool flipped)
-{
-    Command command(new amun::Command);
-    amun::CommandReferee *referee = command->mutable_referee();
-    referee->set_flipped(flipped);
-    sendCommand(command);
 }
 
 static QString toString(const QDateTime& dt)

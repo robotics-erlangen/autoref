@@ -65,8 +65,6 @@
     <property name="title">
      <string>&amp;Game</string>
     </property>
-    <addaction name="actionSidesFlipped"/>
-    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuVideo">

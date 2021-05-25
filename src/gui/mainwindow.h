@@ -57,7 +57,6 @@ private slots:
     void sendCommand(const Command &command);
     void setRecording(bool record);
     void showConfigDialog();
-    void setFlipped(bool flipped);
 
 private:
     Ui::MainWindow *ui;
