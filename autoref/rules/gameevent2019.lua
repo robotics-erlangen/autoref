@@ -216,40 +216,4 @@ function Events.placementSuccess(teamIsYellow, timeTaken, precision, distance)
 	return { placement_succeeded = event, type = "PLACEMENT_SUCCEEDED" }
 end
 
--- the following events normally covered by the game controller, use only them for the internal autoref
-function Events.keeperBallHolding(teamIsYellow, location, duration)
-	local event = createFromStandardInfo(teamIsYellow, nil, location)
-	if duration then
-		event.duration = duration
-	end
-	return { keeper_held_ball = event, type = "KEEPER_HELD_BALL" }
-end
-
-function Events.noProgress(location, time)
-	local event = {}
-	if location then
-		event.location = toLocation(location)
-	end
-	if time then
-		event.time = time
-	end
-	return { no_progress_in_game = event, type = "NO_PROGRESS_IN_GAME" }
-end
-
-function Events.prepared(timeTaken)
-	return { prepared = { time_taken = timeTaken }, type = "PREPARED" }
-end
-
-function Events.numberOfRobots(teamIsYellow)
-	return { too_many_robots = { by_team = toTeam(teamIsYellow) }, type = "TOO_MANY_ROBOTS" }
-end
-
-function Events.placementFailed(teamIsYellow, remainingDistance)
-	local event = createFromStandardInfo(teamIsYellow)
-	if remainingDistance then
-		event.remaining_distance = remainingDistance
-	end
-	return { placement_failed = event, type = "PLACEMENT_FAILED" }
-end
-
 return Events
