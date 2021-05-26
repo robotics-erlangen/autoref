@@ -29,7 +29,6 @@ local vis = require "base/vis"
 local BallOwner = require "base/ballowner"
 local World = require "base/world"
 local plot = require "base/plot"
-local Parameters = require "base/parameters"
 
 local GameController = require "gamecontroller"
 
@@ -55,7 +54,7 @@ end
 
 local fouls = nil
 local foulTimes = {}
-local FOUL_TIMEOUT = Parameters.add("main", "FOUL_TIMEOUT", 3) -- minimum time between subsequent fouls of the same kind
+local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
 local ballWasValidBefore = false
 local debugMessage = ""
@@ -67,7 +66,7 @@ local function runEvent(foul)
 	-- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
 	local simpleRefState = World.RefereeState:match("%u%l+")
 	if foul.possibleRefStates[simpleRefState] and
-			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT()) and
+			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT) and
 			foul.occuring() then
 		foulTimes[foul] = World.Time
 		-- TODO: sanity checks on occuring events
@@ -132,7 +131,6 @@ local function main()
         end
 	end
 
-	Parameters.update()
     eventsToSend = {}
 
 	-- check events that should always be executed first

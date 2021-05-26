@@ -22,11 +22,10 @@ local Collision = {}
 
 local World = require "base/world"
 local Event = require "rules/gameevent2019"
-local Parameters = require "base/parameters"
 
-local COLLISION_SPEED = Parameters.add("collision", "COLLISION_SPEED", 1.5)
-local COLLISION_SPEED_DIFF = Parameters.add("collision", "COLLISION_SPEED_DIFF", 0.3)
-local ASSUMED_BREAK_SPEED_DIFF = Parameters.add("collision", "ASSUMED_BREAK_SPEED_DIFF", 0.5)
+local COLLISION_SPEED = 1.5
+local COLLISION_SPEED_DIFF = 0.3
+local ASSUMED_BREAK_SPEED_DIFF = 0.3
 
 -- collision between two robots, at least one of them being fast.
 
@@ -55,26 +54,23 @@ function Collision.occuring()
     end
 
     Collision.ignore = false
-    local collisionSpeed = COLLISION_SPEED()
-    local maxSpeedDiff = COLLISION_SPEED_DIFF()
-    local breakDiff = ASSUMED_BREAK_SPEED_DIFF()
     for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
         for _, offRobot in ipairs(World[offense.."Robots"]) do
             for _, defRobot in ipairs(World[defense.."Robots"]) do
                 local speedDiff = offRobot.speed - defRobot.speed
                 local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
-                    defRobot.pos):distanceTo(offRobot.pos) - breakDiff
-                local defSpeed = math.max(0, defRobot.speed:length() - breakDiff)
-                local offSpeed = math.max(0, offRobot.speed:length() - breakDiff)
+                    defRobot.pos):distanceTo(offRobot.pos) - ASSUMED_BREAK_SPEED_DIFF
+                local defSpeed = math.max(0, defRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
+                local offSpeed = math.max(0, offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
                 local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
-                        and projectedSpeed > collisionSpeed and offSpeed > defSpeed
+                        and projectedSpeed > COLLISION_SPEED and offSpeed > defSpeed
                         and not collidingRobots[offRobot] and not collidingRobots[defRobot] then
                     
                     collidingRobots[offRobot] = World.Time
                     collidingRobots[defRobot] = World.Time
-                    if offSpeed - defSpeed > maxSpeedDiff then
-                        local speed = math.round(offRobot.speed:length() - breakDiff, 2)
+                    if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
+                        local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
                         local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
                         Collision.message = message

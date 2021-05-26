@@ -24,10 +24,9 @@ local Referee = require "base/referee"
 local debug = require "base/debug"
 local vis = require "base/vis"
 local World = require "base/world"
-local Parameters = require "base/parameters"
 local Event = require "rules/gameevent2019"
 
-local OUT_OF_FIELD_MIN_TIME = Parameters.add("outoffield", "OUT_OF_FIELD_MIN_TIME", 0.25)
+local OUT_OF_FIELD_MIN_TIME = 0.25
 
 OutOfField.possibleRefStates = {
     Game = true,
@@ -106,7 +105,7 @@ function OutOfField.occuring()
     debug.set("in field before", wasInFieldBefore)
     debug.set("delay time", World.Time - outOfFieldTime)
 
-    if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME() then
+    if waitingForDecision and World.Time - outOfFieldTime > OUT_OF_FIELD_MIN_TIME then
         outOfFieldTime = math.huge -- reset
         waitingForDecision = false
 

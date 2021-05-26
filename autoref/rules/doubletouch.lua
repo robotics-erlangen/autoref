@@ -24,9 +24,8 @@ local Referee = require "base/referee"
 local debug = require "base/debug"
 local World = require "base/world"
 local Event = require "rules/gameevent2019"
-local Parameters = require "base/parameters"
 
-local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = Parameters.add("doubletouch", "CONSIDER_FREE_KICK_EXECUTED_THRESHOLD", 0.07)
+local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = 0.07
 
 -- define all refstates to be able to reset variables
 -- foul occurs actually only in Game
@@ -56,7 +55,7 @@ function DoubleTouch.occuring()
             debug.set("last touch in freekick", lastTouchingRobotInFreekick)
 
             local distToFreekickPos = World.Ball.pos:distanceTo(lastBallPosInStop)
-            if distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD() then
+            if distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
                 local offenseTeam = r.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. r.id
                 DoubleTouch.event = Event.doubleTouch(r.isYellow, r.id, lastBallPosInStop)
@@ -77,7 +76,7 @@ function DoubleTouch.occuring()
         debug.set("last touch in freekick", lastTouchingRobotInFreekick)
         debug.set("touching robot", touchingRobot)
         debug.set("distToFreekickPos", distToFreekickPos)
-        if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD() then
+        if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
             if touchingRobot == lastTouchingRobotInFreekick then
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
                 DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id

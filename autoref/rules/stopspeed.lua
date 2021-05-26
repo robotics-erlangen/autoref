@@ -21,12 +21,11 @@
 local StopSpeed = {}
 
 local World = require "base/world"
-local Parameters = require "base/parameters"
 local Event = require "rules/gameevent2019"
 
 local STOP_SPEED = 1.5 -- as specified by the rules
 local GRACE_PERIOD = 2 -- as specified by rules
-local SPEED_TOLERANCE = Parameters.add("stopspeed", "SPEED_TOLERANCE", 0.02)
+local SPEED_TOLERANCE = 0.02
 
 StopSpeed.possibleRefStates = {
     Stop = true
@@ -45,7 +44,7 @@ function StopSpeed.occuring()
 
     for _, robot in ipairs(World.Robots) do
         local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE() and not fastRobotsInThisStop[robot] then
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and not fastRobotsInThisStop[robot] then
             StopSpeed.message = teamStr.." bot "..robot.id.." was too fast during stop"
             StopSpeed.event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
             fastRobotsInThisStop[robot] = true
