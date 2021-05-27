@@ -1,5 +1,5 @@
 # ***************************************************************************
-# *   Copyright 2015 Michael Eischer                                        *
+# *   Copyright 2021 Paul Bergmann                                          *
 # *   Robotics Erlangen e.V.                                                *
 # *   http://www.robotics-erlangen.de/                                      *
 # *   info@robotics-erlangen.de                                             *
@@ -18,23 +18,28 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-# firmware
-add_subdirectory(framework/src/firmware)
 
-# libs
-add_subdirectory(config)
-add_subdirectory(framework/src/core)
-add_subdirectory(framework/src/protobuf)
-add_subdirectory(framework/src/amun/processor)
-add_subdirectory(framework/src/amun/strategy)
-add_subdirectory(framework/src/amun/gamecontroller)
-add_subdirectory(framework/src/amun/seshat)
-add_subdirectory(framework/src/visionlog)
-add_subdirectory(backend)
+add_executable(autoref-cli WIN32 MACOSX_BUNDLE
+    autorefcli.cpp
+    ../framework/src/amuncli/testtools/include/testtools/testtools.h
+    ../framework/src/amuncli/testtools/testtools.cpp
+)
 
-# apps
-add_subdirectory(framework/src/ra/guihelper)
-add_subdirectory(framework/src/ra/plotter)
-add_subdirectory(framework/src/ra/widgets)
-add_subdirectory(gui)
-add_subdirectory(cli)
+target_include_directories(autoref-cli
+    PRIVATE ../framework/src/amuncli/testtools/include/testtools
+)
+
+target_link_libraries(autoref-cli
+    PRIVATE autoref::backend
+    PRIVATE amun::seshat
+    PRIVATE shared::core
+    PRIVATE Qt5::Core
+)
+
+target_compile_definitions(autoref-cli
+    PRIVATE -DAUTOREF_DIR=\"${CMAKE_SOURCE_DIR}\"
+)
+
+if (TARGET lib::jemalloc)
+    target_link_libraries(autoref-cli PRIVATE lib::jemalloc)
+endif()

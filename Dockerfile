@@ -20,7 +20,7 @@ RUN set -xe; \
 	mkdir build; \
 	cd build; \
 	cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..; \
-	make autoref -j $(nproc)
+	make autoref autoref-cli -j $(nproc)
 
 ##
 ## Run stage
