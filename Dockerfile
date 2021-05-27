@@ -43,7 +43,6 @@ COPY --chown=default:default --from=build-stage /home/default/COPYING COPYING
 COPY --chown=default:default --from=build-stage /home/default/LICENSE LICENSE
 COPY --chown=default:default --from=build-stage /home/default/src/framework/strategy/lua src/framework/strategy/lua/
 COPY --chown=default:default --from=build-stage /home/default/autoref autoref/
-COPY --chown=default:default --from=build-stage /home/default/base base/
 COPY --chown=default:default --from=build-stage /home/default/build/bin build/bin/
 # COPY --chown just changes permissions on the inner folder. We need to aquire
 # the outer one as well
