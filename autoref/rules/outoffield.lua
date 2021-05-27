@@ -24,7 +24,7 @@ local Referee = require "base/referee"
 local debug = require "base/debug"
 local vis = require "base/vis"
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 local OUT_OF_FIELD_MIN_TIME = 0.25
 

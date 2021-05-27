@@ -23,7 +23,7 @@ local DoubleTouch = {}
 local Referee = require "base/referee"
 local debug = require "base/debug"
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 local CONSIDER_FREE_KICK_EXECUTED_THRESHOLD = 0.07
 

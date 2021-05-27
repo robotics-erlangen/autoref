@@ -22,7 +22,7 @@ local AttackerDefAreaDist = {}
 
 local Field = require "base/field"
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 AttackerDefAreaDist.possibleRefStates = {
     Stop = true,

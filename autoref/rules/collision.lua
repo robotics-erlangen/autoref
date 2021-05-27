@@ -21,7 +21,7 @@
 local Collision = {}
 
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 local COLLISION_SPEED = 1.5
 local COLLISION_SPEED_DIFF = 0.3

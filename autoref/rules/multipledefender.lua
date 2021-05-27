@@ -23,7 +23,7 @@ local MultipleDefender = {}
 local Field = require "base/field"
 local Referee = require "base/referee"
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 MultipleDefender.possibleRefStates = {
     Game = true

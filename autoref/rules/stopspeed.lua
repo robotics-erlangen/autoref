@@ -21,7 +21,7 @@
 local StopSpeed = {}
 
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 local STOP_SPEED = 1.5 -- as specified by the rules
 local GRACE_PERIOD = 2 -- as specified by rules

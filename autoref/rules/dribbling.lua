@@ -22,7 +22,7 @@ local Dribbling = {}
 
 local Referee = require "base/referee"
 local World = require "base/world"
-local Event = require "rules/gameevent2019"
+local Event = require "gameevents"
 
 local MAX_DRIBBLING_DIST = 1 -- as specified by the rules
 
