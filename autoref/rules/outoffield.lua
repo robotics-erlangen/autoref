@@ -110,6 +110,10 @@ function OutOfField.occuring()
         waitingForDecision = false
 
         if rawOutOfFieldCounter < 5 then
+            -- although the ball might currently not be inside the field, this variable needs to be reset
+            -- if there were less than 5 raw frames, but the ball is not actually outside of the field,
+            -- this grants another chance to recognize it
+            wasInFieldBefore = true
             return false
         end
 
