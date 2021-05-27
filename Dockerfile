@@ -32,7 +32,8 @@ RUN set -xe; \
 	apt-get update; \
 	apt-get install --no-install-recommends -y \
 		qtbase5-dev libqt5opengl5-dev libprotobuf-dev \
-		x11vnc xvfb; \
+		x11vnc xvfb \
+		tini ; \
 	apt-get clean -y; \
 	rm -rf /var/lib/apt/lists/*;
 
@@ -57,4 +58,4 @@ USER default
 # Ports used by SSL protocols are documented here
 # https://ssl.robocup.org/league-software/
 EXPOSE 5900
-ENTRYPOINT ["/docker-entry.bash"]
+ENTRYPOINT ["tini", "--", "/docker-entry.bash"]
