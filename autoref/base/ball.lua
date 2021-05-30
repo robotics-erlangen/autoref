@@ -62,6 +62,7 @@ function Ball:init()
 	self.hasRawData = false
 	self._hadRawData = false -- used for detecting old simulator logs with no recoded ball raw data
 	self.rawPositions = {}
+	self.possibleNextPositions = {}
 end
 
 function Ball:__tostring()
@@ -96,10 +97,36 @@ function Ball:_update(data, time)
 	local nextSpeed = Coordinates.toLocal(Vector.createReadOnly(data.v_x, data.v_y))
 	local SIZE_LIMIT = 1000
 	if nextPos:isNan() or nextSpeed:isNan() or math.abs(nextPos.x) > SIZE_LIMIT or
-		math.abs(nextPos.y) > SIZE_LIMIT or math.abs(nextSpeed.x) > SIZE_LIMIT or math.abs(nextSpeed.y) > SIZE_LIMIT then
+			math.abs(nextPos.y) > SIZE_LIMIT or math.abs(nextSpeed.x) > SIZE_LIMIT or math.abs(nextSpeed.y) > SIZE_LIMIT then
 		self:_updateLostBall(time)
 		return
 	end
+
+	-- check for plausibility and delay accepting a position that has moved to far
+	local MAX_PLAUSIBLE_MOVE_DIST = 1
+	local MIN_MOVED_DETECTIONS = 3
+	if nextPos:distanceTo(self.pos) > MAX_PLAUSIBLE_MOVE_DIST then
+		local foundSimilarPos = false
+		for pos, count in pairs(self.possibleNextPositions) do
+			if pos:distanceTo(nextPos) <= MAX_PLAUSIBLE_MOVE_DIST then
+				local nextCount = count + #data.raw
+				self.possibleNextPositions[pos] = nextCount
+				if nextCount >= MIN_MOVED_DETECTIONS then
+					foundSimilarPos = true
+					break
+				else
+					self:_updateLostBall(time)
+					return
+				end
+			end
+		end
+		if not foundSimilarPos then
+			self.possibleNextPositions[nextPos] = #data.raw
+			self:_updateLostBall(time)
+			return
+		end
+	end
+	self.possibleNextPositions = {}
 
 	-- data from amun is in global coordiantes
 	local lastSpeedLength = self.speed:length()
