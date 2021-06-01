@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "$1" == "vnc" ]]; then
+	shift 1
 	echo "Launch in VNC mode"
 
 	if [[ -z "${VNC_PASSWORD}" ]]; then
