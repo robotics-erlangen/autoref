@@ -39,10 +39,7 @@ compile-framework:
   artifacts:
     paths:
       - src/framework/build/bin/
-      - src/framework/build/run_replay_tests.py
     expire_in: 1 day
-  only:
-    - schedules
   image: ubuntu-18.04-no-v8
 
 run_replay_tests:
@@ -62,8 +59,6 @@ run_replay_tests:
     key: "replay-tests"
     paths:
     - autoref-tests
-  only:
-    - schedules
   image: ubuntu-18.04-no-v8
 
 .test: &test_template
