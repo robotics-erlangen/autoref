@@ -5,8 +5,8 @@ import os
 import subprocess
 import re
 
-if len(sys.argv) != 3:
-	print("Usage: python3 run_autoref_tests.py <tests directory> <autoref location>")
+if len(sys.argv) != 4:
+	print("Usage: python3 run_autoref_tests.py <tests directory> <autoref location> <replaycli binary>")
 	exit(1)
 
 def createLuaScript(jsonFile):
@@ -38,7 +38,7 @@ for (dirPath, dirNames, fileNames) in os.walk(sys.argv[1]):
 			fullName = os.path.join(dirPath, file)
 			fullJSONName = os.path.join(dirPath, jsonFileName)
 			createLuaScript(fullJSONName)
-			result = subprocess.run(["./bin/replay-cli", "-t", "init.lua", fullName, sys.argv[2]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			result = subprocess.run([sys.argv[3], "-t", "init.lua", fullName, sys.argv[2]], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			if result.returncode != 0:
 				print(str(result.stdout, "utf8"))
 				print(str(result.stderr, "utf8"))
