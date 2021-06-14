@@ -48,12 +48,20 @@ compile-framework:
 run_replay_tests:
   script:
     - "echo running replay tests"
-    - "cd src/framework/build"
-    - "git lfs clone https://github.com/robotics-erlangen/autoreftests.git"
-    - "python3 run_replay_tests.py autoreftests ../../../autoref/init.lua"
+    # this will just do nothing if the repository is already cloned
+    - "git lfs clone https://gitlab.com/robocup-small-size/autoref-tests.git"
+    - "cd autoref-tests"
+    - "git pull"
+    - "cd .."
+    - "cd cmake"
+    - "python3 run_autoref_tests.py ../autoref-tests ../autoref/init.lua ../src/framework/build/bin/replay-cli"
   stage: test
   dependencies:
     - compile-framework
+  cache:
+    key: "replay-tests"
+    paths:
+    - autoref-tests
   only:
     - schedules
   image: ubuntu-18.04-no-v8
