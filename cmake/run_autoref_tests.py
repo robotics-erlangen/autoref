@@ -9,6 +9,11 @@ if len(sys.argv) != 4:
 	print("Usage: python3 run_autoref_tests.py <tests directory> <autoref location> <replaycli binary>")
 	exit(1)
 
+ignoreTestsFile = []
+with open("excluded-tests", "r") as f:
+	for line in f.readlines():
+		ignoreTestsFile.append(line.replace(" \n", "").replace("\n", ""))
+
 def createLuaScript(jsonFile):
 	def nameReplace(match):
 		name = match[0].replace(" ", "").replace("\t", "").replace(":", "")
@@ -26,10 +31,16 @@ def createLuaScript(jsonFile):
 
 exitCode = 0
 numFailingTests = 0
+numIgnoredTests = 0
 for (dirPath, dirNames, fileNames) in os.walk(sys.argv[1]):
 	containsStrategy = False
 	for file in fileNames:
 		if file.endswith(".log"):
+			partialFileName = dirPath + "/" + file
+			if partialFileName.replace(sys.argv[1] + "/", "") in ignoreTestsFile:
+				print("Ignoring test case " + file)
+				numIgnoredTests += 1
+				continue
 			jsonFileName = file.replace(".log", ".json")
 			if not jsonFileName in fileNames:
 				print("No matching .json file found for log file " + file)
@@ -46,7 +57,10 @@ for (dirPath, dirNames, fileNames) in os.walk(sys.argv[1]):
 				numFailingTests += 1
 os.remove("init.lua")
 if numFailingTests == 0:
-	print("All tests successfull!")
+	if numIgnoredTests > 0:
+		print("All tests successfull (" + str(numIgnoredTests) + " cases ignored)!")
+	else:
+		print("All tests successfull!")
 else:
 	print(str(numFailingTests) + " testcase(s) failed!")
 	exit(1)
