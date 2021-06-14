@@ -45,8 +45,7 @@ compile-framework:
 run_replay_tests:
   script:
     - "echo running replay tests"
-    # this will just do nothing if the repository is already cloned
-    - "git lfs clone https://gitlab.com/robocup-small-size/autoref-tests.git"
+    - "[[ ! -d autoref-tests ]] && git lfs clone https://gitlab.com/robocup-small-size/autoref-tests.git"
     - "cd autoref-tests"
     - "git pull"
     - "cd .."
@@ -58,7 +57,7 @@ run_replay_tests:
   cache:
     key: "replay-tests"
     paths:
-    - autoref-tests
+    - autoref-tests/
   image: ubuntu-18.04-no-v8
 
 .test: &test_template
