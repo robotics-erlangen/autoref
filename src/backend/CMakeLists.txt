@@ -23,6 +23,8 @@ add_library(backend
     ../framework/src/amun/include/amun/amunclient.h
 
     amun.cpp
+    visiontrackedpublisher.h
+    visiontrackedpublisher.cpp
     ../framework/src/amun/amunclient.cpp
     ../framework/src/amun/networkinterfacewatcher.cpp
     ../framework/src/amun/networkinterfacewatcher.h
@@ -30,6 +32,8 @@ add_library(backend
     ../framework/src/amun/receiver.h
     ../framework/src/amun/optionsmanager.h
     ../framework/src/amun/optionsmanager.cpp
+    ../framework/src/amun/gamecontroller/sslvisiontracked.h
+    ../framework/src/amun/gamecontroller/sslvisiontracked.cpp
 )
 target_link_libraries(backend
     PRIVATE shared::core

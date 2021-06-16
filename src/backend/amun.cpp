@@ -26,6 +26,7 @@
 #include "processor/processor.h"
 #include "strategy/strategy.h"
 #include "networkinterfacewatcher.h"
+#include "visiontrackedpublisher.h"
 #include <QMetaType>
 #include <QThread>
 
@@ -85,7 +86,7 @@ Amun::~Amun()
 void Amun::start()
 {
     // create processor
-    Q_ASSERT(m_processor == NULL);
+    Q_ASSERT(m_processor == nullptr);
     m_processor = new Processor(m_timer, false);
     m_processor->moveToThread(m_processorThread);
     connect(m_processorThread, SIGNAL(finished()), m_processor, SLOT(deleteLater()));
@@ -141,6 +142,12 @@ void Amun::start()
             m_processor, SLOT(handleVisionPacket(QByteArray, qint64, QString)));
     connect(m_vision, &Receiver::sendStatus, this, &Amun::handleStatus);
 
+    m_visionPublisher = new VisionTrackedPublisher();
+    m_visionPublisher->moveToThread(m_networkThread);
+    connect(m_networkThread, SIGNAL(finished()), m_visionPublisher, SLOT(deleteLater()));
+    connect(m_processor, &Processor::setFlipped, m_visionPublisher, &VisionTrackedPublisher::setFlip);
+    connect(this, &Amun::sendStatus, m_visionPublisher, &VisionTrackedPublisher::handleStatus);
+
     // start threads
     m_processorThread->start();
     m_networkThread->start();
@@ -167,11 +174,12 @@ void Amun::stop()
     delete m_optionsManager;
 
     // worker objects are destroyed on thread shutdown
-    m_vision = NULL;
-    m_referee = NULL;
-    m_autoref = NULL;
-    m_processor = NULL;
+    m_vision = nullptr;
+    m_referee = nullptr;
+    m_autoref = nullptr;
+    m_processor = nullptr;
     m_optionsManager = nullptr;
+    m_visionPublisher = nullptr;
 }
 
 void Amun::handleRefereePacket(QByteArray, qint64, QString host)
@@ -181,7 +189,7 @@ void Amun::handleRefereePacket(QByteArray, qint64, QString host)
 
 void Amun::setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port)
 {
-    Q_ASSERT(receiver == NULL);
+    Q_ASSERT(receiver == nullptr);
     receiver = new Receiver(address, port, m_timer);
     receiver->moveToThread(m_networkThread);
     connect(m_networkThread, SIGNAL(finished()), receiver, SLOT(deleteLater()));

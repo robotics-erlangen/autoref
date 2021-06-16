@@ -34,6 +34,7 @@ class Strategy;
 class Timer;
 class QHostAddress;
 class OptionsManager;
+class VisionTrackedPublisher;
 
 class Amun : public QObject
 {
@@ -80,6 +81,8 @@ private:
     Timer *m_timer = nullptr;
 
     NetworkInterfaceWatcher *m_networkInterfaceWatcher = nullptr;
+
+    VisionTrackedPublisher *m_visionPublisher = nullptr;
 
     std::shared_ptr<GameControllerConnection> m_gameControllerConnection;
 };
