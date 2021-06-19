@@ -42,7 +42,7 @@ end
 
 -- returns the smoothed and filtered ball speed
 local lastSpeed = World.Ball.speed:length()
-local FILTER_FACTOR = 0.15
+local FILTER_FACTOR = 0.7
 local MAX_REALISTIC_SPEED = 10
 local wasInvisible = false
 local function smoothBallSpeed()
