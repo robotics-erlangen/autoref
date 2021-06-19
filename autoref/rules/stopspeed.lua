@@ -25,7 +25,7 @@ local Event = require "gameevents"
 
 local STOP_SPEED = 1.5 -- as specified by the rules
 local GRACE_PERIOD = 2 -- as specified by rules
-local SPEED_TOLERANCE = 0.02
+local SPEED_TOLERANCE = 0.1
 
 StopSpeed.possibleRefStates = {
     Stop = true
