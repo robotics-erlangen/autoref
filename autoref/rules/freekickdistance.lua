@@ -44,9 +44,19 @@ function FreekickDistance.occuring()
         KickoffYellow = "Blue"
     }
     local defense = defenseTeamMap[World.RefereeState]
+	if World.Ball.speed:length() > 1 then
+		return
+	end
     for _, robot in ipairs(World[defense.."Robots"]) do
         local d = robot.pos:distanceTo(stopBallPos)-robot.shootRadius
-        if d < STOP_BALL_DISTANCE and World.Ball.speed:length() < 1 then
+		local isCurrentlyTooClose = false
+		if World.Ball:isPositionValid() then
+			-- the ball could have been moved by a few centimeters from the initial position
+			local extraDistance = 0.1
+			local dist = robot.pos:distanceTo(World.Ball.pos)
+			isCurrentlyTooClose = dist < STOP_BALL_DISTANCE - extraDistance
+		end
+        if isCurrentlyTooClose or d < STOP_BALL_DISTANCE then
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
             FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
             FreekickDistance.event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
