@@ -54,7 +54,6 @@ function Ball:init()
 	self.speedZ = 0
 	self.deceleration = 0
 	self.maxSpeed = 0
-	self.initSpeedZ = 0
 	self.touchdownPos = nil
 	self.isBouncing = false
 	self.framesDecelerating = math.huge
@@ -143,6 +142,22 @@ function Ball:_update(data, time)
 	self:_updateTrackedState(lastSpeedLength)
 
 	self:_updateRawDetections(data.raw)
+end
+
+function Ball:_updateFromTrueState(data, time)
+	self.hasRawData = true
+
+	-- data from amun is in global coordiantes
+	local lastSpeedLength = self.speed:length()
+	self._isVisible = true
+	self.pos = Coordinates.toLocal(Vector.createReadOnly(data.p_x, data.p_y))
+	self.speed = Coordinates.toLocal(Vector.createReadOnly(data.v_x, data.v_y))
+	self.posZ = data.p_z
+	self.speedZ = data.v_z
+	-- TODO: bouncing is not present in true data
+	self.isBouncing = false
+
+	self:_updateTrackedState(lastSpeedLength)
 end
 
 function Ball:_updateRawDetections(rawData)

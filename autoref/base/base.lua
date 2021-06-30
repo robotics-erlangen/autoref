@@ -51,6 +51,7 @@ require "base/plot"
 require "base/robot"
 require "base/vis"
 require "base/world"
+require "validation-rules/trueworld"
 debugger._loadBaseDebug()
 
 -- prevent access to internal APIs

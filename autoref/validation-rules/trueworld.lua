@@ -1,11 +1,8 @@
---[[
---- Provides informations about game state
-module "World"
-]]--
+-- this is a copy of the base world, just with minor modifications to use the true world state from the simulator
 
 --[[***********************************************************************
 *   Copyright 2015 Alexander Danzer, Michael Eischer, Christian Lobmeier, *
-*       Philipp Nordhus                                                   *
+*       Philipp Nordhus, Andreas Wendler                                  *
 *   Robotics Erlangen e.V.                                                *
 *   http://www.robotics-erlangen.de/                                      *
 *   info@robotics-erlangen.de                                             *
@@ -28,6 +25,7 @@ local amun = amun
 local Ball = require "base/ball"
 local Constants = require "base/constants"
 local Robot = require "base/robot"
+local vis = require "base/vis"
 
 --- Ball and team informations.
 -- @class table
@@ -79,7 +77,6 @@ World.TeamIsBlue = false
 World.IsSimulated = false
 World.IsLargeField = false
 World.SelectedOptions = nil
-World.HasTrueState = false
 
 World.RULEVERSION = nil
 
@@ -211,14 +208,18 @@ function World._updateWorld(state)
 		Constants.switchSimulatorConstants(World.IsSimulated)
 	end
 
-	World.HasTrueState = #state.reality > 0
+    if #state.reality == 0 then
+        return false
+    end
+    local reality = state.reality[#state.reality]
 
 	-- update ball if available
-	if state.ball then
-		World.Ball:_update(state.ball, World.Time)
+	if reality.ball then
+		World.Ball:_updateFromTrueState(reality.ball, World.Time)
 	end
+	vis.addCircle("autoref ballpos", World.Ball.pos, 0.1, vis.colors.red)
 
-	local dataFriendly = World.TeamIsBlue and state.blue or state.yellow
+	local dataFriendly = World.TeamIsBlue and reality.blue_robots or reality.yellow_robots
 	if dataFriendly then
 		-- sort data by robot id
 		local dataById = {}
@@ -230,7 +231,7 @@ function World._updateWorld(state)
 		World.YellowRobots = {}
 		World.YellowInvisibleRobots = {}
 		for _, robot in pairs(World.YellowRobotsById) do
-			robot:_update(dataById[robot.id], World.Time)
+			robot:_updateFromTrueState(dataById[robot.id], World.Time)
 			-- sort robot into visible / not visible
 			if robot.isVisible then
 				table.insert(World.YellowRobots, robot)
@@ -240,7 +241,7 @@ function World._updateWorld(state)
 		end
 	end
 
-	local dataOpponent = World.TeamIsBlue and state.yellow or state.blue
+	local dataOpponent = World.TeamIsBlue and reality.yellow_robots or reality.blue_robots
 	if dataOpponent then
 		-- only keep robots that are still existent
 		local opponentRobotsById = World.BlueRobotsById
@@ -254,7 +255,7 @@ function World._updateWorld(state)
 			if not robot then
 				robot = Robot(rdata.id, false)
 			end
-			robot:_update(rdata, World.Time)
+			robot:_updateFromTrueState(rdata, World.Time)
 			table.insert(World.BlueRobots, robot)
 			World.BlueRobotsById[rdata.id] = robot
 		end
@@ -268,7 +269,7 @@ function World._updateWorld(state)
 	table.append(World.Robots, World.BlueRobots)
 
 	-- no vision data only if the parameter is false
-	return state.has_vision_data ~= false
+	return true
 end
 
 -- Get rule version from geometry

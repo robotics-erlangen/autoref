@@ -72,6 +72,9 @@ function Robot:init(id, isYellow)
 	self.dir = nil
 	self.speed = nil
 	self.angularSpeed = nil
+
+	-- only for robots constructed from simulator truth
+	self.isTouchingBall = false
 end
 
 function Robot:__tostring()
@@ -104,6 +107,26 @@ function Robot:_update(state, time)
 	self.dir = Coordinates.toLocal(state.phi)
 	self.speed = Coordinates.toLocal(Vector.createReadOnly(state.v_x, state.v_y))
 	self.angularSpeed = state.omega -- do not invert!
+end
+
+function Robot:_updateFromTrueState(state, time)
+
+	-- check if robot is tracked
+	if not state then
+		if self.isVisible ~= false then
+			self.isVisible = false
+			self.lostSince = time
+		end
+		return
+	end
+
+	-- TODO: phi and angularSpeed are not set
+
+	self._toStringCache = ""
+	self.isVisible = true
+	self.pos = Coordinates.toLocal(Vector.createReadOnly(state.p_x, state.p_y))
+	self.speed = Coordinates.toLocal(Vector.createReadOnly(state.v_x, state.v_y))
+	self.isTouchingBall = state.touches_ball and true or false
 end
 
 --- Check whether the robot has the given ball.

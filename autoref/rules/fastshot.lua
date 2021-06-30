@@ -96,7 +96,6 @@ function FastShot.occuring()
             lastSpeeds = {}
             local lastTouchingRobot, shootPosition = Referee.robotAndPosOfLastBallTouch()
             if lastTouchingRobot then
-                log("Last robot: "..tostring(lastTouchingRobot.id))
                 local color = lastTouchingRobot.isYellow and World.YellowColorStr or World.BlueColorStr
                 FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastTouchingRobot.id ..
                     "<br>Speed: " .. math.round(maxSpeed, 2) .. "m/s"
