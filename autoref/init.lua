@@ -31,6 +31,7 @@ local World = require "base/world"
 local plot = require "base/plot"
 
 local GameController = require "gamecontroller"
+local EventValidator = require "eventvalidator"
 
 local descriptionToFileNames = {
     ["Robot collisions"] = "collision",
@@ -78,8 +79,12 @@ local function runEvent(foul)
 		if foul.ignore then
 			debug.set("ignore") -- just for the empty if branche
 		else
-			table.insert(eventsToSend, foul.event)
-			GameController.sendEvent(foul.event)
+			if World.RefereeState ~= "Halt" then
+				table.insert(eventsToSend, foul.event)
+				EventValidator.dispatchEvent(foul.event)
+			else
+				log("Error: issued event during Halt")
+			end
 		end
 		if foul.reset then
 			foul.reset()
@@ -108,6 +113,10 @@ end
 
 local function main()
     GameController.update()
+
+    if World.HasTrueState then
+        EventValidator.update()
+    end
 
     if World.BallPlacementPos then
         vis.addPath("ball placement", {World.Ball.pos, World.BallPlacementPos}, vis.colors.redHalf, true, nil, 0.5)
