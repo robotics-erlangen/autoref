@@ -31,11 +31,11 @@ local EventValidator = {}
 
 -- NOTE: if you add an event here, also add all the supported event types in the list below
 local fouls = {
-	DoubleTouch
+	-- DoubleTouch,
 }
 
 local SUPPORTED_EVENTS = {
-	"ATTACKER_DOUBLE_TOUCHED_BALL"
+	-- "ATTACKER_DOUBLE_TOUCHED_BALL",
 }
 
 local foulTimes = {}

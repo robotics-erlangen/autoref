@@ -35,14 +35,15 @@ local firstTouchPos = nil
 function DoubleTouch.occuring()
 	for _, robot in pairs(World.Robots) do
 		if robot.isTouchingBall then
-			if lastTouchRobot == nil then
+			if lastTouchRobot == nil and World.RefereeState ~= "Game" and World.RefereeState ~= "GameForce" then
 				lastTouchRobot = robot
 				firstTouchPos = World.Ball.pos
 			elseif lastTouchRobot ~= robot then
 				lastTouchRobot = nil
 				firstTouchPos = nil
 			else
-				if firstTouchPos:distanceTo(World.Ball.pos) > 0.05 then
+				-- TODO: the last touch reporting does not seem to be perfect just yet
+				if firstTouchPos and firstTouchPos:distanceTo(World.Ball.pos) > 0.05 then
 					local offenseTeam = robot.isYellow and "Yellow" or "Blue"
 					DoubleTouch.message = "(truth) Double touch by " .. offenseTeam .. " " .. robot.id
                 	DoubleTouch.event = Event.doubleTouch(robot.isYellow, robot.id, firstTouchPos)
