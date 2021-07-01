@@ -21,21 +21,27 @@
 local debug = require "base/debug"
 local TrackedWorld = require "base/world"
 local TrueWorld = require "validation-rules/trueworld"
+local LastTouch = require "validation-rules/lasttouch"
 
 local GameController = require "gamecontroller"
 
 -- rules
 local DoubleTouch = require "validation-rules/doubletouch"
+local OutOfField = require "validation-rules/outoffield"
 
 local EventValidator = {}
 
 -- NOTE: if you add an event here, also add all the supported event types in the list below
 local fouls = {
 	-- DoubleTouch,
+	OutOfField
 }
 
 local SUPPORTED_EVENTS = {
 	-- "ATTACKER_DOUBLE_TOUCHED_BALL",
+	"BALL_LEFT_FIELD_GOAL_LINE",
+	"BALL_LEFT_FIELD_TOUCH_LINE",
+	"AIMLESS_KICK"
 }
 
 local foulTimes = {}
@@ -121,6 +127,7 @@ end
 
 function EventValidator.update()
     TrueWorld.update()
+	LastTouch.update()
 	lastUpdateTime = TrueWorld.Time
 
 	for _, foul in ipairs(fouls) do
