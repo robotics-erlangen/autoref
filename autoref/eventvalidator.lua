@@ -28,20 +28,23 @@ local GameController = require "gamecontroller"
 -- rules
 local DoubleTouch = require "validation-rules/doubletouch"
 local OutOfField = require "validation-rules/outoffield"
+local FastShot = require "validation-rules/fastshot"
 
 local EventValidator = {}
 
 -- NOTE: if you add an event here, also add all the supported event types in the list below
 local fouls = {
 	-- DoubleTouch,
-	OutOfField
+	OutOfField,
+	FastShot
 }
 
 local SUPPORTED_EVENTS = {
 	-- "ATTACKER_DOUBLE_TOUCHED_BALL",
 	"BALL_LEFT_FIELD_GOAL_LINE",
 	"BALL_LEFT_FIELD_TOUCH_LINE",
-	"AIMLESS_KICK"
+	"AIMLESS_KICK",
+	"BOT_KICKED_BALL_TOO_FAST"
 }
 
 local foulTimes = {}
