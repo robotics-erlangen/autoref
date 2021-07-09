@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local FreekickDistance = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local FreekickDistance = Class("Rules.FreekickDistance", Rule)
 
 local World = require "base/world"
 local Event = require "gameevents"
@@ -31,8 +33,11 @@ FreekickDistance.possibleRefStates = {
     Kickoff = true
 }
 
-local stopBallPos
-function FreekickDistance.occuring()
+function FreekickDistance:init()
+	self.stopBallPos = nil
+end
+
+function FreekickDistance:occuring()
     local defenseTeamMap = {
         DirectBlue = "Yellow",
         DirectYellow = "Blue",
@@ -48,7 +53,7 @@ function FreekickDistance.occuring()
 		return
 	end
     for _, robot in ipairs(World[defense.."Robots"]) do
-        local d = robot.pos:distanceTo(stopBallPos)-robot.shootRadius
+        local d = robot.pos:distanceTo(self.stopBallPos)-robot.shootRadius
 		local isCurrentlyTooClose = false
 		if World.Ball:isPositionValid() then
 			-- the ball could have been moved by a few centimeters from the initial position
@@ -58,15 +63,15 @@ function FreekickDistance.occuring()
 		end
         if isCurrentlyTooClose or d < STOP_BALL_DISTANCE then
             local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            FreekickDistance.message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
-            FreekickDistance.event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
-            return true
+            local message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
+            local event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
+            return event, message
         end
     end
 end
 
-function FreekickDistance.reset()
-    stopBallPos = World.Ball.pos
+function FreekickDistance:reset()
+    self.stopBallPos = World.Ball.pos
 end
 
 return FreekickDistance

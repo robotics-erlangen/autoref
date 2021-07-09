@@ -34,9 +34,9 @@ local EventValidator = {}
 
 -- NOTE: if you add an event here, also add all the supported event types in the list below
 local fouls = {
-	-- DoubleTouch,
-	OutOfField,
-	FastShot
+	-- DoubleTouch(),
+	OutOfField(),
+	FastShot()
 }
 
 local SUPPORTED_EVENTS = {
@@ -55,22 +55,20 @@ local function runEvent(foul)
 	-- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
 	local simpleRefState = TrueWorld.RefereeState:match("%u%l+")
 	if foul.possibleRefStates[simpleRefState] and
-			(foul.shouldAlwaysExecute or not foulTimes[foul] or TrueWorld.Time - foulTimes[foul] > FOUL_TIMEOUT) and
-			foul.occuring() then
-		foulTimes[foul] = TrueWorld.Time
-		if foul.message then
-			log(foul.message)
-		end
+			(foul.shouldAlwaysExecute or not foulTimes[foul] or TrueWorld.Time - foulTimes[foul] > FOUL_TIMEOUT) then
+		local event, message = foul:occuring()
+		if event then
+			foulTimes[foul] = TrueWorld.Time
+			if message then
+				log(message)
+			end
 
-		EventValidator.dispatchValidationEvent(foul.event)
+			EventValidator.dispatchValidationEvent(event)
 
-		if foul.reset then
-			foul.reset()
+			foul:reset()
 		end
 	elseif not foul.possibleRefStates[simpleRefState] then
-		if foul.reset then
-			foul.reset()
-		end
+		foul:reset()
 	end
 end
 

@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local StopSpeed = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local StopSpeed = Class("Rules.StopSpeed", Rule)
 
 local World = require "base/world"
 local Event = require "gameevents"
@@ -30,33 +32,33 @@ local SPEED_TOLERANCE = 0.1
 StopSpeed.possibleRefStates = {
     Stop = true
 }
-
--- dont stop calling the occuring function once the event triggered
 StopSpeed.shouldAlwaysExecute = true
 StopSpeed.runOnInvisibleBall = true
 
-local enterStopTime = World.Time
-local fastRobotsInThisStop = {}
-function StopSpeed.occuring()
-    if World.Time - enterStopTime < GRACE_PERIOD then
-        return false
+function StopSpeed:init()
+	self.enterStopTime = World.Time
+	self.fastRobotsInThisStop = {}
+end
+
+function StopSpeed:occuring()
+    if World.Time - self.enterStopTime < GRACE_PERIOD then
+        return
     end
 
     for _, robot in ipairs(World.Robots) do
         local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and not fastRobotsInThisStop[robot] then
-            StopSpeed.message = teamStr.." bot "..robot.id.." was too fast during stop"
-            StopSpeed.event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
-            fastRobotsInThisStop[robot] = true
-            return true
+        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and not self.fastRobotsInThisStop[robot] then
+            local message = teamStr.." bot "..robot.id.." was too fast during stop"
+            local event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
+            self.fastRobotsInThisStop[robot] = true
+            return event, message
         end
     end
-    return false
 end
 
-function StopSpeed.reset()
-    fastRobotsInThisStop = {}
-    enterStopTime = World.Time
+function StopSpeed:reset()
+    self.fastRobotsInThisStop = {}
+    self.enterStopTime = World.Time
 end
 
 return StopSpeed

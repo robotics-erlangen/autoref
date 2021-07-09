@@ -21,48 +21,56 @@
 local World = require "base/world"
 local Event = require "gameevents"
 
-local BallPlacementInterference = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local BallPlacementInterference = Class("Rules.BallPlacementInterference", Rule)
 
+
+-- TODO: If multiple robots commit the same foul within 2 seconds, only the first foul counts.
+-- TODO: Each foul has a grace period of 2 seconds per team until it is raised again.
+-- TODO: If a robot keeps committing a foul, it will be punished again after the grace period.
+-- TODO: das gleiche auch noch fuer ein paar andere Regeln
 
 BallPlacementInterference.possibleRefStates = {
     Ball = true
 }
-
 BallPlacementInterference.shouldAlwaysExecute = true
 BallPlacementInterference.resetOnInvisibleBall = true
 
-local inRangeStartTimes = {}
-local robotsInThisStop = {}
-function BallPlacementInterference.occuring()
+function BallPlacementInterference:init()
+	self.inRangeStartTimes = {}
+	self.robotsInThisStop = {}
+end
+
+function BallPlacementInterference:occuring()
     if World.BallPlacementPos then
         local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
         for _, robot in ipairs(World[opponent.."Robots"]) do
             local dist = robot.pos:distanceToLineSegment(World.Ball.pos, World.BallPlacementPos)
             if dist < 0.5 + robot.radius then
-                if not inRangeStartTimes[robot] then
-                    inRangeStartTimes[robot] = World.Time
+                if not self.inRangeStartTimes[robot] then
+                    self.inRangeStartTimes[robot] = World.Time
                 else
-                    local time = World.Time - inRangeStartTimes[robot]
-                    if time > 2 and not robotsInThisStop[robot] then
-                        robotsInThisStop[robot] = true
-                        BallPlacementInterference.message = "Ball placement interference " .. (table.count(robotsInThisStop))
-                        BallPlacementInterference.event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
-                        return true
+                    local time = World.Time - self.inRangeStartTimes[robot]
+                    if time > 2 and not self.robotsInThisStop[robot] then
+                        self.robotsInThisStop[robot] = true
+                        local message = "Ball placement interference " .. (table.count(self.robotsInThisStop))
+                        local event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
+                        return event, message
                     end
                 end
             else
-                inRangeStartTimes[robot] = nil
+                self.inRangeStartTimes[robot] = nil
             end
         end
     end
-    return false
 end
 
-function BallPlacementInterference.reset()
+function BallPlacementInterference:reset()
     local simpleRefState = World.RefereeState:match("%u%l+")
     if simpleRefState ~= "Ball" then
-        inRangeStartTimes = {}
-        robotsInThisStop = {}
+        self.inRangeStartTimes = {}
+        self.robotsInThisStop = {}
     end
 end
 

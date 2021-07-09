@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local MultipleDefender = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local MultipleDefender = Class("Rules.MultipleDefender", Rule)
 
 local Field = require "base/field"
 local Referee = require "base/referee"
@@ -29,29 +31,23 @@ MultipleDefender.possibleRefStates = {
     Game = true
 }
 
-local function checkOccupation(team, occupation)
-    for _, robot in ipairs(World[team.."Robots"]) do
-        local distThreshold = occupation == "partially" and robot.radius or -robot.radius
-        if robot ~= World[team.."Keeper"]
-                and Field["isIn"..team.."DefenseArea"](robot.pos, distThreshold)
-                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
-                and World.Ball.posZ == 0 then
-            MultipleDefender.message = team .. " " .. robot.id ..
-                " touched the ball<br>while being located <b>" ..
-                occupation .. "</b><br>within its own defense area"
-            MultipleDefender.event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil, occupation == "partially")
-            return true
-        end
-    end
-    return false
-end
-
 function MultipleDefender.occuring()
     local defense = "Yellow"
     if World.Ball.pos.y > 0 then -- on blue side of field
         defense = "Blue"
     end
-    return checkOccupation(defense, "entirely") -- or checkOccupation(defense, "partially")
+	for _, robot in ipairs(World[defense.."Robots"]) do
+        local distThreshold = -robot.radius
+        if robot ~= World[defense.."Keeper"]
+                and Field["isIn"..defense.."DefenseArea"](robot.pos, distThreshold)
+                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
+                and World.Ball.posZ == 0 then
+            local message = defense .. " " .. robot.id ..
+                " touched the ball<br>while being located entirely within its own defense area"
+            local event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil)
+            return event, message
+        end
+    end
 end
 
 return MultipleDefender

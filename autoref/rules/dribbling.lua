@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Dribbling = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local Dribbling = Class("Rules.Dribbling", Rule)
 
 local Referee = require "base/referee"
 local World = require "base/world"
@@ -30,8 +32,11 @@ Dribbling.possibleRefStates = {
     Game = true
 }
 
-local dribblingStart
-function Dribbling.occuring()
+function Dribbling:init()
+	self.dribblingStart = nil
+end
+
+function Dribbling:occuring()
     local currentTouchingRobot
     for _, robot in ipairs(World.Robots) do
         if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
@@ -40,19 +45,19 @@ function Dribbling.occuring()
         end
     end
     if currentTouchingRobot then
-        if not dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
-            dribblingStart = currentTouchingRobot.pos:copy()
+        if not self.dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
+            self.dribblingStart = currentTouchingRobot.pos:copy()
         end
-        if currentTouchingRobot.pos:distanceTo(dribblingStart) > MAX_DRIBBLING_DIST then
+        if currentTouchingRobot.pos:distanceTo(self.dribblingStart) > MAX_DRIBBLING_DIST then
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
-            Dribbling.message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
+            local message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
                 .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
             -- TODO: should it be the ball position or the robot position
-            Dribbling.event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, dribblingStart, currentTouchingRobot.pos)
-            return true
+            local event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, self.dribblingStart, currentTouchingRobot.pos)
+            return event, message
         end
     else
-        dribblingStart = nil
+        self.dribblingStart = nil
     end
 end
 

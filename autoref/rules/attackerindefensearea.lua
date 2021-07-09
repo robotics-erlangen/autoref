@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local AttackerInDefenseArea = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local AttackerInDefenseArea = Class("Rules.AttackerInDefenseArea", Rule)
 
 local Field = require "base/field"
 local Referee = require "base/referee"
@@ -29,18 +31,18 @@ AttackerInDefenseArea.possibleRefStates = {
     Game = true
 }
 
-function AttackerInDefenseArea.occuring()
+function AttackerInDefenseArea:occuring()
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
 		if Field["isIn"..defense.."DefenseArea"](World.Ball.pos, World.Ball.radius) then
 			for _, robot in ipairs(World[offense.."Robots"]) do
 				-- attacker touches ball while the ball is in the defense area
 				if World.Ball.posZ == 0 and robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
 					local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-					AttackerInDefenseArea.message = color .. " " .. robot.id ..
+					local message = color .. " " .. robot.id ..
 						" touched the ball in defense area"
 					-- TODO: distance in defense area
-					AttackerInDefenseArea.event = Event.attackerInDefenseArea(robot.isYellow, robot.id, robot.pos)
-					return true
+					local event = Event.attackerInDefenseArea(robot.isYellow, robot.id, robot.pos)
+					return event, message
 				end
 			end
 		end

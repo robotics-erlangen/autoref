@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local AttackerDefAreaDist = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local AttackerDefAreaDist = Class("Rules.AttackerDefAreaDist", Rule)
 
 local Field = require "base/field"
 local World = require "base/world"
@@ -29,42 +31,42 @@ AttackerDefAreaDist.possibleRefStates = {
     Indirect = true,
     Direct = true,
 }
-
-local BUFFER_TIME = 2 -- as given by the rules
-
--- dont stop calling the occuring function once the event triggered
 AttackerDefAreaDist.shouldAlwaysExecute = true
 AttackerDefAreaDist.runOnInvisibleBall = true
 
-local startTime = 0
-local closeRobotsInThisState = {}
-function AttackerDefAreaDist.occuring()
+local BUFFER_TIME = 2 -- as given by the rules
 
-    if World.Time - startTime < BUFFER_TIME then
-        return false
+function AttackerDefAreaDist:init()
+	self:reset()
+end
+
+function AttackerDefAreaDist:occuring()
+
+    if World.Time - self.startTime < BUFFER_TIME then
+        return
     end
 
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
         for _, robot in ipairs(World[offense.."Robots"]) do
-                local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
-                if distance <= 0.2 and not closeRobotsInThisState[robot] then
+			local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
+			if distance <= 0.2 and not self.closeRobotsInThisState[robot] then
 
-                    local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-                    AttackerDefAreaDist.message = "20cm defense area<br>distance violation by<br>"
-                        .. color .. " " .. robot.id
+				local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+				local message = "20cm defense area<br>distance violation by<br>"
+					.. color .. " " .. robot.id
 
-                    AttackerDefAreaDist.event = Event.attackerDefAreaDist(robot.isYellow, robot.id, robot.pos, distance)
+				local event = Event.attackerDefAreaDist(robot.isYellow, robot.id, robot.pos, distance)
 
-                    closeRobotsInThisState[robot] = true
-                    return true
-                end
-            end
+				self.closeRobotsInThisState[robot] = true
+				return event, message
+			end
+		end
     end
 end
 
-function AttackerDefAreaDist.reset()
-    startTime = World.Time
-    closeRobotsInThisState = {}
+function AttackerDefAreaDist:reset()
+    self.startTime = World.Time
+    self.closeRobotsInThisState = {}
 end
 
 return AttackerDefAreaDist

@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local DoubleTouch = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local DoubleTouch = Class("ValidationRules.DoubleTouch", Rule)
 
 local World = require "validation-rules/trueworld"
 local Event = require "gameevents"
@@ -30,33 +32,36 @@ DoubleTouch.possibleRefStates = {
 	Game = true,
 }
 
-local lastTouchRobot = nil
-local firstTouchPos = nil
-function DoubleTouch.occuring()
+function DoubleTouch:init()
+	self.lastTouchRobot = nil
+	self.firstTouchPos = nil
+end
+
+function DoubleTouch:occuring()
 	for _, robot in pairs(World.Robots) do
 		if robot.isTouchingBall then
-			if lastTouchRobot == nil and World.RefereeState ~= "Game" and World.RefereeState ~= "GameForce" then
-				lastTouchRobot = robot
-				firstTouchPos = World.Ball.pos
-			elseif lastTouchRobot ~= robot then
-				lastTouchRobot = nil
-				firstTouchPos = nil
+			if self.lastTouchRobot == nil and World.RefereeState ~= "Game" and World.RefereeState ~= "GameForce" then
+				self.lastTouchRobot = robot
+				self.firstTouchPos = World.Ball.pos
+			elseif self.lastTouchRobot ~= robot then
+				self.lastTouchRobot = nil
+				self.firstTouchPos = nil
 			else
 				-- TODO: the last touch reporting does not seem to be perfect just yet
-				if firstTouchPos and firstTouchPos:distanceTo(World.Ball.pos) > 0.05 then
+				if self.firstTouchPos and self.firstTouchPos:distanceTo(World.Ball.pos) > 0.05 then
 					local offenseTeam = robot.isYellow and "Yellow" or "Blue"
-					DoubleTouch.message = "(truth) Double touch by " .. offenseTeam .. " " .. robot.id
-                	DoubleTouch.event = Event.doubleTouch(robot.isYellow, robot.id, firstTouchPos)
-					return true
+					local message = "(truth) Double touch by " .. offenseTeam .. " " .. robot.id
+                	local event = Event.doubleTouch(robot.isYellow, robot.id, self.firstTouchPos)
+					return event, message
 				end
 			end
 		end
 	end
 end
 
-function DoubleTouch.reset()
-	lastTouchRobot = nil
-	firstTouchPos = nil
+function DoubleTouch:reset()
+	self.lastTouchRobot = nil
+	self.firstTouchPos = nil
 end
 
 return DoubleTouch

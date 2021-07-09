@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local FastShot = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local FastShot = Class("ValidationRules.FastShot", Rule)
 
 local Referee = require "base/referee"
 local LastTouch = require "validation-rules/lasttouch"
@@ -36,16 +38,16 @@ FastShot.possibleRefStates = {
 
 local MAX_SHOOT_SPEED = 6.5
 
-function FastShot.occuring()
+function FastShot:occuring()
 	local lastRobot, lastTouchPos = LastTouch.lastTouchRobotAndPos()
 	if not lastRobot then
 		return false
 	end
 	if World.Ball.speed:length() > MAX_SHOOT_SPEED then
 		local color = lastRobot.isYellow and World.YellowColorStr or World.BlueColorStr
-		FastShot.message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastRobot.id
-		FastShot.event = Event.fastShot(lastRobot.isYellow, lastRobot.id, lastTouchPos, World.Ball.speed:length())
-		return true
+		local message = "(truth) Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastRobot.id
+		local event = Event.fastShot(lastRobot.isYellow, lastRobot.id, lastTouchPos, World.Ball.speed:length())
+		return event, message
 	end
 end
 

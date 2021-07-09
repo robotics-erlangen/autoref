@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local DoubleTouch = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local DoubleTouch = Class("Rules.DoubleTouch", Rule)
 
 local Referee = require "base/referee"
 local debug = require "base/debug"
@@ -34,35 +36,38 @@ DoubleTouch.possibleRefStates = {
     Stop = true,
     Game = true,
     Kickoff = true,
-    Penalty = true,
+    Penalty = true, -- TODO: is penalty still current??
     Direct = true,
     Indirect = true,
     Ball = true
 }
 
-local lastTouchingRobotInFreekick
-local lastBallPosInStop
-function DoubleTouch.occuring()
+function DoubleTouch:init()
+	self.lastTouchingRobotInFreekick = nil
+	self.lastBallPosInStop = nil
+end
+
+function DoubleTouch:occuring()
     local simpleRefState = World.RefereeState:match("%u%l+")
-    if simpleRefState == "Stop" or not lastBallPosInStop then
-        lastBallPosInStop = World.Ball.pos:copy()
+    if simpleRefState == "Stop" or not self.lastBallPosInStop then
+        self.lastBallPosInStop = World.Ball.pos:copy()
     end
 
     if simpleRefState == "Indirect" or simpleRefState == "Direct" or simpleRefState == "Kickoff" then
         local r = Referee.robotAndPosOfLastBallTouch()
         if World.Ball.posZ == 0 and r and r.pos:distanceTo(World.Ball.pos) < Referee.touchDist then
-            lastTouchingRobotInFreekick = r
-            debug.set("last touch in freekick", lastTouchingRobotInFreekick)
+            self.lastTouchingRobotInFreekick = r
+            debug.set("last touch in freekick", self.lastTouchingRobotInFreekick)
 
-            local distToFreekickPos = World.Ball.pos:distanceTo(lastBallPosInStop)
+            local distToFreekickPos = World.Ball.pos:distanceTo(self.lastBallPosInStop)
             if distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
                 local offenseTeam = r.isYellow and "Yellow" or "Blue"
-                DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. r.id
-                DoubleTouch.event = Event.doubleTouch(r.isYellow, r.id, lastBallPosInStop)
-                return true
+                local message = "Double touch by " .. offenseTeam .. " " .. r.id
+                local event = Event.doubleTouch(r.isYellow, r.id, self.lastBallPosInStop)
+                return event, message
             end
         end
-    elseif World.RefereeState == "Game" and lastTouchingRobotInFreekick then
+    elseif World.RefereeState == "Game" and self.lastTouchingRobotInFreekick then
         local touchingRobot
         if World.Ball.posZ == 0 then
             for _, robot in ipairs(World.Robots) do
@@ -72,25 +77,24 @@ function DoubleTouch.occuring()
             end
         end
 
-        local distToFreekickPos = World.Ball.pos:distanceTo(lastBallPosInStop)
-        debug.set("last touch in freekick", lastTouchingRobotInFreekick)
+        local distToFreekickPos = World.Ball.pos:distanceTo(self.lastBallPosInStop)
+        debug.set("last touch in freekick", self.lastTouchingRobotInFreekick)
         debug.set("touching robot", touchingRobot)
         debug.set("distToFreekickPos", distToFreekickPos)
         if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
-            if touchingRobot == lastTouchingRobotInFreekick then
+            if touchingRobot == self.lastTouchingRobotInFreekick then
                 local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
-                DoubleTouch.message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
-                DoubleTouch.event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, lastBallPosInStop)
-                return true
+                local message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
+                local event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, self.lastBallPosInStop)
+                return event, message
             else
-                lastTouchingRobotInFreekick = nil
+                self.lastTouchingRobotInFreekick = nil
             end
         end
     else
-        lastTouchingRobotInFreekick = nil
-        lastBallPosInStop = World.Ball.pos:copy()
+        self.lastTouchingRobotInFreekick = nil
+        self.lastBallPosInStop = World.Ball.pos:copy()
     end
-    return false
 end
 
 return DoubleTouch

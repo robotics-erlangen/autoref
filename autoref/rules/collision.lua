@@ -18,7 +18,9 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Collision = {}
+local Rule = require "rules/rule"
+local Class = require "base/class"
+local Collision = Class("Rules.Collision", Rule)
 
 local World = require "base/world"
 local Event = require "gameevents"
@@ -38,18 +40,19 @@ Collision.possibleRefStates = {
     Ball = true,
     Stop = true,
 }
-
--- dont stop calling the occuring function once the event triggered
 Collision.shouldAlwaysExecute = true
 Collision.runOnInvisibleBall = true
 
-local collidingRobots = {} -- robot -> time
-function Collision.occuring()
+function Collision:init()
+	self.collidingRobots = {} -- robot -> time
+end
+
+function Collision:occuring()
     -- go through old collision times
     local COLLISION_COUNT_TIME = 3
-    for robot, time in pairs(collidingRobots) do
+    for robot, time in pairs(self.collidingRobots) do
         if World.Time - time > COLLISION_COUNT_TIME then
-            collidingRobots[robot] = nil
+            self.collidingRobots[robot] = nil
         end
     end
 
@@ -65,32 +68,29 @@ function Collision.occuring()
                 local collisionPoint = (offRobot.pos + defRobot.pos) / 2
                 if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
                         and projectedSpeed > COLLISION_SPEED and offSpeed > defSpeed
-                        and not collidingRobots[offRobot] and not collidingRobots[defRobot] then
+                        and not self.collidingRobots[offRobot] and not self.collidingRobots[defRobot] then
                     
-                    collidingRobots[offRobot] = World.Time
-                    collidingRobots[defRobot] = World.Time
+					self.collidingRobots[offRobot] = World.Time
+					self.collidingRobots[defRobot] = World.Time
                     if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
                         local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
                         local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
                             offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
-                        Collision.message = message
-                        Collision.event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
-                        return true
+                        local message = message
+                        local event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
+                        return event, message
                     else
                         local message = "Collision by both teams ("..
                             offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")"
-                        Collision.message = message
                         -- TODO: angle is not provided
-                        Collision.event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
+                        local event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
                             collisionPoint, speedDiff)
-                        return true
+                        return event, message
                     end
                 end
             end
         end
     end
-
-    return false
 end
 
 return Collision

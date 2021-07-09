@@ -18,46 +18,26 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local Rule = require "rules/rule"
 local Class = require "base/class"
-local OutOfField = Class("ValidationRules.OutOfField", Rule)
+local Rule = Class("Rules.Rule")
 
-local Referee = require "base/referee"
-local LastTouch = require "validation-rules/lasttouch"
-local World = require "validation-rules/trueworld"
-local Event = require "gameevents"
+-- static properties
+Rule.possibleRefStates = {} -- must contain a list of ref states in which the rule should run
+Rule.shouldAlwaysExecute = false -- execute even directly after the rule was triggered (prevent timeout until next rule trigger)
+Rule.runOnInvisibleBall = false -- if the rule should be executed when the ball is not currently visible
+Rule.resetOnInvisibleBall = false
 
-OutOfField.possibleRefStates = {
-    Game = true,
-}
+-- the init function can have one parameter, the world object used for dependency injection
 
-function OutOfField:occuring()
-	local lastRobot, lastTouchPos = LastTouch.lastTouchRobotAndPos()
-	if not lastRobot then
-		return false
-	end
-	if math.abs(World.Ball.pos.y) > World.Geometry.FieldHeightHalf + World.Ball.radius then
-
-		-- aimless kick check
-		if ((World.Ball.pos.y > 0 and lastRobot.isYellow)
-				or (World.Ball.pos.y < 0 and not lastRobot.isYellow))
-				and lastTouchPos.y * World.Ball.pos.y < 0
-				and not Referee.wasKickoff() then
-
-			local message = "(truth) Aimless kick"
-			local event = Event.aimlessKick(lastRobot.isYellow, lastRobot.id, World.Ball.pos, lastTouchPos)
-			return event, message
-		end
-
-		local message = "(truth) Ball left field goal line"
-		local event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, World.Ball.pos, true)
-		return event, message
-	end
-	if math.abs(World.Ball.pos.x) > World.Geometry.FieldWidthHalf + World.Ball.radius then
-		local message = "(truth) Ball left field touch line"
-		local event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, World.Ball.pos, false)
-		return event, message
-	end
+-- returns a rule violation event if the rule is currently violated and a matching message
+function Rule:occuring()
+	error("stub")
 end
 
-return OutOfField
+function Rule:reset()
+	-- override if necessary
+	-- will be called in each frame the function occuring is not called (due to invisible ball,
+	-- time after last rule trigger or not matching ref state)
+end
+
+return Rule

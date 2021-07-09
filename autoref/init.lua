@@ -67,36 +67,26 @@ local function runEvent(foul)
 	-- stripping 'Blue', 'Yellow', 'ColorPrepare', 'Force' and 'PlacementColor'
 	local simpleRefState = World.RefereeState:match("%u%l+")
 	if foul.possibleRefStates[simpleRefState] and
-			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT) and
-			foul.occuring() then
-		foulTimes[foul] = World.Time
-		-- TODO: sanity checks on occuring events
-		if foul.message then
-			log(foul.message)
-		end
-		debugMessage = foul.message
+			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT) then
+		local event, message = foul:occuring()
+		if event then
+			foulTimes[foul] = World.Time
+			-- TODO: sanity checks on occuring events
+			if message then
+				log(message)
+			end
+			debugMessage = message
 
-		if foul.ignore then
-			debug.set("ignore") -- just for the empty if branche
-		else
 			if World.RefereeState ~= "Halt" then
-				table.insert(eventsToSend, foul.event)
-				EventValidator.dispatchEvent(foul.event)
+				table.insert(eventsToSend, event)
+				EventValidator.dispatchEvent(event)
 			else
 				log("Error: issued event during Halt")
 			end
-		end
-		if foul.reset then
-			foul.reset()
+			foul:reset()
 		end
 	elseif not foul.possibleRefStates[simpleRefState] then
-		if foul.reset then
-			foul.reset()
-		end
-	end
-
-	if foulTimes[foul] and foul.freekickPosition and foulTimes[foul] > World.Time - 1 then
-		vis.addCircle("event position", foul.freekickPosition, 0.1, vis.colors.blue, true)
+		foul:reset()
 	end
 end
 
@@ -126,17 +116,15 @@ local function main()
     if fouls == nil then
         fouls = { }
         for _, filename in pairs(descriptionToFileNames) do
-            local foul = require("rules/" .. filename)
-            if foul.reset then
-                foul.reset()
-            end
+            local foul = require("rules/" .. filename)()
+            foul:reset()
             table.insert(fouls, foul)
         end
     end
 
     for _, foul in ipairs(fouls) do
         if foul.resetOnInvisibleBall and not World.Ball:isPositionValid() then
-            foul.reset()
+            foul:reset()
         end
 	end
 
