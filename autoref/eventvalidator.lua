@@ -35,14 +35,15 @@ local StopSpeed  = require "rules/stopspeed"
 local EventValidator = {}
 
 -- NOTE: if you add an event here, also add all the supported event types in the list below
-local fouls = {
-	-- DoubleTouch(),
-	OutOfField(),
-	FastShot(),
-	AttackerDefAreaDist(TrueWorld),
-	StopSpeed(TrueWorld),
-	AttackerInDefenseArea(TrueWorld)
+local foulClasses = {
+	-- DoubleTouch,
+	OutOfField,
+	FastShot,
+	AttackerDefAreaDist,
+	StopSpeed,
+	AttackerInDefenseArea
 }
+local fouls = nil
 
 local SUPPORTED_EVENTS = {
 	-- "ATTACKER_DOUBLE_TOUCHED_BALL",
@@ -138,6 +139,15 @@ function EventValidator.update()
     TrueWorld.update()
 	LastTouch.update()
 	lastUpdateTime = TrueWorld.Time
+
+	if fouls == nil then
+		fouls = {}
+		for _, foul in ipairs(foulClasses) do
+			local inst = foul(TrueWorld)
+			inst:reset()
+            table.insert(fouls, inst)
+		end
+	end
 
 	for _, foul in ipairs(fouls) do
 		runEvent(foul)
