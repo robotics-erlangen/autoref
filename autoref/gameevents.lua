@@ -216,4 +216,61 @@ function Events.placementSuccess(teamIsYellow, timeTaken, precision, distance)
 	return { placement_succeeded = event, type = "PLACEMENT_SUCCEEDED" }
 end
 
+function Events.eventMessage(event)
+	if not event.type then
+		return "Error: malformed event"
+	end
+	local eventObject
+	for k, v in pairs(event) do
+		if k ~= "type" then
+			eventObject = v
+		end
+	end
+	if not eventObject then
+		return "Error: event is missing data"
+	end
+	local teamString = ""
+	if eventObject.by_team and eventObject.by_bot then
+		teamString = (eventObject.by_team == "YELLOW" and "yellow " or "blue ") .. tostring(eventObject.by_bot)
+	end
+	if event.type == "BALL_LEFT_FIELD_GOAL_LINE" then
+		return teamString .. " shot the ball out via the goal line"
+	elseif event.type == "BALL_LEFT_FIELD_TOUCH_LINE" then
+		return teamString .. " shot the ball out via the touch line"
+	elseif event.type == "AIMLESS_KICK" then
+		return "aimless kick by " .. teamString
+	elseif event.type == "POSSIBLE_GOAL" then
+		return "possible goal for " .. (eventObject.by_team == "YELLOW" and "yellow " or "blue ") .. ", shot by " ..
+			(eventObject.kicking_team == "YELLOW" and "yellow " or "blue ") .. tostring(eventObject.kicking_bot)
+	elseif event.type == "BOT_TOO_FAST_IN_STOP" then
+		return teamString .. " was too fast in stop"
+	elseif event.type == "DEFENDER_TOO_CLOSE_TO_KICK_POINT" then
+		return teamString .. " too close to kick point (" .. string.format("%.2f", eventObject.distance) .. " m)"
+	elseif event.type == "BOT_CRASH_DRAWN" then
+		return "yellow " .. tostring(eventObject.bot_yellow) .. " and blue " .. tostring(eventObject.bot_blue) .. " crashed into each other"
+	elseif event.type == "BOT_CRASH_UNIQUE" then
+		local violatingTeam = eventObject.by_team == "YELLOW" and "yellow " or "blue "
+		local victimTeam = eventObject.by_team == "YELLOW" and "blue " or "yellow "
+		return violatingTeam .. tostring(eventObject.violator) .. " crashed into " .. victimTeam .. tostring(eventObject.victim)
+	elseif event.type == "DEFENDER_IN_DEFENSE_AREA" then
+		return teamString .. " touched the ball in its own defense area"
+	elseif event.type == "ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA" then
+		return teamString .. " touched the ball in the opponent defense area"
+	elseif event.type == "BOT_KICKED_BALL_TOO_FAST" then
+		return teamString .. " kicked the ball too fast (" .. string.format("%.2f", eventObject.initial_ball_speed) .. " m/s)"
+	elseif event.type == "BOT_DRIBBLED_BALL_TOO_FAR" then
+		return teamString .. " dribbled the ball too far"
+	elseif event.type == "ATTACKER_DOUBLE_TOUCHED_BALL" then
+		return teamString .. " double touched the ball"
+	elseif event.type == "ATTACKER_TOO_CLOSE_TO_DEFENSE_AREA" then
+		return teamString .. " too close to opponent defense area in stop/freekick"
+	elseif event.type == "BOT_INTERFERED_PLACEMENT" then
+		return teamString .. " interferred with ball placement"
+	elseif event.type == "PLACEMENT_SUCCEEDED" then
+		return (eventObject.by_team == "YELLOW" and "yellow " or "blue ") .. "team successfully placed the ball"
+	else
+		return "Unknown event"
+	end
+end
+
 return Events

@@ -50,15 +50,9 @@ function AttackerDefAreaDist:occuring()
         for _, robot in ipairs(self.World[offense.."Robots"]) do
 			local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
 			if distance <= 0.2 and not self.closeRobotsInThisState[robot] then
-
-				local color = robot.isYellow and self.World.YellowColorStr or self.World.BlueColorStr
-				local message = "20cm defense area<br>distance violation by<br>"
-					.. color .. " " .. robot.id
-
 				local event = Event.attackerDefAreaDist(robot.isYellow, robot.id, robot.pos, distance)
-
 				self.closeRobotsInThisState[robot] = true
-				return event, message
+				return event
 			end
 		end
     end

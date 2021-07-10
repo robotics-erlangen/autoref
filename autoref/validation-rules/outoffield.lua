@@ -44,19 +44,16 @@ function OutOfField:occuring()
 				and lastTouchPos.y * World.Ball.pos.y < 0
 				and not Referee.wasKickoff() then
 
-			local message = "(truth) Aimless kick"
 			local event = Event.aimlessKick(lastRobot.isYellow, lastRobot.id, World.Ball.pos, lastTouchPos)
-			return event, message
+			return event
 		end
 
-		local message = "(truth) Ball left field goal line"
 		local event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, World.Ball.pos, true)
-		return event, message
+		return event
 	end
 	if math.abs(World.Ball.pos.x) > World.Geometry.FieldWidthHalf + World.Ball.radius then
-		local message = "(truth) Ball left field touch line"
 		local event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, World.Ball.pos, false)
-		return event, message
+		return event
 	end
 end
 

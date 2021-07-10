@@ -43,10 +43,8 @@ function FastShot:occuring()
 		return false
 	end
 	if World.Ball.speed:length() > MAX_SHOOT_SPEED then
-		local color = lastRobot.isYellow and World.YellowColorStr or World.BlueColorStr
-		local message = "(truth) Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastRobot.id
 		local event = Event.fastShot(lastRobot.isYellow, lastRobot.id, lastTouchPos, World.Ball.speed:length())
-		return event, message
+		return event
 	end
 end
 

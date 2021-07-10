@@ -29,7 +29,7 @@ Rule.resetOnInvisibleBall = false
 
 -- the init function can have one parameter, the world object used for dependency injection
 
--- returns a rule violation event if the rule is currently violated and a matching message
+-- returns a rule violation event if the rule is currently violated
 function Rule:occuring()
 	error("stub")
 end

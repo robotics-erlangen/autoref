@@ -54,9 +54,8 @@ function BallPlacementInterference:occuring()
                     local time = World.Time - self.inRangeStartTimes[robot]
                     if time > 2 and not self.robotsInThisStop[robot] then
                         self.robotsInThisStop[robot] = true
-                        local message = "Ball placement interference " .. (table.count(self.robotsInThisStop))
                         local event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
-                        return event, message
+                        return event
                     end
                 end
             else

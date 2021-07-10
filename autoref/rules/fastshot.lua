@@ -103,13 +103,10 @@ function FastShot:occuring()
             self.lastSpeeds = {}
             local lastTouchingRobot, shootPosition = Referee.robotAndPosOfLastBallTouch()
             if lastTouchingRobot then
-                local color = lastTouchingRobot.isYellow and World.YellowColorStr or World.BlueColorStr
-                local message = "Shot over "..MAX_SHOOT_SPEED.." m/s by " .. color .. " " .. lastTouchingRobot.id ..
-                    "<br>Speed: " .. math.round(self.maxSpeed, 2) .. "m/s"
                 -- TODO: max ball height is not set
                 local event = Event.fastShot(lastTouchingRobot.isYellow, lastTouchingRobot.id, shootPosition, self.maxSpeed)
                 self.maxSpeed = 0
-                return event, message
+                return event
             end
         end
     else -- don't keep single values from flickering

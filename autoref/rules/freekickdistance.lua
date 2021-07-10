@@ -62,10 +62,8 @@ function FreekickDistance:occuring()
 			isCurrentlyTooClose = dist < STOP_BALL_DISTANCE - extraDistance
 		end
         if isCurrentlyTooClose or d < STOP_BALL_DISTANCE then
-            local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
-            local message = color .. " " .. robot.id .. " did not keep "..tostring(STOP_BALL_DISTANCE*100).." cm distance<br>to ball during free kick"
             local event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
-            return event, message
+            return event
         end
     end
 end

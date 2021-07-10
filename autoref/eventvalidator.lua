@@ -22,6 +22,7 @@ local TrackedWorld = require "base/world"
 local TrueWorld = require "validation-rules/trueworld"
 local LastTouch = require "validation-rules/lasttouch"
 
+local GameEvents = require "gameevents"
 local GameController = require "gamecontroller"
 
 -- rules
@@ -65,12 +66,9 @@ local function runEvent(foul)
 	local simpleRefState = TrueWorld.RefereeState:match("%u%l+")
 	if foul.possibleRefStates[simpleRefState] and
 			(foul.shouldAlwaysExecute or not foulTimes[foul] or TrueWorld.Time - foulTimes[foul] > FOUL_TIMEOUT) then
-		local event, message = foul:occuring()
+		local event = foul:occuring()
 		if event then
 			foulTimes[foul] = TrueWorld.Time
-			if message then
-				log(message)
-			end
 
 			EventValidator.dispatchValidationEvent(event)
 
@@ -86,7 +84,9 @@ local waitingEvents = {
 	validation = {}
 }
 
-function EventValidator.sendEvent(event)
+function EventValidator.sendEvent(event, fromTracked, fromValidation)
+	log(GameEvents.eventMessage(event) .. " [" .. (fromTracked and "R" or "") .. ((fromTracked and fromValidation) and ", " or "") ..
+		(fromValidation and "VR" or "") .. "]")
 	GameController.sendEvent(event)
 end
 
@@ -94,8 +94,7 @@ function EventValidator.checkEvent(event, source)
 	local otherSource = source == "tracked" and "validation" or "tracked"
 	for time, oldEvent in pairs(waitingEvents[otherSource]) do
 		if event.type == oldEvent.type then
-			log("Found matching events!")
-			EventValidator.sendEvent(event)
+			EventValidator.sendEvent(event, true, true)
 			waitingEvents[otherSource][time] = nil
 			return
 		end
@@ -109,7 +108,7 @@ function EventValidator.checkEventTimeout()
 		for time, event in pairs(waitingEvents[source]) do
 			if TrueWorld.Time - time > EVENT_MATCH_TIMEOUT then
 				log("Event match timeout: " .. event.type)
-				EventValidator.sendEvent(event)
+				EventValidator.sendEvent(event, source == "tracked", source == "validation")
 				waitingEvents[source][time] = nil
 			end
 		end
@@ -119,7 +118,7 @@ end
 local lastUpdateTime = nil
 function EventValidator.dispatchEvent(event)
 	if lastUpdateTime == nil or TrackedWorld.Time - lastUpdateTime > 1 then
-		EventValidator.sendEvent(event)
+		EventValidator.sendEvent(event, true, false)
 		return
 	end
 	for _, type in ipairs(SUPPORTED_EVENTS) do
@@ -128,7 +127,7 @@ function EventValidator.dispatchEvent(event)
 			return
 		end
 	end
-	EventValidator.sendEvent(event)
+	EventValidator.sendEvent(event, true, false)
 end
 
 function EventValidator.dispatchValidationEvent(event)

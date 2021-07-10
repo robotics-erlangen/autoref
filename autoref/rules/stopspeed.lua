@@ -47,13 +47,11 @@ function StopSpeed:occuring()
     end
 
     for _, robot in ipairs(self.World.Robots) do
-        local teamStr = robot.isYellow and "yellow" or "blue"
 		local tolerance = self.World.IsSimulatorTruth and 0 or SPEED_TOLERANCE
         if robot.speed:length() > STOP_SPEED + tolerance and not self.fastRobotsInThisStop[robot] then
-            local message = teamStr.." bot "..robot.id.." was too fast during stop"
             local event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
             self.fastRobotsInThisStop[robot] = true
-            return event, message
+            return event
         end
     end
 end

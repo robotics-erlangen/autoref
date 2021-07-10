@@ -50,11 +50,9 @@ function Dribbling:occuring()
         end
         if currentTouchingRobot.pos:distanceTo(self.dribblingStart) > MAX_DRIBBLING_DIST then
             local lastRobot = Referee.robotAndPosOfLastBallTouch()
-            local message = "Dribbling over " .. MAX_DRIBBLING_DIST .. "m<br>by "
-                .. Referee.teamWhichTouchedBallLast() .. " " .. lastRobot.id
             -- TODO: should it be the ball position or the robot position
             local event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, self.dribblingStart, currentTouchingRobot.pos)
-            return event, message
+            return event
         end
     else
         self.dribblingStart = nil

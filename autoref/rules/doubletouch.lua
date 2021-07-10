@@ -61,10 +61,8 @@ function DoubleTouch:occuring()
 
             local distToFreekickPos = World.Ball.pos:distanceTo(self.lastBallPosInStop)
             if distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
-                local offenseTeam = r.isYellow and "Yellow" or "Blue"
-                local message = "Double touch by " .. offenseTeam .. " " .. r.id
                 local event = Event.doubleTouch(r.isYellow, r.id, self.lastBallPosInStop)
-                return event, message
+                return event
             end
         end
     elseif World.RefereeState == "Game" and self.lastTouchingRobotInFreekick then
@@ -83,10 +81,8 @@ function DoubleTouch:occuring()
         debug.set("distToFreekickPos", distToFreekickPos)
         if touchingRobot and distToFreekickPos > CONSIDER_FREE_KICK_EXECUTED_THRESHOLD then
             if touchingRobot == self.lastTouchingRobotInFreekick then
-                local offenseTeam = touchingRobot.isYellow and "Yellow" or "Blue"
-                local message = "Double touch by " .. offenseTeam .. " " .. touchingRobot.id
                 local event = Event.doubleTouch(touchingRobot.isYellow, touchingRobot.id, self.lastBallPosInStop)
-                return event, message
+                return event
             else
                 self.lastTouchingRobotInFreekick = nil
             end

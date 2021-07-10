@@ -58,7 +58,6 @@ local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
 
 local ballWasValidBefore = false
-local debugMessage = ""
 
 local eventsToSend = {}
 
@@ -68,14 +67,10 @@ local function runEvent(foul)
 	local simpleRefState = World.RefereeState:match("%u%l+")
 	if foul.possibleRefStates[simpleRefState] and
 			(foul.shouldAlwaysExecute or not foulTimes[foul] or World.Time - foulTimes[foul] > FOUL_TIMEOUT) then
-		local event, message = foul:occuring()
+		local event = foul:occuring()
 		if event then
 			foulTimes[foul] = World.Time
 			-- TODO: sanity checks on occuring events
-			if message then
-				log(message)
-			end
-			debugMessage = message
 
 			if World.RefereeState ~= "Halt" then
 				table.insert(eventsToSend, event)
@@ -94,10 +89,6 @@ local function debugEvents(events)
     debug.pushtop()
     -- Do not change this, as it is used for replay tests
     debug.set("GAME_CONTROLLER_EVENTS", events)
-    debug.pop()
-    
-    debug.pushtop()
-    debug.set("AUTOREF_EVENT", debugMessage)
     debug.pop()
 end
 

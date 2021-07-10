@@ -74,17 +74,13 @@ function Collision:occuring()
 					self.collidingRobots[defRobot] = World.Time
                     if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
                         local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
-                        local message = "Collision foul by " .. World[offense.."ColorStr"] .. " " ..
-                            offRobot.id .. "<br>while traveling at " .. speed .. " m/s"
                         local event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
-                        return event, message
+                        return event
                     else
-                        local message = "Collision by both teams ("..
-                            offense.." "..offRobot.id..", "..defense.." "..defRobot.id..")"
                         -- TODO: angle is not provided
                         local event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
                             collisionPoint, speedDiff)
-                        return event, message
+                        return event
                     end
                 end
             end

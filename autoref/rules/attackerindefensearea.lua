@@ -48,12 +48,9 @@ function AttackerInDefenseArea:occuring()
 			for _, robot in ipairs(self.World[offense.."Robots"]) do
 				-- attacker touches ball while the ball is in the defense area
 				if self:ballTouchesRobot(robot) then
-					local color = robot.isYellow and self.World.YellowColorStr or self.World.BlueColorStr
-					local message = color .. " " .. robot.id ..
-						" touched the ball in defense area"
 					-- TODO: distance in defense area
 					local event = Event.attackerInDefenseArea(robot.isYellow, robot.id, robot.pos)
-					return event, message
+					return event
 				end
 			end
 		end

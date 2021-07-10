@@ -121,21 +121,9 @@ function OutOfField:occuring()
             return
         end
 
-        local executingTeam = World.YellowColorStr
-        if Referee.teamWhichTouchedBallLast() == World.YellowColorStr then
-             executingTeam = World.BlueColorStr
-        end
-
-        outOfFieldEvent = "Throw-In"
 		vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
-		local event, message
+		local event
 		if math.abs(self.outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
-            if (lastRobot.isYellow and self.outOfFieldPos.y>0) or (not lastRobot.isYellow and self.outOfFieldPos.y<0) then
-                outOfFieldEvent = "Goal Kick"
-            else
-                outOfFieldEvent = "Corner Kick"
-            end
-            message = outOfFieldEvent .. " " .. executingTeam
             event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, true)
 
             -- positive y position means blue side of field, negative yellow
@@ -157,25 +145,21 @@ function OutOfField:occuring()
 
                 if closeToGoal or insideGoal
                         or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
-                    message =  "<b>Goal</b> for " .. scoringTeam
                     local forYellow = scoringTeam == World.YellowColorStr
                     event = Event.goal(forYellow, lastRobot.isYellow, lastRobot.id,
 					self.outOfFieldPos, lastPos, forYellow and self.maxHeightAfterYellowTouch or self.maxHeightAfterBlueTouch)
-                    return event, message
+                    return event
                 else
                     return
                 end
             elseif icing then
-                outOfFieldEvent = "<b>Icing</b>"
-                message =  outOfFieldEvent .. " of " .. Referee.teamWhichTouchedBallLast()
                 event = Event.aimlessKick(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, lastPos)
             end
         else -- out off field line
             event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, false)
-            message = outOfFieldEvent .. " " .. executingTeam
         end
 
-        return event, message
+        return event
     end
 end
 

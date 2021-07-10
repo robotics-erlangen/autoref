@@ -42,10 +42,8 @@ function MultipleDefender.occuring()
                 and Field["isIn"..defense.."DefenseArea"](robot.pos, distThreshold)
                 and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
                 and World.Ball.posZ == 0 then
-            local message = defense .. " " .. robot.id ..
-                " touched the ball<br>while being located entirely within its own defense area"
             local event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil)
-            return event, message
+            return event
         end
     end
 end
