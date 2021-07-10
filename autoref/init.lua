@@ -34,23 +34,23 @@ local GameController = require "gamecontroller"
 local EventValidator = require "eventvalidator"
 
 local descriptionToFileNames = {
-    ["Robot collisions"] = "collision",
-    ["Shooting speed"] = "fastshot",
-    ["Ball out of field"] = "outoffield",
-    ["Multiple Defender"] = "multipledefender",
-    ["Dribbling over 1m"] = "dribbling",
-    ["Attacker in defense area"] = "attackerindefensearea",
-    ["Robot speed during Stop"] = "stopspeed",
-    ["Attacker distance to defense area"] = "attackerdefareadist",
-    ["Distance during free kicks"] = "freekickdistance",
-    ["Double touch after free kick"] = "doubletouch",
-    ["Ball placement"] = "ballplacement",
-    ["Ball placement interference"] = "placementinterference",
+	["Robot collisions"] = "collision",
+	["Shooting speed"] = "fastshot",
+	["Ball out of field"] = "outoffield",
+	["Multiple Defender"] = "multipledefender",
+	["Dribbling over 1m"] = "dribbling",
+	["Attacker in defense area"] = "attackerindefensearea",
+	["Robot speed during Stop"] = "stopspeed",
+	["Attacker distance to defense area"] = "attackerdefareadist",
+	["Distance during free kicks"] = "freekickdistance",
+	["Double touch after free kick"] = "doubletouch",
+	["Ball placement"] = "ballplacement",
+	["Ball placement interference"] = "placementinterference",
 }
 
 local optionnames = { }
 for description, _ in pairs(descriptionToFileNames) do
-    table.insert(optionnames, description)
+	table.insert(optionnames, description)
 end
 
 local fouls = nil
@@ -86,40 +86,40 @@ local function runEvent(foul)
 end
 
 local function debugEvents(events)
-    debug.pushtop()
-    -- Do not change this, as it is used for replay tests
-    debug.set("GAME_CONTROLLER_EVENTS", events)
-    debug.pop()
+	debug.pushtop()
+	-- Do not change this, as it is used for replay tests
+	debug.set("GAME_CONTROLLER_EVENTS", events)
+	debug.pop()
 end
 
 local function main()
-    GameController.update()
+	GameController.update()
 
-    if World.HasTrueState then
-        EventValidator.update()
-    end
-
-    if World.BallPlacementPos then
-        vis.addPath("ball placement", {World.Ball.pos, World.BallPlacementPos}, vis.colors.redHalf, true, nil, 0.5)
-        vis.addCircle("ball placement", World.BallPlacementPos, 0.6, vis.colors.green, false)
-    end
-
-    if fouls == nil then
-        fouls = { }
-        for _, filename in pairs(descriptionToFileNames) do
-            local foul = require("rules/" .. filename)()
-            foul:reset()
-            table.insert(fouls, foul)
-        end
-    end
-
-    for _, foul in ipairs(fouls) do
-        if foul.resetOnInvisibleBall and not World.Ball:isPositionValid() then
-            foul:reset()
-        end
+	if World.HasTrueState then
+		EventValidator.update()
 	end
 
-    eventsToSend = {}
+	if World.BallPlacementPos then
+		vis.addPath("ball placement", {World.Ball.pos, World.BallPlacementPos}, vis.colors.redHalf, true, nil, 0.5)
+		vis.addCircle("ball placement", World.BallPlacementPos, 0.6, vis.colors.green, false)
+	end
+
+	if fouls == nil then
+		fouls = { }
+		for _, filename in pairs(descriptionToFileNames) do
+			local foul = require("rules/" .. filename)()
+			foul:reset()
+			table.insert(fouls, foul)
+		end
+	end
+
+	for _, foul in ipairs(fouls) do
+		if foul.resetOnInvisibleBall and not World.Ball:isPositionValid() then
+			foul:reset()
+		end
+	end
+
+	eventsToSend = {}
 
 	-- check events that should always be executed first
 	for _, foul in ipairs(fouls) do
@@ -129,44 +129,44 @@ local function main()
 	end
 
 	-- stop when the ball is not visible
-    if World.Ball:isPositionValid() then
-        ballWasValidBefore = true
-    elseif ballWasValidBefore then
-        ballWasValidBefore = false
-        -- log("Ball is not visible!")
-    else
-        debugEvents(eventsToSend)
-        return
-    end
+	if World.Ball:isPositionValid() then
+		ballWasValidBefore = true
+	elseif ballWasValidBefore then
+		ballWasValidBefore = false
+		-- log("Ball is not visible!")
+	else
+		debugEvents(eventsToSend)
+		return
+	end
 
 	-- check events that should only be executed when the ball is visible
 	for _, foul in ipairs(fouls) do
 		if not foul.runOnInvisibleBall then
 			runEvent(foul)
 		end
-    end
-    
-    debugEvents(eventsToSend)
+	end
 
-    Referee.illustrateRefereeStates()
+	debugEvents(eventsToSend)
+
+	Referee.illustrateRefereeStates()
 end
 
 local function mainLoopWrapper(func)
-    return function()
-        if not World.update() then
-            return -- skip processing if no vision data is available yet
-        end
-        func()
-        plot._plotAggregated()
-    end
+	return function()
+		if not World.update() then
+			return -- skip processing if no vision data is available yet
+		end
+		func()
+		plot._plotAggregated()
+	end
 end
 
 Entrypoints.add("2021", function()
-    main()
-    debug.resetStack()
-    Referee.update()
-    BallOwner.lastRobot()
+	main()
+	debug.resetStack()
+	Referee.update()
+	BallOwner.lastRobot()
 end)
 
 return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper),
-        options = optionnames}
+		options = optionnames}

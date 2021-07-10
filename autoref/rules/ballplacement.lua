@@ -26,7 +26,7 @@ local Class = require "base/class"
 local BallPlacement = Class("Rules.BallPlacement", Rule)
 
 BallPlacement.possibleRefStates = {
-    Ball = true
+	Ball = true
 }
 BallPlacement.runOnInvisibleBall = true
 
@@ -39,43 +39,43 @@ function BallPlacement:init()
 end
 
 function BallPlacement:occuring()
-    if World.BallPlacementPos then
-        local ballDistance = World.BallPlacementPos:distanceTo(World.Ball.pos)
-		
+	if World.BallPlacementPos then
+		local ballDistance = World.BallPlacementPos:distanceTo(World.Ball.pos)
+
 		if not World.Ball:isPositionValid() then
 			return
 		end
-        
-        local noRobotNearBall = true
-        local isYellowFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectYellow" or World.NextRefereeState == "IndirectYellow")
-        local isBlueFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectBlue" or World.NextRefereeState == "IndirectBlue")
-        local allowedYellowDistance = isYellowFreekick and 0.05 or 0.5
-        local allowedBlueDistance = isBlueFreekick and 0.05 or 0.5
-        for _, robot in ipairs(World.Robots) do
-            local allowedDistance = robot.isYellow and allowedYellowDistance or allowedBlueDistance
-            if robot.pos:distanceTo(World.Ball.pos) < allowedDistance + robot.shootRadius then
-                noRobotNearBall = false
-            end
-        end
-        if ballDistance < ACCEPTABLE_RADIUS and World.Ball.speed:length() < SLOW_BALL_SPEED and noRobotNearBall then
-            if not self.inRadiusTime then
-                self.inRadiusTime = World.Time
-            end
-            if World.Time - self.inRadiusTime > IN_RADIUS_WAIT_TIME then
-                local event = Event.placementSuccess(World.RefereeState == "BallPlacementYellow", World.Time - self.startTime,
-                    ballDistance, self.startingBallPos:distanceTo(World.Ball.pos))
-                return event
-            end
-        else
-            self.inRadiusTime = nil
-        end
-    end
+
+		local noRobotNearBall = true
+		local isYellowFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectYellow" or World.NextRefereeState == "IndirectYellow")
+		local isBlueFreekick = World.NextRefereeState and (World.NextRefereeState == "DirectBlue" or World.NextRefereeState == "IndirectBlue")
+		local allowedYellowDistance = isYellowFreekick and 0.05 or 0.5
+		local allowedBlueDistance = isBlueFreekick and 0.05 or 0.5
+		for _, robot in ipairs(World.Robots) do
+			local allowedDistance = robot.isYellow and allowedYellowDistance or allowedBlueDistance
+			if robot.pos:distanceTo(World.Ball.pos) < allowedDistance + robot.shootRadius then
+				noRobotNearBall = false
+			end
+		end
+		if ballDistance < ACCEPTABLE_RADIUS and World.Ball.speed:length() < SLOW_BALL_SPEED and noRobotNearBall then
+			if not self.inRadiusTime then
+				self.inRadiusTime = World.Time
+			end
+			if World.Time - self.inRadiusTime > IN_RADIUS_WAIT_TIME then
+				local event = Event.placementSuccess(World.RefereeState == "BallPlacementYellow", World.Time - self.startTime,
+					ballDistance, self.startingBallPos:distanceTo(World.Ball.pos))
+				return event
+			end
+		else
+			self.inRadiusTime = nil
+		end
+	end
 end
 
 function BallPlacement:reset()
-    self.startingBallPos = World.Ball.pos
-    self.startTime = World.Time
-    self.inRadiusTime = nil
+	self.startingBallPos = World.Ball.pos
+	self.startTime = World.Time
+	self.inRadiusTime = nil
 end
 
 return BallPlacement

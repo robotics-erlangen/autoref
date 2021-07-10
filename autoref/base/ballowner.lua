@@ -21,11 +21,11 @@ local BALL_OWN_HYSTERESIS = 0.03
 local lastBallOwner = nil
 local lastCall = 0
 function BallOwner.lastRobot()
-    if lastCall and lastCall == World.Time then -- cached result
-        return lastBallOwner
-    else
-        lastCall = World.Time
-    end
+	if lastCall and lastCall == World.Time then -- cached result
+		return lastBallOwner
+	else
+		lastCall = World.Time
+	end
 
 	-- search robot with min dist to ball
 	local minDist = math.huge

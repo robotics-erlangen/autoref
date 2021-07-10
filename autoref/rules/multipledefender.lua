@@ -28,24 +28,24 @@ local World = require "base/world"
 local Event = require "gameevents"
 
 MultipleDefender.possibleRefStates = {
-    Game = true
+	Game = true
 }
 
 function MultipleDefender.occuring()
-    local defense = "Yellow"
-    if World.Ball.pos.y > 0 then -- on blue side of field
-        defense = "Blue"
-    end
+	local defense = "Yellow"
+	if World.Ball.pos.y > 0 then -- on blue side of field
+		defense = "Blue"
+	end
 	for _, robot in ipairs(World[defense.."Robots"]) do
-        local distThreshold = -robot.radius
-        if robot ~= World[defense.."Keeper"]
-                and Field["isIn"..defense.."DefenseArea"](robot.pos, distThreshold)
-                and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
-                and World.Ball.posZ == 0 then
-            local event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil)
-            return event
-        end
-    end
+		local distThreshold = -robot.radius
+		if robot ~= World[defense.."Keeper"]
+				and Field["isIn"..defense.."DefenseArea"](robot.pos, distThreshold)
+				and robot.pos:distanceTo(World.Ball.pos) < Referee.touchDist
+				and World.Ball.posZ == 0 then
+			local event = Event.multipleDefender(robot.isYellow, robot.id, robot.pos, nil)
+			return event
+		end
+	end
 end
 
 return MultipleDefender

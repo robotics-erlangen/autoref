@@ -26,9 +26,9 @@ local World = require "validation-rules/trueworld"
 local Event = require "gameevents"
 
 DoubleTouch.possibleRefStates = {
-    Kickoff = true,
-    Direct = true,
-    Indirect = true,
+	Kickoff = true,
+	Direct = true,
+	Indirect = true,
 	Game = true,
 }
 

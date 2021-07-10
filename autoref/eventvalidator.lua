@@ -135,7 +135,7 @@ function EventValidator.dispatchValidationEvent(event)
 end
 
 function EventValidator.update()
-    TrueWorld.update()
+	TrueWorld.update()
 	LastTouch.update()
 	lastUpdateTime = TrueWorld.Time
 
@@ -144,7 +144,7 @@ function EventValidator.update()
 		for _, foul in ipairs(foulClasses) do
 			local inst = foul(TrueWorld)
 			inst:reset()
-            table.insert(fouls, inst)
+			table.insert(fouls, inst)
 		end
 	end
 

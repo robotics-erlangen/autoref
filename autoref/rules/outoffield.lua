@@ -31,7 +31,7 @@ local Event = require "gameevents"
 local OUT_OF_FIELD_MIN_TIME = 0.25
 
 OutOfField.possibleRefStates = {
-    Game = true,
+	Game = true,
 }
 
 function OutOfField:init()
@@ -47,28 +47,26 @@ end
 
 -- Field.isInField considers the inside of the goal as in the field, this is not what we want here
 local function isBallInField(ballPos)
-    ballPos = ballPos or World.Ball.pos
-    return math.abs(ballPos.y) < World.Geometry.FieldHeightHalf + World.Ball.radius and
-            math.abs(ballPos.x) < World.Geometry.FieldWidthHalf + World.Ball.radius
+	ballPos = ballPos or World.Ball.pos
+	return math.abs(ballPos.y) < World.Geometry.FieldHeightHalf + World.Ball.radius and
+			math.abs(ballPos.x) < World.Geometry.FieldWidthHalf + World.Ball.radius
 end
 
 function OutOfField:occuring()
-    local ballPos = World.Ball.pos
-    local outOfFieldEvent -- for event message
+	local ballPos = World.Ball.pos
+	local previousPos = self.lastTouchPosition
 
-    local previousPos = self.lastTouchPosition
-
-    local lastTeam = Referee.teamWhichTouchedBallLast()
+	local lastTeam = Referee.teamWhichTouchedBallLast()
 	local lastRobot, lastPos = Referee.robotAndPosOfLastBallTouch()
-    self.lastTouchPosition = lastPos
+	self.lastTouchPosition = lastPos
 
-    if lastTeam and lastRobot then
-        -- "match" string to remove the font-tags
-        debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
+	if lastTeam and lastRobot then
+		-- "match" string to remove the font-tags
+		debug.set("last ball touch", lastTeam:match(">(%a+)<") .. " " .. lastRobot.id)
 		vis.addCircle("last ball touch", lastPos, 0.02, vis.colors.red, true)
-    else
-        self.waitingForDecision = false
-        return
+	else
+		self.waitingForDecision = false
+		return
 	end
 
 	if not self.waitingForDecision then
@@ -84,83 +82,83 @@ function OutOfField:occuring()
 			self.maxHeightAfterBlueTouch = math.max(self.maxHeightAfterBlueTouch, World.Ball.posZ)
 		end
 
-        if isBallInField() then
-            self.wasInFieldBefore = true
-        elseif self.wasInFieldBefore then
-            self.outOfFieldTime = World.Time
-            self.wasInFieldBefore = false
-            self.outOfFieldPos = World.Ball.pos:copy()
-            self.waitingForDecision = true
-        end
-    end
+		if isBallInField() then
+			self.wasInFieldBefore = true
+		elseif self.wasInFieldBefore then
+			self.outOfFieldTime = World.Time
+			self.wasInFieldBefore = false
+			self.outOfFieldPos = World.Ball.pos:copy()
+			self.waitingForDecision = true
+		end
+	end
 
-    if self.waitingForDecision then
-        for _, pos in ipairs(World.Ball.rawPositions) do
-            if not isBallInField(pos) then
-                self.rawOutOfFieldCounter = self.rawOutOfFieldCounter + 1
-            end
-        end
-    end
-    if isBallInField() and not self.waitingForDecision then
-        self.rawOutOfFieldCounter = 0
-    end
+	if self.waitingForDecision then
+		for _, pos in ipairs(World.Ball.rawPositions) do
+			if not isBallInField(pos) then
+				self.rawOutOfFieldCounter = self.rawOutOfFieldCounter + 1
+			end
+		end
+	end
+	if isBallInField() and not self.waitingForDecision then
+		self.rawOutOfFieldCounter = 0
+	end
 
-    debug.set("wait decision", self.waitingForDecision)
-    debug.set("in field before", self.wasInFieldBefore)
-    debug.set("delay time", World.Time - self.outOfFieldTime)
+	debug.set("wait decision", self.waitingForDecision)
+	debug.set("in field before", self.wasInFieldBefore)
+	debug.set("delay time", World.Time - self.outOfFieldTime)
 
-    if self.waitingForDecision and World.Time - self.outOfFieldTime > OUT_OF_FIELD_MIN_TIME then
-        self.outOfFieldTime = math.huge -- reset
-        self.waitingForDecision = false
+	if self.waitingForDecision and World.Time - self.outOfFieldTime > OUT_OF_FIELD_MIN_TIME then
+		self.outOfFieldTime = math.huge -- reset
+		self.waitingForDecision = false
 
-        if self.rawOutOfFieldCounter < 5 then
-            -- although the ball might currently not be inside the field, this variable needs to be reset
-            -- if there were less than 5 raw frames, but the ball is not actually outside of the field,
-            -- this grants another chance to recognize it
-            self.wasInFieldBefore = true
-            return
-        end
+		if self.rawOutOfFieldCounter < 5 then
+			-- although the ball might currently not be inside the field, this variable needs to be reset
+			-- if there were less than 5 raw frames, but the ball is not actually outside of the field,
+			-- this grants another chance to recognize it
+			self.wasInFieldBefore = true
+			return
+		end
 
 		vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
 		local event
 		if math.abs(self.outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
-            event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, true)
+			event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, true)
 
-            -- positive y position means blue side of field, negative yellow
-            local icing = ((self.outOfFieldPos.y > 0 and lastTeam == World.YellowColorStr)
-                or (self.outOfFieldPos.y < 0 and lastTeam == World.BlueColorStr))
-                and lastPos.y * self.outOfFieldPos.y < 0
-                and not Referee.wasKickoff() -- last touch was on other side of field
+			-- positive y position means blue side of field, negative yellow
+			local icing = ((self.outOfFieldPos.y > 0 and lastTeam == World.YellowColorStr)
+				or (self.outOfFieldPos.y < 0 and lastTeam == World.BlueColorStr))
+				and lastPos.y * self.outOfFieldPos.y < 0
+				and not Referee.wasKickoff() -- last touch was on other side of field
 
 			if math.abs(self.outOfFieldPos.x) < World.Geometry.GoalWidth/2 then
-                local scoringTeam = self.outOfFieldPos.y>0 and World.YellowColorStr or World.BlueColorStr
-                -- TODO investigate ball position after min_time in order to
-                -- determine goal post collisions: inside goal or defense area
-                local side = self.outOfFieldPos.y<0 and "Yellow" or "Blue"
-                local insideGoal = math.abs(ballPos.x) < World.Geometry.GoalWidth/2
-                    and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
-                    and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
+				local scoringTeam = self.outOfFieldPos.y>0 and World.YellowColorStr or World.BlueColorStr
+				-- TODO investigate ball position after min_time in order to
+				-- determine goal post collisions: inside goal or defense area
+				local side = self.outOfFieldPos.y<0 and "Yellow" or "Blue"
+				local insideGoal = math.abs(ballPos.x) < World.Geometry.GoalWidth/2
+					and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
+					and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
 
-                local closeToGoal = (World.Geometry[side.."Goal"]):distanceTo(World.Ball.pos) < 0.8
+				local closeToGoal = (World.Geometry[side.."Goal"]):distanceTo(World.Ball.pos) < 0.8
 
-                if closeToGoal or insideGoal
-                        or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
-                    local forYellow = scoringTeam == World.YellowColorStr
-                    event = Event.goal(forYellow, lastRobot.isYellow, lastRobot.id,
+				if closeToGoal or insideGoal
+						or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
+					local forYellow = scoringTeam == World.YellowColorStr
+					event = Event.goal(forYellow, lastRobot.isYellow, lastRobot.id,
 					self.outOfFieldPos, lastPos, forYellow and self.maxHeightAfterYellowTouch or self.maxHeightAfterBlueTouch)
-                    return event
-                else
-                    return
-                end
-            elseif icing then
-                event = Event.aimlessKick(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, lastPos)
-            end
-        else -- out off field line
-            event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, false)
-        end
+					return event
+				else
+					return
+				end
+			elseif icing then
+				event = Event.aimlessKick(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, lastPos)
+			end
+		else -- out off field line
+			event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, false)
+		end
 
-        return event
-    end
+		return event
+	end
 end
 
 return OutOfField

@@ -32,7 +32,7 @@ local BallPlacementInterference = Class("Rules.BallPlacementInterference", Rule)
 -- TODO: das gleiche auch noch fuer ein paar andere Regeln
 
 BallPlacementInterference.possibleRefStates = {
-    Ball = true
+	Ball = true
 }
 BallPlacementInterference.shouldAlwaysExecute = true
 BallPlacementInterference.resetOnInvisibleBall = true
@@ -43,34 +43,34 @@ function BallPlacementInterference:init()
 end
 
 function BallPlacementInterference:occuring()
-    if World.BallPlacementPos then
-        local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
-        for _, robot in ipairs(World[opponent.."Robots"]) do
-            local dist = robot.pos:distanceToLineSegment(World.Ball.pos, World.BallPlacementPos)
-            if dist < 0.5 + robot.radius then
-                if not self.inRangeStartTimes[robot] then
-                    self.inRangeStartTimes[robot] = World.Time
-                else
-                    local time = World.Time - self.inRangeStartTimes[robot]
-                    if time > 2 and not self.robotsInThisStop[robot] then
-                        self.robotsInThisStop[robot] = true
-                        local event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
-                        return event
-                    end
-                end
-            else
-                self.inRangeStartTimes[robot] = nil
-            end
-        end
-    end
+	if World.BallPlacementPos then
+		local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
+		for _, robot in ipairs(World[opponent.."Robots"]) do
+			local dist = robot.pos:distanceToLineSegment(World.Ball.pos, World.BallPlacementPos)
+			if dist < 0.5 + robot.radius then
+				if not self.inRangeStartTimes[robot] then
+					self.inRangeStartTimes[robot] = World.Time
+				else
+					local time = World.Time - self.inRangeStartTimes[robot]
+					if time > 2 and not self.robotsInThisStop[robot] then
+						self.robotsInThisStop[robot] = true
+						local event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
+						return event
+					end
+				end
+			else
+				self.inRangeStartTimes[robot] = nil
+			end
+		end
+	end
 end
 
 function BallPlacementInterference:reset()
-    local simpleRefState = World.RefereeState:match("%u%l+")
-    if simpleRefState ~= "Ball" then
-        self.inRangeStartTimes = {}
-        self.robotsInThisStop = {}
-    end
+	local simpleRefState = World.RefereeState:match("%u%l+")
+	if simpleRefState ~= "Ball" then
+		self.inRangeStartTimes = {}
+		self.robotsInThisStop = {}
+	end
 end
 
 return BallPlacementInterference

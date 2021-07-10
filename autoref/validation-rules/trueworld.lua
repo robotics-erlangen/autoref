@@ -210,10 +210,10 @@ function World._updateWorld(state)
 		Constants.switchSimulatorConstants(World.IsSimulated)
 	end
 
-    if #state.reality == 0 then
-        return false
-    end
-    local reality = state.reality[#state.reality]
+	if #state.reality == 0 then
+		return false
+	end
+	local reality = state.reality[#state.reality]
 
 	-- update ball if available
 	if reality.ball then
@@ -347,7 +347,7 @@ function World._updateGameState(state)
 	World.ActionTimeRemaining = (state.current_action_time_remaining or 0) / 1000000 --in seconds
 
 	--[[
-    optional sint32 stage_time_left = 2;
+	optional sint32 stage_time_left = 2;
 	message TeamInfo {
 		// The team's name (empty string if operator has not typed anything).
 		required string name = 1;

@@ -32,13 +32,13 @@ local ASSUMED_BREAK_SPEED_DIFF = 0.3
 -- collision between two robots, at least one of them being fast.
 
 Collision.possibleRefStates = {
-    Game = true,
-    Kickoff = true,
-    Penalty = true,
-    Direct = true,
-    Indirect = true,
-    Ball = true,
-    Stop = true,
+	Game = true,
+	Kickoff = true,
+	Penalty = true,
+	Direct = true,
+	Indirect = true,
+	Ball = true,
+	Stop = true,
 }
 Collision.shouldAlwaysExecute = true
 Collision.runOnInvisibleBall = true
@@ -48,44 +48,44 @@ function Collision:init()
 end
 
 function Collision:occuring()
-    -- go through old collision times
-    local COLLISION_COUNT_TIME = 3
-    for robot, time in pairs(self.collidingRobots) do
-        if World.Time - time > COLLISION_COUNT_TIME then
-            self.collidingRobots[robot] = nil
-        end
-    end
+	-- go through old collision times
+	local COLLISION_COUNT_TIME = 3
+	for robot, time in pairs(self.collidingRobots) do
+		if World.Time - time > COLLISION_COUNT_TIME then
+			self.collidingRobots[robot] = nil
+		end
+	end
 
-    Collision.ignore = false
-    for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-        for _, offRobot in ipairs(World[offense.."Robots"]) do
-            for _, defRobot in ipairs(World[defense.."Robots"]) do
-                local speedDiff = offRobot.speed - defRobot.speed
-                local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
-                    defRobot.pos):distanceTo(offRobot.pos) - ASSUMED_BREAK_SPEED_DIFF
-                local defSpeed = math.max(0, defRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
-                local offSpeed = math.max(0, offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
-                local collisionPoint = (offRobot.pos + defRobot.pos) / 2
-                if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
-                        and projectedSpeed > COLLISION_SPEED and offSpeed > defSpeed
-                        and not self.collidingRobots[offRobot] and not self.collidingRobots[defRobot] then
-                    
+	Collision.ignore = false
+	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
+		for _, offRobot in ipairs(World[offense.."Robots"]) do
+			for _, defRobot in ipairs(World[defense.."Robots"]) do
+				local speedDiff = offRobot.speed - defRobot.speed
+				local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
+					defRobot.pos):distanceTo(offRobot.pos) - ASSUMED_BREAK_SPEED_DIFF
+				local defSpeed = math.max(0, defRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
+				local offSpeed = math.max(0, offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
+				local collisionPoint = (offRobot.pos + defRobot.pos) / 2
+				if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
+						and projectedSpeed > COLLISION_SPEED and offSpeed > defSpeed
+						and not self.collidingRobots[offRobot] and not self.collidingRobots[defRobot] then
+
 					self.collidingRobots[offRobot] = World.Time
 					self.collidingRobots[defRobot] = World.Time
-                    if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
-                        local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
-                        local event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
-                        return event
-                    else
-                        -- TODO: angle is not provided
-                        local event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
-                            collisionPoint, speedDiff)
-                        return event
-                    end
-                end
-            end
-        end
-    end
+					if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
+						local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
+						local event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
+						return event
+					else
+						-- TODO: angle is not provided
+						local event = Event.botCrashBoth(offRobot.isYellow and offRobot.id or defRobot.id, offRobot.isYellow and defRobot.id or offRobot.id,
+							collisionPoint, speedDiff)
+						return event
+					end
+				end
+			end
+		end
+	end
 end
 
 return Collision

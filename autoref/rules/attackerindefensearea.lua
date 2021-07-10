@@ -27,7 +27,7 @@ local Referee = require "base/referee"
 local Event = require "gameevents"
 
 AttackerInDefenseArea.possibleRefStates = {
-    Game = true
+	Game = true
 }
 
 function AttackerInDefenseArea:init(worldInjection)
@@ -54,7 +54,7 @@ function AttackerInDefenseArea:occuring()
 				end
 			end
 		end
-    end
+	end
 end
 
 return AttackerInDefenseArea

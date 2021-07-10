@@ -57,10 +57,10 @@ Robot.constants = {
 -- @param id number - the robot id
 -- @param isYellow boolean - true if yellow robot
 function Robot:init(id, isYellow)
-    self.id = id
+	self.id = id
 	self.radius = 0.09 -- set default radius if no specs are available
-    self.dribblerWidth = 0.07 --just a good default guess
-    self.shootRadius = 0.067 -- shoot radius of 2014 generation
+	self.dribblerWidth = 0.07 --just a good default guess
+	self.shootRadius = 0.067 -- shoot radius of 2014 generation
 	self.lostSince = 0
 	self.lastResponseTime = 0
 	self.isYellow = isYellow

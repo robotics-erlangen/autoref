@@ -26,9 +26,9 @@ local Field = require "base/field"
 local Event = require "gameevents"
 
 AttackerDefAreaDist.possibleRefStates = {
-    Stop = true,
-    Indirect = true,
-    Direct = true,
+	Stop = true,
+	Indirect = true,
+	Direct = true,
 }
 AttackerDefAreaDist.shouldAlwaysExecute = true
 AttackerDefAreaDist.runOnInvisibleBall = true
@@ -42,12 +42,12 @@ end
 
 function AttackerDefAreaDist:occuring()
 
-    if self.World.Time - self.startTime < BUFFER_TIME then
-        return
-    end
+	if self.World.Time - self.startTime < BUFFER_TIME then
+		return
+	end
 
-    for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
-        for _, robot in ipairs(self.World[offense.."Robots"]) do
+	for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
+		for _, robot in ipairs(self.World[offense.."Robots"]) do
 			local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
 			if distance <= 0.2 and not self.closeRobotsInThisState[robot] then
 				local event = Event.attackerDefAreaDist(robot.isYellow, robot.id, robot.pos, distance)
@@ -55,12 +55,12 @@ function AttackerDefAreaDist:occuring()
 				return event
 			end
 		end
-    end
+	end
 end
 
 function AttackerDefAreaDist:reset()
-    self.startTime = self.World.Time
-    self.closeRobotsInThisState = {}
+	self.startTime = self.World.Time
+	self.closeRobotsInThisState = {}
 end
 
 return AttackerDefAreaDist

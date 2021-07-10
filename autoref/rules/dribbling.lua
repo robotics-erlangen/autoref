@@ -29,7 +29,7 @@ local Event = require "gameevents"
 local MAX_DRIBBLING_DIST = 1 -- as specified by the rules
 
 Dribbling.possibleRefStates = {
-    Game = true
+	Game = true
 }
 
 function Dribbling:init()
@@ -37,26 +37,26 @@ function Dribbling:init()
 end
 
 function Dribbling:occuring()
-    local currentTouchingRobot
-    for _, robot in ipairs(World.Robots) do
-        if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
-            currentTouchingRobot = robot
-            break
-        end
-    end
-    if currentTouchingRobot then
-        if not self.dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
-            self.dribblingStart = currentTouchingRobot.pos:copy()
-        end
-        if currentTouchingRobot.pos:distanceTo(self.dribblingStart) > MAX_DRIBBLING_DIST then
-            local lastRobot = Referee.robotAndPosOfLastBallTouch()
-            -- TODO: should it be the ball position or the robot position
-            local event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, self.dribblingStart, currentTouchingRobot.pos)
-            return event
-        end
-    else
-        self.dribblingStart = nil
-    end
+	local currentTouchingRobot
+	for _, robot in ipairs(World.Robots) do
+		if robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
+			currentTouchingRobot = robot
+			break
+		end
+	end
+	if currentTouchingRobot then
+		if not self.dribblingStart or currentTouchingRobot ~= Referee.robotAndPosOfLastBallTouch() then
+			self.dribblingStart = currentTouchingRobot.pos:copy()
+		end
+		if currentTouchingRobot.pos:distanceTo(self.dribblingStart) > MAX_DRIBBLING_DIST then
+			local lastRobot = Referee.robotAndPosOfLastBallTouch()
+			-- TODO: should it be the ball position or the robot position
+			local event = Event.dribbling(lastRobot.isYellow, lastRobot.id, lastRobot.pos, self.dribblingStart, currentTouchingRobot.pos)
+			return event
+		end
+	else
+		self.dribblingStart = nil
+	end
 end
 
 return Dribbling

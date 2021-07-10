@@ -27,12 +27,12 @@ local World = require "validation-rules/trueworld"
 local Event = require "gameevents"
 
 FastShot.possibleRefStates = {
-    Game = true,
+	Game = true,
 	GameForce = true,
-    Kickoff = true,
-    Penalty = true,
-    Direct = true,
-    Indirect = true
+	Kickoff = true,
+	Penalty = true,
+	Direct = true,
+	Indirect = true
 }
 
 local MAX_SHOOT_SPEED = 6.5

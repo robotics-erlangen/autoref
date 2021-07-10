@@ -28,7 +28,7 @@ local World = require "validation-rules/trueworld"
 local Event = require "gameevents"
 
 OutOfField.possibleRefStates = {
-    Game = true,
+	Game = true,
 }
 
 function OutOfField:occuring()

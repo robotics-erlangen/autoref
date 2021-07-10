@@ -30,7 +30,7 @@ local GRACE_PERIOD = 2 -- as specified by rules
 local SPEED_TOLERANCE = 0.1
 
 StopSpeed.possibleRefStates = {
-    Stop = true
+	Stop = true
 }
 StopSpeed.shouldAlwaysExecute = true
 StopSpeed.runOnInvisibleBall = true
@@ -42,23 +42,23 @@ function StopSpeed:init(worldInjection)
 end
 
 function StopSpeed:occuring()
-    if self.World.Time - self.enterStopTime < GRACE_PERIOD then
-        return
-    end
+	if self.World.Time - self.enterStopTime < GRACE_PERIOD then
+		return
+	end
 
-    for _, robot in ipairs(self.World.Robots) do
+	for _, robot in ipairs(self.World.Robots) do
 		local tolerance = self.World.IsSimulatorTruth and 0 or SPEED_TOLERANCE
-        if robot.speed:length() > STOP_SPEED + tolerance and not self.fastRobotsInThisStop[robot] then
-            local event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
-            self.fastRobotsInThisStop[robot] = true
-            return event
-        end
-    end
+		if robot.speed:length() > STOP_SPEED + tolerance and not self.fastRobotsInThisStop[robot] then
+			local event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
+			self.fastRobotsInThisStop[robot] = true
+			return event
+		end
+	end
 end
 
 function StopSpeed:reset()
-    self.fastRobotsInThisStop = {}
-    self.enterStopTime = self.World.Time
+	self.fastRobotsInThisStop = {}
+	self.enterStopTime = self.World.Time
 end
 
 return StopSpeed

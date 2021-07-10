@@ -86,11 +86,11 @@ function Events.goal(scoringTeamIsYellow, shootingTeamIsYellow, shootingBotId, l
 	if maxBallHeight then
 		event.max_ball_height = maxBallHeight
 	end
-    if scoringTeamIsYellow then
-        event.num_robots_by_team = #World.YellowRobots
-    else
-        event.num_robots_by_team = #World.BlueRobots
-    end
+	if scoringTeamIsYellow then
+		event.num_robots_by_team = #World.YellowRobots
+	else
+		event.num_robots_by_team = #World.BlueRobots
+	end
 	return { possible_goal = event, type = "POSSIBLE_GOAL" }
 end
 

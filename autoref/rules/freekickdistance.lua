@@ -28,9 +28,9 @@ local Event = require "gameevents"
 local STOP_BALL_DISTANCE = 0.5 -- as specified by the rules
 
 FreekickDistance.possibleRefStates = {
-    Direct = true,
-    Indirect = true,
-    Kickoff = true
+	Direct = true,
+	Indirect = true,
+	Kickoff = true
 }
 
 function FreekickDistance:init()
@@ -38,22 +38,22 @@ function FreekickDistance:init()
 end
 
 function FreekickDistance:occuring()
-    local defenseTeamMap = {
-        DirectBlue = "Yellow",
-        DirectYellow = "Blue",
-        IndirectBlue = "Yellow",
-        IndirectYellow = "Blue",
-        KickoffBluePrepare = "Yellow",
-        KickoffYellowPrepare = "Blue",
-        KickoffBlue = "Yellow",
-        KickoffYellow = "Blue"
-    }
-    local defense = defenseTeamMap[World.RefereeState]
+	local defenseTeamMap = {
+		DirectBlue = "Yellow",
+		DirectYellow = "Blue",
+		IndirectBlue = "Yellow",
+		IndirectYellow = "Blue",
+		KickoffBluePrepare = "Yellow",
+		KickoffYellowPrepare = "Blue",
+		KickoffBlue = "Yellow",
+		KickoffYellow = "Blue"
+	}
+	local defense = defenseTeamMap[World.RefereeState]
 	if World.Ball.speed:length() > 1 then
 		return
 	end
-    for _, robot in ipairs(World[defense.."Robots"]) do
-        local d = robot.pos:distanceTo(self.stopBallPos)-robot.shootRadius
+	for _, robot in ipairs(World[defense.."Robots"]) do
+		local d = robot.pos:distanceTo(self.stopBallPos)-robot.shootRadius
 		local isCurrentlyTooClose = false
 		if World.Ball:isPositionValid() then
 			-- the ball could have been moved by a few centimeters from the initial position
@@ -61,15 +61,15 @@ function FreekickDistance:occuring()
 			local dist = robot.pos:distanceTo(World.Ball.pos)
 			isCurrentlyTooClose = dist < STOP_BALL_DISTANCE - extraDistance
 		end
-        if isCurrentlyTooClose or d < STOP_BALL_DISTANCE then
-            local event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
-            return event
-        end
-    end
+		if isCurrentlyTooClose or d < STOP_BALL_DISTANCE then
+			local event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)
+			return event
+		end
+	end
 end
 
 function FreekickDistance:reset()
-    self.stopBallPos = World.Ball.pos
+	self.stopBallPos = World.Ball.pos
 end
 
 return FreekickDistance
