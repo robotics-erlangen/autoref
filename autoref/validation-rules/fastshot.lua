@@ -22,7 +22,6 @@ local Rule = require "rules/rule"
 local Class = require "base/class"
 local FastShot = Class("ValidationRules.FastShot", Rule)
 
-local Referee = require "base/referee"
 local LastTouch = require "validation-rules/lasttouch"
 local World = require "validation-rules/trueworld"
 local Event = require "gameevents"

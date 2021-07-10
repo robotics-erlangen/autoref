@@ -18,7 +18,6 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local debug = require "base/debug"
 local TrackedWorld = require "base/world"
 local TrueWorld = require "validation-rules/trueworld"
 local LastTouch = require "validation-rules/lasttouch"
@@ -26,9 +25,12 @@ local LastTouch = require "validation-rules/lasttouch"
 local GameController = require "gamecontroller"
 
 -- rules
-local DoubleTouch = require "validation-rules/doubletouch"
+-- local DoubleTouch = require "validation-rules/doubletouch"
 local OutOfField = require "validation-rules/outoffield"
 local FastShot = require "validation-rules/fastshot"
+local AttackerDefAreaDist = require "rules/attackerdefareadist"
+local AttackerInDefenseArea = require "rules/attackerindefensearea"
+local StopSpeed  = require "rules/stopspeed"
 
 local EventValidator = {}
 
@@ -36,7 +38,10 @@ local EventValidator = {}
 local fouls = {
 	-- DoubleTouch(),
 	OutOfField(),
-	FastShot()
+	FastShot(),
+	AttackerDefAreaDist(TrueWorld),
+	StopSpeed(TrueWorld),
+	AttackerInDefenseArea(TrueWorld)
 }
 
 local SUPPORTED_EVENTS = {
@@ -44,7 +49,10 @@ local SUPPORTED_EVENTS = {
 	"BALL_LEFT_FIELD_GOAL_LINE",
 	"BALL_LEFT_FIELD_TOUCH_LINE",
 	"AIMLESS_KICK",
-	"BOT_KICKED_BALL_TOO_FAST"
+	"BOT_KICKED_BALL_TOO_FAST",
+	"BOT_TOO_FAST_IN_STOP",
+	"ATTACKER_TOO_CLOSE_TO_DEFENSE_AREA",
+	"ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA"
 }
 
 local foulTimes = {}

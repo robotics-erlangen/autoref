@@ -24,20 +24,31 @@ local AttackerInDefenseArea = Class("Rules.AttackerInDefenseArea", Rule)
 
 local Field = require "base/field"
 local Referee = require "base/referee"
-local World = require "base/world"
 local Event = require "gameevents"
 
 AttackerInDefenseArea.possibleRefStates = {
     Game = true
 }
 
+function AttackerInDefenseArea:init(worldInjection)
+	self.World = worldInjection or (require "base/world")
+end
+
+function AttackerInDefenseArea:ballTouchesRobot(robot)
+	if self.World.IsSimulatorTruth then
+		return robot.isTouchingBall
+	else
+		return self.World.Ball.posZ == 0 and robot.pos:distanceTo(self.World.Ball.pos) <= Referee.touchDist
+	end
+end
+
 function AttackerInDefenseArea:occuring()
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-		if Field["isIn"..defense.."DefenseArea"](World.Ball.pos, World.Ball.radius) then
-			for _, robot in ipairs(World[offense.."Robots"]) do
+		if Field["isIn"..defense.."DefenseArea"](self.World.Ball.pos, self.World.Ball.radius) then
+			for _, robot in ipairs(self.World[offense.."Robots"]) do
 				-- attacker touches ball while the ball is in the defense area
-				if World.Ball.posZ == 0 and robot.pos:distanceTo(World.Ball.pos) <= Referee.touchDist then
-					local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+				if self:ballTouchesRobot(robot) then
+					local color = robot.isYellow and self.World.YellowColorStr or self.World.BlueColorStr
 					local message = color .. " " .. robot.id ..
 						" touched the ball in defense area"
 					-- TODO: distance in defense area

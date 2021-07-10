@@ -144,7 +144,7 @@ function Ball:_update(data, time)
 	self:_updateRawDetections(data.raw)
 end
 
-function Ball:_updateFromTrueState(data, time)
+function Ball:_updateFromTrueState(data)
 	self.hasRawData = true
 
 	-- data from amun is in global coordiantes

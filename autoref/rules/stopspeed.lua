@@ -22,11 +22,11 @@ local Rule = require "rules/rule"
 local Class = require "base/class"
 local StopSpeed = Class("Rules.StopSpeed", Rule)
 
-local World = require "base/world"
 local Event = require "gameevents"
 
 local STOP_SPEED = 1.5 -- as specified by the rules
 local GRACE_PERIOD = 2 -- as specified by rules
+-- not used when this is a validation rule
 local SPEED_TOLERANCE = 0.1
 
 StopSpeed.possibleRefStates = {
@@ -35,19 +35,21 @@ StopSpeed.possibleRefStates = {
 StopSpeed.shouldAlwaysExecute = true
 StopSpeed.runOnInvisibleBall = true
 
-function StopSpeed:init()
-	self.enterStopTime = World.Time
+function StopSpeed:init(worldInjection)
+	self.World = worldInjection or (require "base/world")
+	self.enterStopTime = self.World.Time
 	self.fastRobotsInThisStop = {}
 end
 
 function StopSpeed:occuring()
-    if World.Time - self.enterStopTime < GRACE_PERIOD then
+    if self.World.Time - self.enterStopTime < GRACE_PERIOD then
         return
     end
 
-    for _, robot in ipairs(World.Robots) do
+    for _, robot in ipairs(self.World.Robots) do
         local teamStr = robot.isYellow and "yellow" or "blue"
-        if robot.speed:length() > STOP_SPEED + SPEED_TOLERANCE and not self.fastRobotsInThisStop[robot] then
+		local tolerance = self.World.IsSimulatorTruth and 0 or SPEED_TOLERANCE
+        if robot.speed:length() > STOP_SPEED + tolerance and not self.fastRobotsInThisStop[robot] then
             local message = teamStr.." bot "..robot.id.." was too fast during stop"
             local event = Event.stopSpeed(robot.isYellow, robot.id, robot.pos, robot.speed:length())
             self.fastRobotsInThisStop[robot] = true
@@ -58,7 +60,7 @@ end
 
 function StopSpeed:reset()
     self.fastRobotsInThisStop = {}
-    self.enterStopTime = World.Time
+    self.enterStopTime = self.World.Time
 end
 
 return StopSpeed

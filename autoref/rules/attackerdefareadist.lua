@@ -23,7 +23,6 @@ local Class = require "base/class"
 local AttackerDefAreaDist = Class("Rules.AttackerDefAreaDist", Rule)
 
 local Field = require "base/field"
-local World = require "base/world"
 local Event = require "gameevents"
 
 AttackerDefAreaDist.possibleRefStates = {
@@ -36,22 +35,23 @@ AttackerDefAreaDist.runOnInvisibleBall = true
 
 local BUFFER_TIME = 2 -- as given by the rules
 
-function AttackerDefAreaDist:init()
+function AttackerDefAreaDist:init(worldInjection)
+	self.World = worldInjection or (require "base/world")
 	self:reset()
 end
 
 function AttackerDefAreaDist:occuring()
 
-    if World.Time - self.startTime < BUFFER_TIME then
+    if self.World.Time - self.startTime < BUFFER_TIME then
         return
     end
 
     for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
-        for _, robot in ipairs(World[offense.."Robots"]) do
+        for _, robot in ipairs(self.World[offense.."Robots"]) do
 			local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
 			if distance <= 0.2 and not self.closeRobotsInThisState[robot] then
 
-				local color = robot.isYellow and World.YellowColorStr or World.BlueColorStr
+				local color = robot.isYellow and self.World.YellowColorStr or self.World.BlueColorStr
 				local message = "20cm defense area<br>distance violation by<br>"
 					.. color .. " " .. robot.id
 
@@ -65,7 +65,7 @@ function AttackerDefAreaDist:occuring()
 end
 
 function AttackerDefAreaDist:reset()
-    self.startTime = World.Time
+    self.startTime = self.World.Time
     self.closeRobotsInThisState = {}
 end
 

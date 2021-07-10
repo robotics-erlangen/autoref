@@ -51,7 +51,7 @@ function DoubleTouch:occuring()
 				if self.firstTouchPos and self.firstTouchPos:distanceTo(World.Ball.pos) > 0.05 then
 					local offenseTeam = robot.isYellow and "Yellow" or "Blue"
 					local message = "(truth) Double touch by " .. offenseTeam .. " " .. robot.id
-                	local event = Event.doubleTouch(robot.isYellow, robot.id, self.firstTouchPos)
+					local event = Event.doubleTouch(robot.isYellow, robot.id, self.firstTouchPos)
 					return event, message
 				end
 			end

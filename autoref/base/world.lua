@@ -83,6 +83,8 @@ World.HasTrueState = false
 
 World.RULEVERSION = nil
 
+World.IsSimulatorTruth = false
+
 World.Geometry = {}
 --- Field geometry.
 -- Lengths in meter

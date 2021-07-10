@@ -80,6 +80,8 @@ World.SelectedOptions = nil
 
 World.RULEVERSION = nil
 
+World.IsSimulatorTruth = true
+
 World.Geometry = {}
 --- Field geometry.
 -- Lengths in meter

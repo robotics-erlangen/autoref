@@ -163,7 +163,6 @@ function OutOfField:occuring()
 					self.outOfFieldPos, lastPos, forYellow and self.maxHeightAfterYellowTouch or self.maxHeightAfterBlueTouch)
                     return event, message
                 else
-                    event = nil
                     return
                 end
             elseif icing then

@@ -53,7 +53,7 @@ end
 
 function FastShot:updateLastRealisticBall()
     if not self.lastRealisticBallPos or self.lastRealisticBallPos:distanceTo(World.Ball.pos) < MAX_FRAME_DISTANCE
-        	or World.Time - self.lastRealisticBallTime > MAX_INVISIBLE_TIME then
+		or World.Time - self.lastRealisticBallTime > MAX_INVISIBLE_TIME then
         self.lastRealisticBallPos = World.Ball.pos:copy()
         self.lastRealisticBallTime = World.Time
     end
