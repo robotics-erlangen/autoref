@@ -29,8 +29,12 @@ local GameController = require "gamecontroller"
 -- local DoubleTouch = require "validation-rules/doubletouch"
 local OutOfField = require "validation-rules/outoffield"
 local FastShot = require "validation-rules/fastshot"
+local FreekickDistance = require "validation-rules/freekickdistance"
+local PlacementSuccess = require "validation-rules/placementsuccess"
 local AttackerDefAreaDist = require "rules/attackerdefareadist"
 local AttackerInDefenseArea = require "rules/attackerindefensearea"
+local MultipleDefender = require "rules/multipledefender"
+local PlacementInterference = require "rules/placementinterference"
 local StopSpeed  = require "rules/stopspeed"
 
 local EventValidator = {}
@@ -42,7 +46,11 @@ local foulClasses = {
 	FastShot,
 	AttackerDefAreaDist,
 	StopSpeed,
-	AttackerInDefenseArea
+	AttackerInDefenseArea,
+	PlacementInterference,
+	MultipleDefender,
+	FreekickDistance,
+	PlacementSuccess
 }
 local fouls = nil
 
@@ -54,8 +62,13 @@ local SUPPORTED_EVENTS = {
 	"BOT_KICKED_BALL_TOO_FAST",
 	"BOT_TOO_FAST_IN_STOP",
 	"ATTACKER_TOO_CLOSE_TO_DEFENSE_AREA",
-	"ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA"
+	"ATTACKER_TOUCHED_BALL_IN_DEFENSE_AREA",
+	"BOT_INTERFERED_PLACEMENT",
+	"DEFENDER_IN_DEFENSE_AREA",
+	"DEFENDER_TOO_CLOSE_TO_KICK_POINT",
+	"PLACEMENT_SUCCEEDED"
 }
+-- still missing rules: double touch, possible goal, collision both, collision, dribbling, bug: aimless kick?
 
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
@@ -102,7 +115,7 @@ function EventValidator.checkEvent(event, source)
 	waitingEvents[source][TrueWorld.Time] = event
 end
 
-local EVENT_MATCH_TIMEOUT = 0.5
+local EVENT_MATCH_TIMEOUT = 0.8
 function EventValidator.checkEventTimeout()
 	for _, source in ipairs({"tracked", "validation"}) do
 		for time, event in pairs(waitingEvents[source]) do

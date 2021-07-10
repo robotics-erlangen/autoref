@@ -18,7 +18,6 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 *************************************************************************]]
 
-local World = require "base/world"
 local Event = require "gameevents"
 
 local Rule = require "rules/rule"
@@ -37,21 +36,22 @@ BallPlacementInterference.possibleRefStates = {
 BallPlacementInterference.shouldAlwaysExecute = true
 BallPlacementInterference.resetOnInvisibleBall = true
 
-function BallPlacementInterference:init()
+function BallPlacementInterference:init(worldInjection)
+	self.World = worldInjection or (require "base/world")
 	self.inRangeStartTimes = {}
 	self.robotsInThisStop = {}
 end
 
 function BallPlacementInterference:occuring()
-	if World.BallPlacementPos then
-		local opponent = World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
-		for _, robot in ipairs(World[opponent.."Robots"]) do
-			local dist = robot.pos:distanceToLineSegment(World.Ball.pos, World.BallPlacementPos)
+	if self.World.BallPlacementPos then
+		local opponent = self.World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
+		for _, robot in ipairs(self.World[opponent.."Robots"]) do
+			local dist = robot.pos:distanceToLineSegment(self.World.Ball.pos, self.World.BallPlacementPos)
 			if dist < 0.5 + robot.radius then
 				if not self.inRangeStartTimes[robot] then
-					self.inRangeStartTimes[robot] = World.Time
+					self.inRangeStartTimes[robot] = self.World.Time
 				else
-					local time = World.Time - self.inRangeStartTimes[robot]
+					local time = self.World.Time - self.inRangeStartTimes[robot]
 					if time > 2 and not self.robotsInThisStop[robot] then
 						self.robotsInThisStop[robot] = true
 						local event = Event.ballPlacementInterference(robot.isYellow, robot.id, robot.pos)
@@ -66,7 +66,7 @@ function BallPlacementInterference:occuring()
 end
 
 function BallPlacementInterference:reset()
-	local simpleRefState = World.RefereeState:match("%u%l+")
+	local simpleRefState = self.World.RefereeState:match("%u%l+")
 	if simpleRefState ~= "Ball" then
 		self.inRangeStartTimes = {}
 		self.robotsInThisStop = {}

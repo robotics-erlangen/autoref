@@ -20,6 +20,7 @@
 
 local Class = require "base/class"
 local Rule = Class("Rules.Rule")
+local Referee = require "base/referee"
 
 -- static properties
 Rule.possibleRefStates = {} -- must contain a list of ref states in which the rule should run
@@ -38,6 +39,15 @@ function Rule:reset()
 	-- override if necessary
 	-- will be called in each frame the function occuring is not called (due to invisible ball,
 	-- time after last rule trigger or not matching ref state)
+end
+
+-- must only be called when self.World is properly set
+function Rule:ballTouchesRobot(robot)
+	if self.World.IsSimulatorTruth then
+		return robot.isTouchingBall
+	else
+		return self.World.Ball.posZ == 0 and robot.pos:distanceTo(self.World.Ball.pos) <= Referee.touchDist
+	end
 end
 
 return Rule

@@ -23,7 +23,6 @@ local Class = require "base/class"
 local AttackerInDefenseArea = Class("Rules.AttackerInDefenseArea", Rule)
 
 local Field = require "base/field"
-local Referee = require "base/referee"
 local Event = require "gameevents"
 
 AttackerInDefenseArea.possibleRefStates = {
@@ -32,14 +31,6 @@ AttackerInDefenseArea.possibleRefStates = {
 
 function AttackerInDefenseArea:init(worldInjection)
 	self.World = worldInjection or (require "base/world")
-end
-
-function AttackerInDefenseArea:ballTouchesRobot(robot)
-	if self.World.IsSimulatorTruth then
-		return robot.isTouchingBall
-	else
-		return self.World.Ball.posZ == 0 and robot.pos:distanceTo(self.World.Ball.pos) <= Referee.touchDist
-	end
 end
 
 function AttackerInDefenseArea:occuring()
