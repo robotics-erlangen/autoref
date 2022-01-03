@@ -37,6 +37,13 @@ function OutOfField:occuring()
 		return false
 	end
 	if math.abs(World.Ball.pos.y) > World.Geometry.FieldHeightHalf + World.Ball.radius then
+        
+        -- possible goal
+        if math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth / 2 then
+            -- TODO: last ball height
+            local event = Event.goal(World.Ball.pos.y > 0, lastRobot.isYellow, lastRobot.id, World.Ball.pos, lastTouchPos, 0)
+            return event
+        end
 
 		-- aimless kick check
 		if ((World.Ball.pos.y > 0 and lastRobot.isYellow)

@@ -145,7 +145,7 @@ function OutOfField:occuring()
 						or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
 					local forYellow = scoringTeam == World.YellowColorStr
 					event = Event.goal(forYellow, lastRobot.isYellow, lastRobot.id,
-					self.outOfFieldPos, lastPos, forYellow and self.maxHeightAfterYellowTouch or self.maxHeightAfterBlueTouch)
+						self.outOfFieldPos, lastPos, forYellow and self.maxHeightAfterYellowTouch or self.maxHeightAfterBlueTouch)
 					return event
 				else
 					return

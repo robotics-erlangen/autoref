@@ -66,9 +66,10 @@ local SUPPORTED_EVENTS = {
 	"BOT_INTERFERED_PLACEMENT",
 	"DEFENDER_IN_DEFENSE_AREA",
 	"DEFENDER_TOO_CLOSE_TO_KICK_POINT",
-	"PLACEMENT_SUCCEEDED"
+	"PLACEMENT_SUCCEEDED",
+	"POSSIBLE_GOAL"
 }
--- still missing rules: double touch, possible goal, collision both, collision, dribbling, bug: aimless kick?
+-- still missing rules: double touch, collision both, collision, dribbling, bug: aimless kick?
 
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
