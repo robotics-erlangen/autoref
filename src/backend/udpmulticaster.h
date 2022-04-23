@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2021 Andreas Wendler                                        *
+ *   Copyright 2022 Paul Bergmann                                          *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,29 +18,24 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef VISIONTRACKEDPUBLISHER_H
-#define VISIONTRACKEDPUBLISHER_H
+#ifndef UDPMULTICASTER_H
+#define UDPMULTICASTER_H
 
-#include <QObject>
-#include "gamecontroller/sslvisiontracked.h"
-#include "protobuf/status.h"
+#include <QtGlobal>
+#include <vector>
 
-#include "udpmulticaster.h"
-
+class QByteArray;
+class QHostAddress;
+class QObject;
 class QUdpSocket;
 
-class VisionTrackedPublisher : public QObject
-{
+class UDPMulticaster {
 public:
-    VisionTrackedPublisher(QObject *parent = nullptr);
+    UDPMulticaster(const QHostAddress& address, quint16 port, QObject* parent = nullptr);
 
-public slots:
-    void setFlip(bool flip);
-    void handleStatus(const Status &status);
-
+    void send(const QByteArray& data);
 private:
-    SSLVisionTracked m_visionTracked;
-    UDPMulticaster m_multicaster;
+    std::vector<QUdpSocket*> m_sockets;
 };
 
-#endif // VISIONTRACKEDPUBLISHER_H
+#endif // UDPMULTICASTER_H

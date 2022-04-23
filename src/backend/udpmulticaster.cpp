@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2021 Andreas Wendler                                        *
+ *   Copyright 2022 Paul Bergmann                                          *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,29 +18,37 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef VISIONTRACKEDPUBLISHER_H
-#define VISIONTRACKEDPUBLISHER_H
-
-#include <QObject>
-#include "gamecontroller/sslvisiontracked.h"
-#include "protobuf/status.h"
-
 #include "udpmulticaster.h"
 
-class QUdpSocket;
+#include <QByteArray>
+#include <QHostAddress>
+#include <QNetworkInterface>
+#include <QUdpSocket>
+#include <QtGlobal>
+#include <vector>
+#include <QDebug>
 
-class VisionTrackedPublisher : public QObject
+UDPMulticaster::UDPMulticaster(const QHostAddress& address, quint16 port, QObject* parent)
 {
-public:
-    VisionTrackedPublisher(QObject *parent = nullptr);
+    for (const QNetworkInterface& interface : QNetworkInterface::allInterfaces()) {
+        if (!(interface.flags() & QNetworkInterface::CanMulticast)) {
+            continue;
+        }
 
-public slots:
-    void setFlip(bool flip);
-    void handleStatus(const Status &status);
+        QUdpSocket* socket = new QUdpSocket(parent);
+        socket->connectToHost(address, port, QUdpSocket::WriteOnly);
+        socket->setMulticastInterface(interface);
 
-private:
-    SSLVisionTracked m_visionTracked;
-    UDPMulticaster m_multicaster;
-};
+        m_sockets.push_back(socket);
+    }
+}
 
-#endif // VISIONTRACKEDPUBLISHER_H
+void UDPMulticaster::send(const QByteArray& data)
+{
+    for (QUdpSocket* socket : m_sockets) {
+        if (socket->write(data) < 0) {
+            qWarning() << "Could not send data: " << socket->errorString();
+        }
+    }
+}
+

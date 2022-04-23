@@ -23,8 +23,10 @@ add_library(backend
     ../framework/src/amun/include/amun/amunclient.h
 
     amun.cpp
-    visiontrackedpublisher.h
+    udpmulticaster.cpp
+    udpmulticaster.h
     visiontrackedpublisher.cpp
+    visiontrackedpublisher.h
     ../framework/src/amun/amunclient.cpp
     ../framework/src/amun/networkinterfacewatcher.cpp
     ../framework/src/amun/networkinterfacewatcher.h

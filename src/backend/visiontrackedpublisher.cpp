@@ -22,10 +22,12 @@
 #include <QHostAddress>
 #include <QUdpSocket>
 
+#include "core/sslprotocols.h"
+
 VisionTrackedPublisher::VisionTrackedPublisher(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_multicaster(QHostAddress(SSL_VISION_TRACKER_ADDRESS), SSL_VISION_TRACKER_PORT, parent)
 {
-    m_senderSocket = new QUdpSocket(this);
 }
 
 void VisionTrackedPublisher::setFlip(bool flip)
@@ -35,13 +37,15 @@ void VisionTrackedPublisher::setFlip(bool flip)
 
 void VisionTrackedPublisher::handleStatus(const Status &status)
 {
+    const static QHostAddress TRACKED_VISION_MULTICAST { SSL_VISION_TRACKER_ADDRESS };
+
     if (status->has_world_state()) {
         gameController::TrackerWrapperPacket packet;
         m_visionTracked.createTrackedFrame(status->world_state(), &packet);
         QByteArray data;
         data.resize(packet.ByteSize());
         if (packet.SerializeToArray(data.data(), data.size())) {
-            m_senderSocket->writeDatagram(data, QHostAddress("224.5.23.2"), 10010);
+            m_multicaster.send(data);
         }
     }
 }
