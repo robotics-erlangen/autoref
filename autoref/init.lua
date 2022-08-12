@@ -48,11 +48,6 @@ local descriptionToFileNames = {
 	["Ball placement interference"] = "placementinterference",
 }
 
-local optionnames = { }
-for description, _ in pairs(descriptionToFileNames) do
-	table.insert(optionnames, description)
-end
-
 local fouls = nil
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
@@ -168,5 +163,4 @@ Entrypoints.add("2021", function()
 	BallOwner.lastRobot()
 end)
 
-return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper),
-		options = optionnames}
+return {name = "AutoRef", entrypoints = Entrypoints.get(mainLoopWrapper)}
