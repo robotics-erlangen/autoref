@@ -53,7 +53,8 @@ function BallPlacement:occuring()
 		local allowedBlueDistance = isBlueFreekick and 0.05 or 0.5
 		for _, robot in ipairs(World.Robots) do
 			local allowedDistance = robot.isYellow and allowedYellowDistance or allowedBlueDistance
-			if robot.pos:distanceTo(World.Ball.pos) < allowedDistance + robot.shootRadius then
+			local maxBallDistance = allowedDistance + robot.shootRadius + World.Ball.radius
+			if robot.pos:distanceTo(World.Ball.pos) < maxBallDistance then
 				noRobotNearBall = false
 			end
 		end
