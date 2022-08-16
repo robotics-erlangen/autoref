@@ -20,14 +20,13 @@
 
 local Rule = require "rules/rule"
 local Class = require "base/class"
+local Constants = require "base/constants"
 local Collision = Class("Rules.Collision", Rule)
 
-local World = require "base/world"
 local Event = require "gameevents"
 
 local COLLISION_SPEED = 1.5
 local COLLISION_SPEED_DIFF = 0.3
-local ASSUMED_BREAK_SPEED_DIFF = 0.3
 
 -- collision between two robots, at least one of them being fast.
 
@@ -43,37 +42,48 @@ Collision.possibleRefStates = {
 Collision.shouldAlwaysExecute = true
 Collision.runOnInvisibleBall = true
 
-function Collision:init()
+function Collision:init(worldInjection)
+	self.World = worldInjection or (require "base/world")
 	self.collidingRobots = {} -- robot -> time
+	if worldInjection then
+		-- when the true world information is used for the validation rule
+		self.assumedBreakSpeedDiff = 0
+		-- When the tracked world state is used, colliding robots are closer together than physically possible
+		-- This is not the case for the true world state. Therefore, an additional distance is required
+		self.collisionDistance = 2 * Constants.maxRobotRadius + 0.02
+	else
+		self.assumedBreakSpeedDiff = 0.3
+		self.collisionDistance = 2 * Constants.maxRobotRadius
+	end
 end
 
 function Collision:occuring()
 	-- go through old collision times
 	local COLLISION_COUNT_TIME = 3
 	for robot, time in pairs(self.collidingRobots) do
-		if World.Time - time > COLLISION_COUNT_TIME then
+		if self.World.Time - time > COLLISION_COUNT_TIME then
 			self.collidingRobots[robot] = nil
 		end
 	end
 
 	Collision.ignore = false
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-		for _, offRobot in ipairs(World[offense.."Robots"]) do
-			for _, defRobot in ipairs(World[defense.."Robots"]) do
+		for _, offRobot in ipairs(self.World[offense.."Robots"]) do
+			for _, defRobot in ipairs(self.World[defense.."Robots"]) do
 				local speedDiff = offRobot.speed - defRobot.speed
 				local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
-					defRobot.pos):distanceTo(offRobot.pos) - ASSUMED_BREAK_SPEED_DIFF
-				local defSpeed = math.max(0, defRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
-				local offSpeed = math.max(0, offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF)
+					defRobot.pos):distanceTo(offRobot.pos) - self.assumedBreakSpeedDiff
+				local defSpeed = math.max(0, defRobot.speed:length() - self.assumedBreakSpeedDiff)
+				local offSpeed = math.max(0, offRobot.speed:length() - self.assumedBreakSpeedDiff)
 				local collisionPoint = (offRobot.pos + defRobot.pos) / 2
-				if offRobot.pos:distanceTo(defRobot.pos) <= 2*offRobot.radius
+				if offRobot.pos:distanceTo(defRobot.pos) <= self.collisionDistance
 						and projectedSpeed > COLLISION_SPEED and offSpeed > defSpeed
 						and not self.collidingRobots[offRobot] and not self.collidingRobots[defRobot] then
 
-					self.collidingRobots[offRobot] = World.Time
-					self.collidingRobots[defRobot] = World.Time
+					self.collidingRobots[offRobot] = self.World.Time
+					self.collidingRobots[defRobot] = self.World.Time
 					if offSpeed - defSpeed > COLLISION_SPEED_DIFF then
-						local speed = math.round(offRobot.speed:length() - ASSUMED_BREAK_SPEED_DIFF, 2)
+						local speed = math.round(offRobot.speed:length() - self.assumedBreakSpeedDiff, 2)
 						local event = Event.botCrash(offRobot.isYellow, offRobot.id, defRobot.id, collisionPoint, speed, speedDiff)
 						return event
 					else

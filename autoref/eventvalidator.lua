@@ -36,6 +36,7 @@ local AttackerInDefenseArea = require "rules/attackerindefensearea"
 local MultipleDefender = require "rules/multipledefender"
 local PlacementInterference = require "rules/placementinterference"
 local StopSpeed  = require "rules/stopspeed"
+local Collision = require "rules/collision"
 
 local EventValidator = {}
 
@@ -50,7 +51,8 @@ local foulClasses = {
 	PlacementInterference,
 	MultipleDefender,
 	FreekickDistance,
-	PlacementSuccess
+	PlacementSuccess,
+	Collision
 }
 local fouls = nil
 
@@ -67,9 +69,11 @@ local SUPPORTED_EVENTS = {
 	"DEFENDER_IN_DEFENSE_AREA",
 	"DEFENDER_TOO_CLOSE_TO_KICK_POINT",
 	"PLACEMENT_SUCCEEDED",
-	"POSSIBLE_GOAL"
+	"POSSIBLE_GOAL",
+	"BOT_CRASH_DRAWN",
+	"BOT_CRASH_UNIQUE"
 }
--- still missing rules: double touch, collision both, collision, dribbling, bug: aimless kick?
+-- still missing rules: double touch, dribbling, bug: aimless kick?
 
 local foulTimes = {}
 local FOUL_TIMEOUT = 3 -- minimum time between subsequent fouls of the same kind
@@ -121,7 +125,7 @@ function EventValidator.checkEventTimeout()
 	for _, source in ipairs({"tracked", "validation"}) do
 		for time, event in pairs(waitingEvents[source]) do
 			if TrueWorld.Time - time > EVENT_MATCH_TIMEOUT then
-				log("Event match timeout: " .. event.type)
+				log("<font color=\"red\">" .. "Event match timeout: " .. event.type .. "</font>")
 				EventValidator.sendEvent(event, source == "tracked", source == "validation")
 				waitingEvents[source][time] = nil
 			end
