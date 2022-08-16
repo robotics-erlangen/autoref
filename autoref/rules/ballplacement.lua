@@ -43,6 +43,10 @@ function BallPlacement:occuring()
 		local ballDistance = World.BallPlacementPos:distanceTo(World.Ball.pos)
 
 		if not World.Ball:isPositionValid() then
+			self.inRadiusTime = nil
+			return
+		end
+		if not World.Ball.hasRawData then
 			return
 		end
 
