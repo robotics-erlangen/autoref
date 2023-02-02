@@ -100,10 +100,10 @@ void Amun::start()
     connect(this, &Amun::gotCommand, m_optionsManager, &OptionsManager::handleCommand);
     connect(m_optionsManager, &OptionsManager::sendStatus, this, &Amun::handleStatus);
 
-    m_gameControllerConnection.reset(new GameControllerConnection(true));
+    m_gameControllerConnection.reset(new StrategyGameControllerMediator(true));
     m_gameControllerConnection->switchInternalGameController(false);
     m_gameControllerConnection->moveToThread(m_autorefThread);
-    connect(this, &Amun::gotRefereeHost, m_gameControllerConnection.get(), &GameControllerConnection::handleRefereeHost);
+    connect(m_processor, &Processor::refereeHostChanged, m_gameControllerConnection.get(), &StrategyGameControllerMediator::handleRefereeHost);
 
     // start strategy threads
     Q_ASSERT(m_autoref == nullptr);
@@ -130,8 +130,7 @@ void Amun::start()
     setupReceiver(m_referee, QHostAddress(SSL_GAME_CONTROLLER_ADDRESS), SSL_GAME_CONTROLLER_PORT);
     connect(this, &Amun::updateRefereePort, m_referee, &Receiver::updatePort);
     // move referee packets to processor
-    connect(m_referee, SIGNAL(gotPacket(QByteArray, qint64, QString)), m_processor, SLOT(handleRefereePacket(QByteArray, qint64)));
-    connect(m_referee, SIGNAL(gotPacket(QByteArray,qint64,QString)), SLOT(handleRefereePacket(QByteArray,qint64,QString)));
+    connect(m_referee, &Receiver::gotPacket, m_processor, &Processor::handleRefereePacket);
 
     // create vision
     setupReceiver(m_vision, QHostAddress(SSL_VISION_ADDRESS), SSL_VISION_PORT);
@@ -180,11 +179,6 @@ void Amun::stop()
     m_processor = nullptr;
     m_optionsManager = nullptr;
     m_visionPublisher = nullptr;
-}
-
-void Amun::handleRefereePacket(QByteArray, qint64, QString host)
-{
-    emit gotRefereeHost(host);
 }
 
 void Amun::setupReceiver(Receiver *&receiver, const QHostAddress &address, quint16 port)

@@ -23,7 +23,7 @@
 
 #include "protobuf/command.h"
 #include "protobuf/status.h"
-#include "gamecontroller/gamecontrollerconnection.h"
+#include "gamecontroller/strategygamecontrollermediator.h"
 #include <memory>
 #include <QObject>
 
@@ -49,7 +49,6 @@ signals:
     void gotCommand(const Command &command);
     void updateVisionPort(quint16 port);
     void updateRefereePort(quint16 port);
-    void gotRefereeHost(QString hostName);
 
 public:
     void start();
@@ -57,7 +56,6 @@ public:
 
 public slots:
     void handleCommand(const Command &command);
-    void handleRefereePacket(QByteArray, qint64, QString host);
     void handleStatusForReplay(const Status &) {}
 
 private slots:
@@ -84,7 +82,7 @@ private:
 
     VisionTrackedPublisher *m_visionPublisher = nullptr;
 
-    std::shared_ptr<GameControllerConnection> m_gameControllerConnection;
+    std::shared_ptr<StrategyGameControllerMediator> m_gameControllerConnection;
 };
 
 #endif // AMUN_H
