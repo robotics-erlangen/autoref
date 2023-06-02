@@ -37,6 +37,7 @@ public:
 public slots:
     void setFlip(bool flip);
     void handleStatus(const Status &status);
+    void updatePort(qint16 port);
 
 private:
     SSLVisionTracked m_visionTracked;

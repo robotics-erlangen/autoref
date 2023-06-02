@@ -49,6 +49,7 @@ signals:
     void gotCommand(const Command &command);
     void updateVisionPort(quint16 port);
     void updateRefereePort(quint16 port);
+    void updateTrackerPort(quint16 port);
 
 public:
     void start();

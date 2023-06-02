@@ -49,3 +49,8 @@ void VisionTrackedPublisher::handleStatus(const Status &status)
         }
     }
 }
+
+void VisionTrackedPublisher::updatePort(qint16 port)
+{
+    m_multicaster = UDPMulticaster(QHostAddress(SSL_VISION_TRACKER_ADDRESS), port, this->parent());
+}

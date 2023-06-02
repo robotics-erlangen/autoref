@@ -27,6 +27,7 @@
 const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
 const uint DEFAULT_VISION_PORT = SSL_VISION_PORT;
 const uint DEFAULT_REFEREE_PORT = SSL_GAME_CONTROLLER_PORT;
+const uint DEFAULT_VISION_TRACKER_PORT = SSL_VISION_TRACKER_PORT;
 
 const bool DEFAULT_PLOTTER_IN_EXTRA_WINDOW = false;
 
@@ -52,6 +53,7 @@ void ConfigDialog::sendConfiguration()
 
     command->mutable_amun()->set_vision_port(ui->visionPort->value());
     command->mutable_amun()->set_referee_port(ui->refPort->value());
+    command->mutable_amun()->set_tracker_port(ui->trackerPort->value());
 
     emit sendCommand(command);
 }
@@ -63,6 +65,7 @@ void ConfigDialog::load()
 
     ui->visionPort->setValue(s.value("Amun/VisionPort2018", DEFAULT_VISION_PORT).toUInt());
     ui->refPort->setValue(s.value("Amun/RefereePort", DEFAULT_REFEREE_PORT).toUInt());
+    ui->trackerPort->setValue(s.value("Amun/TrackerPort", DEFAULT_VISION_TRACKER_PORT).toUInt());
 
     ui->plotterInExtraWindow->setChecked(s.value("Amun/PlotterInExtraWindow", DEFAULT_PLOTTER_IN_EXTRA_WINDOW).toBool());
 
@@ -74,6 +77,7 @@ void ConfigDialog::reset()
     ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
     ui->visionPort->setValue(DEFAULT_VISION_PORT);
     ui->refPort->setValue(DEFAULT_REFEREE_PORT);
+    ui->trackerPort->setValue(DEFAULT_VISION_TRACKER_PORT);
     ui->plotterInExtraWindow->setChecked(DEFAULT_PLOTTER_IN_EXTRA_WINDOW);
 }
 
@@ -84,6 +88,7 @@ void ConfigDialog::apply()
 
     s.setValue("Amun/VisionPort2018", ui->visionPort->value());
     s.setValue("Amun/RefereePort", ui->refPort->value());
+    s.setValue("Amun/TrackerPort", ui->trackerPort->value());
 
     s.setValue("Amun/PlotterInExtraWindow", ui->plotterInExtraWindow->isChecked());
 

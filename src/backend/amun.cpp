@@ -146,6 +146,7 @@ void Amun::start()
     connect(m_networkThread, SIGNAL(finished()), m_visionPublisher, SLOT(deleteLater()));
     connect(m_processor, &Processor::setFlipped, m_visionPublisher, &VisionTrackedPublisher::setFlip);
     connect(this, &Amun::sendStatus, m_visionPublisher, &VisionTrackedPublisher::handleStatus);
+    connect(this, &Amun::updateTrackerPort, m_visionPublisher, &VisionTrackedPublisher::updatePort);
 
     // start threads
     m_processorThread->start();
@@ -205,6 +206,9 @@ void Amun::handleCommand(const Command &command)
         }
         if (command->amun().has_referee_port()) {
             emit updateRefereePort(command->amun().referee_port());
+        }
+        if (command->amun().has_tracker_port()) {
+            emit updateTrackerPort(command->amun().tracker_port());
         }
     }
 

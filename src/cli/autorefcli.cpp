@@ -46,6 +46,7 @@ struct Settings {
     QString m_entryPoint;
     std::uint32_t m_visionPort = SSL_VISION_PORT;
     std::uint32_t m_gameControllerPort = SSL_GAME_CONTROLLER_PORT;
+    std::uint32_t m_trackerPort = SSL_VISION_TRACKER_PORT;
 };
 
 void getSettings(Settings& settings) {
@@ -55,10 +56,12 @@ void getSettings(Settings& settings) {
 
     QCommandLineOption recordLogOption { "record", "Record the game to the specified log file", "logfile" };
     QCommandLineOption visionPortOption { "vision-port", "Port to receive vision detections on", "vision-port" };
+    QCommandLineOption trackerPortOption { "tracker-port", "Port to publish tracking results on", "tracker-port" };
     QCommandLineOption gameControllerPortOption { "gc-port", "Port to receive game controller/referee messages on", "gc-port" };
 
     parser.addOption(recordLogOption);
     parser.addOption(visionPortOption);
+    parser.addOption(trackerPortOption);
     parser.addOption(gameControllerPortOption);
 
     parser.process(*QCoreApplication::instance());
@@ -74,6 +77,15 @@ void getSettings(Settings& settings) {
             std::exit(1);
         }
         settings.m_visionPort = port;
+    }
+
+    if (parser.isSet(trackerPortOption)) {
+        const int port = parser.value(trackerPortOption).toInt();
+        if (port <= 0) {
+            qFatal("Invalid tracker port, must be positive");
+            std::exit(1);
+        }
+        settings.m_trackerPort = port;
     }
 
     if (parser.isSet(gameControllerPortOption)) {
@@ -98,6 +110,7 @@ Command buildCommand(const Settings& settings) {
     amun::CommandAmun *amun = command->mutable_amun();
     amun->set_vision_port(settings.m_visionPort);
     amun->set_referee_port(settings.m_gameControllerPort);
+    amun->set_tracker_port(settings.m_trackerPort);
 
     return command;
 }
