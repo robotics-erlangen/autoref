@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Autoref
+Name=Autoref-ER-Force
 Icon=${CMAKE_SOURCE_DIR}/data/icons/autoref.svg
 Exec=${CMAKE_BINARY_DIR}/bin/autoref
 Terminal=false
