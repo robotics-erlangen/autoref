@@ -24,6 +24,9 @@ EOF
 	chmod 700 ~/.xinitrc
 	export X11VNC_CREATE_GEOM="${VNC_GEOMETRY}"
 	exec x11vnc -forever -usepw -display WAIT:cmd=FINDCREATEDISPLAY-Xvfb
+elif [[ "$1" == "gui" ]]; then
+	echo "Launch in GUI mode"
+	exec $HOME/build/bin/autoref $@
 else
 	echo "Launch in headless mode"
 	exec $HOME/build/bin/autoref-cli $@
