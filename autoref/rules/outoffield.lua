@@ -29,6 +29,7 @@ local World = require "base/world"
 local Event = require "gameevents"
 
 local OUT_OF_FIELD_MIN_TIME = 0.25
+local CLOSE_TO_GOAL_THRESHOLD = 0.2
 
 OutOfField.possibleRefStates = {
 	Game = true,
@@ -139,7 +140,7 @@ function OutOfField:occuring()
 					and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
 					and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
 
-				local closeToGoal = (World.Geometry[side.."Goal"]):distanceTo(World.Ball.pos) < 0.8
+				local closeToGoal = World.Ball.pos:distanceToLineSegment(World.Geometry[side.."GoalLeft"], World.Geometry[side.."GoalRight"]) < CLOSE_TO_GOAL_THRESHOLD
 
 				if closeToGoal or insideGoal
 						or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
