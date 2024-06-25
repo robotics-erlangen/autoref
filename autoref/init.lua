@@ -88,8 +88,6 @@ local function debugEvents(events)
 end
 
 local function main()
-	GameController.update()
-
 	if World.HasTrueState then
 		EventValidator.update()
 	end
@@ -148,6 +146,10 @@ end
 
 local function mainLoopWrapper(func)
 	return function()
+		-- Connect to GameController even without vision data to avoid
+		-- confusion
+		GameController.update()
+
 		if not World.update() then
 			return -- skip processing if no vision data is available yet
 		end
