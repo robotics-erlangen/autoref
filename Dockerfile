@@ -1,7 +1,7 @@
 #
 # Build stage
 #
-FROM ubuntu:20.04 AS build-stage
+FROM ubuntu:24.04 AS build-stage
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Install dependencies
@@ -25,7 +25,7 @@ RUN set -xe; \
 ##
 ## Run stage
 ##
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN set -xe; \
