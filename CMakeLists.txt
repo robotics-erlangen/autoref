@@ -18,7 +18,7 @@
 # *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
 # ***************************************************************************
 
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.11.0)
 project(erforce)
 enable_testing()
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_SOURCE_DIR}/src/framework/cmake")
@@ -27,12 +27,12 @@ if(POLICY CMP0071) # compatibility with CMake 3.10.0
 endif()
 
 include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG(-std=gnu++17 HAVE_C17)
-if (NOT HAVE_C17)
-    message(FATAL_ERROR "Your compiler does not understand -std=c++17, consider updating your compiler")
+CHECK_CXX_COMPILER_FLAG(-std=gnu++20 HAVE_C20)
+if (NOT HAVE_C20)
+    message(FATAL_ERROR "Your compiler does not understand -std=c++20, consider updating your compiler")
 endif()
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++17")
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++20")
+SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_CXX_STANDARD_REQUIRED YES)
 SET(CMAKE_CXX_EXTENSIONS ON)
 
@@ -68,9 +68,18 @@ find_package(Threads REQUIRED)
 sanitize_env()
 find_package(Protobuf 3.3.0)
 restore_env()
-# old cmake versions can't detect the protobuf version number
-# the protobuf version on such systems is too old to be useful
-if(NOT ${PROTOBUF_FOUND} OR ${CMAKE_VERSION} VERSION_LESS 3.6.0 OR NOT TARGET protobuf::protoc)
+
+# if protobouf is not found the version string is empty and apparently ifs in cmake do not follow short-circuit logic,
+# which means below it evaluates the if condition to "... OR VERSION_GREATER_EQUAL 4.25.0" and then cmake dies
+# this is stupid, but can't be helped
+if (NOT ${PROTOBUF_FOUND})
+    set(Protobuf_VERSION 4.25.0)
+endif()
+
+if(NOT ${PROTOBUF_FOUND}
+        # protobuf version 4.25.0 leads to weird linker errors, not sure if versions greater than that cause the same issues
+        OR ${Protobuf_VERSION} VERSION_GREATER_EQUAL 4.25.0
+        OR NOT TARGET protobuf::protoc)
     include(BuildProtobuf)
 endif()
 
@@ -86,6 +95,7 @@ if(NOT APPLE)
 endif()
 include(BuildEigen)
 include(BuildLuaJIT2)
+include(BuildGoogleTest)
 include(BuildSourceMap)
 include(GetGameController)
 

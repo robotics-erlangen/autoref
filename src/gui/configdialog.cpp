@@ -24,7 +24,7 @@
 #include <QPushButton>
 #include <QSettings>
 
-const uint DEFAULT_SYSTEM_DELAY = 0; // in ms
+const uint DEFAULT_VISION_TRANSMISSION_DELAY = 0; // in ms
 const uint DEFAULT_VISION_PORT = SSL_VISION_PORT;
 const uint DEFAULT_REFEREE_PORT = SSL_GAME_CONTROLLER_PORT;
 const uint DEFAULT_VISION_TRACKER_PORT = SSL_VISION_TRACKER_PORT;
@@ -49,7 +49,7 @@ void ConfigDialog::sendConfiguration()
 {
     Command command(new amun::Command);
     // from ms to ns
-    command->mutable_tracking()->set_system_delay(ui->systemDelayBox->value() * 1000 * 1000);
+    command->mutable_tracking()->set_vision_transmission_delay(ui->visionTransmissionDelayBox->value() * 1000 * 1000);
 
     command->mutable_amun()->set_vision_port(ui->visionPort->value());
     command->mutable_amun()->set_referee_port(ui->refPort->value());
@@ -61,7 +61,7 @@ void ConfigDialog::sendConfiguration()
 void ConfigDialog::load()
 {
     QSettings s;
-    ui->systemDelayBox->setValue(s.value("Tracking/SystemDelayAutoref", DEFAULT_SYSTEM_DELAY).toUInt()); // in ms
+    ui->visionTransmissionDelayBox->setValue(s.value("Tracking/VisionTransmissionDelayAutoref", DEFAULT_VISION_TRANSMISSION_DELAY).toUInt()); // in ms
 
     ui->visionPort->setValue(s.value("Amun/VisionPort2018", DEFAULT_VISION_PORT).toUInt());
     ui->refPort->setValue(s.value("Amun/RefereePort", DEFAULT_REFEREE_PORT).toUInt());
@@ -74,7 +74,7 @@ void ConfigDialog::load()
 
 void ConfigDialog::reset()
 {
-    ui->systemDelayBox->setValue(DEFAULT_SYSTEM_DELAY);
+    ui->visionTransmissionDelayBox->setValue(DEFAULT_VISION_TRANSMISSION_DELAY);
     ui->visionPort->setValue(DEFAULT_VISION_PORT);
     ui->refPort->setValue(DEFAULT_REFEREE_PORT);
     ui->trackerPort->setValue(DEFAULT_VISION_TRACKER_PORT);
@@ -84,7 +84,7 @@ void ConfigDialog::reset()
 void ConfigDialog::apply()
 {
     QSettings s;
-    s.setValue("Tracking/SystemDelayAutoref", ui->systemDelayBox->value());
+    s.setValue("Tracking/VisionTransmissionDelayAutoref", ui->visionTransmissionDelayBox->value());
 
     s.setValue("Amun/VisionPort2018", ui->visionPort->value());
     s.setValue("Amun/RefereePort", ui->refPort->value());

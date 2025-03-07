@@ -24,6 +24,8 @@
 #include "core/timer.h"
 #include "core/sslprotocols.h"
 #include "processor/processor.h"
+#include "protobuf/ssl_geometry.pb.h"
+#include "protobuf/world.pb.h"
 #include "strategy/strategy.h"
 #include "networkinterfacewatcher.h"
 #include "visiontrackedpublisher.h"
@@ -57,6 +59,8 @@ Amun::Amun(bool simulatorOnly, QObject *parent) :
     qRegisterMetaType< QList<robot::RadioResponse> >("QList<robot::RadioResponse>");
     qRegisterMetaType<Status>("Status");
     qRegisterMetaType<amun::CommandReferee>("amun::CommandReferee");
+    qRegisterMetaType<world::BallModel>("world::BallModel");
+    qRegisterMetaType<SSL_GeometryCameraCalibration>("SSL_GeometryCameraCalibration");
 
     // global timer, which can be slowed down / sped up
     m_timer = new Timer;
