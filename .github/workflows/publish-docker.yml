@@ -34,9 +34,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ vars.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
-        tags: |
-          type=ref,event=tag
-          type=sha,prefix=commit-,format=short
+          tags: |
+            type=ref,event=tag
+            type=sha,prefix=commit-,format=short
         env:
           DOCKER_METADATA_SHORT_SHA_LENGTH: 12
 
