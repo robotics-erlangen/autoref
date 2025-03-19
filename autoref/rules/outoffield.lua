@@ -26,6 +26,7 @@ local Referee = require "base/referee"
 local debug = require "base/debug"
 local vis = require "base/vis"
 local World = require "base/world"
+local BallObserver = require "ballobserver"
 local Event = require "gameevents"
 
 local OUT_OF_FIELD_MIN_TIME = 0.25
@@ -54,7 +55,7 @@ local function isBallInField(ballPos)
 end
 
 function OutOfField:occuring()
-	local ballPos = World.Ball.pos
+	local ballPos = BallObserver.getRealisticBallPos()
 	local previousPos = self.lastTouchPosition
 
 	local lastTeam = Referee.teamWhichTouchedBallLast()
@@ -78,17 +79,17 @@ function OutOfField:occuring()
 			else
 				self.maxHeightAfterBlueTouch = 0
 			end
-		elseif isBallInField() then
+		elseif isBallInField(ballPos) then
 			self.maxHeightAfterYellowTouch = math.max(self.maxHeightAfterYellowTouch, World.Ball.posZ)
 			self.maxHeightAfterBlueTouch = math.max(self.maxHeightAfterBlueTouch, World.Ball.posZ)
 		end
 
-		if isBallInField() then
+		if isBallInField(ballPos) then
 			self.wasInFieldBefore = true
 		elseif self.wasInFieldBefore then
 			self.outOfFieldTime = World.Time
 			self.wasInFieldBefore = false
-			self.outOfFieldPos = World.Ball.pos:copy()
+			self.outOfFieldPos = ballPos:copy()
 			self.waitingForDecision = true
 		end
 	end
@@ -100,7 +101,7 @@ function OutOfField:occuring()
 			end
 		end
 	end
-	if isBallInField() and not self.waitingForDecision then
+	if isBallInField(ballPos) and not self.waitingForDecision then
 		self.rawOutOfFieldCounter = 0
 	end
 
@@ -120,7 +121,7 @@ function OutOfField:occuring()
 			return
 		end
 
-		vis.addCircle("ball out of play", World.Ball.pos, 0.02, vis.colors.blue, true)
+		vis.addCircle("ball out of play", ballPos, 0.02, vis.colors.blue, true)
 		local event
 		if math.abs(self.outOfFieldPos.y) > World.Geometry.FieldHeightHalf then -- out of goal line
 			event = Event.ballLeftField(lastRobot.isYellow, lastRobot.id, self.outOfFieldPos, true)
@@ -140,7 +141,7 @@ function OutOfField:occuring()
 					and math.abs(ballPos.y) > World.Geometry.FieldHeightHalf
 					and math.abs(ballPos.y) <World.Geometry.FieldHeightHalf+0.2
 
-				local closeToGoal = World.Ball.pos:distanceToLineSegment(World.Geometry[side.."GoalLeft"], World.Geometry[side.."GoalRight"]) < CLOSE_TO_GOAL_THRESHOLD
+				local closeToGoal = ballPos:distanceToLineSegment(World.Geometry[side.."GoalLeft"], World.Geometry[side.."GoalRight"]) < CLOSE_TO_GOAL_THRESHOLD
 
 				if closeToGoal or insideGoal
 						or math.abs(ballPos.y) > World.Geometry.FieldHeightHalf+0.2 then -- math.abs(World.Ball.pos.x) < World.Geometry.GoalWidth/2
