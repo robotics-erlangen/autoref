@@ -30,6 +30,7 @@ local BallOwner = require "base/ballowner"
 local World = require "base/world"
 local plot = require "base/plot"
 
+local BallObserver = require "ballobserver"
 local GameController = require "gamecontroller"
 local EventValidator = require "eventvalidator"
 
@@ -153,6 +154,9 @@ local function mainLoopWrapper(func)
 		if not World.update() then
 			return -- skip processing if no vision data is available yet
 		end
+
+		BallObserver._update()
+
 		func()
 		plot._plotAggregated()
 	end
