@@ -254,7 +254,7 @@ function World._updateWorld(state)
 			-- sort robot into visible / not visible
 			if not robot.isVisible then
 				table.insert(World.YellowInvisibleRobots, robot)
-			elseif World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y < World.Geometry.GoalSubstitutionAreaPosY then
+			elseif World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y < World.Geometry.GoalSubstitutionAreaPosY - Constants.maxRobotRadius then
 				table.insert(World.YellowRobotsInExchangeArea, robot)
 			else
 				table.insert(World.YellowRobots, robot)
@@ -278,7 +278,7 @@ function World._updateWorld(state)
 			end
 			robot:_update(rdata, World.Time)
 			-- don't add robots that are in the blue goal substitution area to the BlueRobots
-			if World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y > -World.Geometry.GoalSubstitutionAreaPosY then
+			if World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y > -(World.Geometry.GoalSubstitutionAreaPosY - Constants.maxRobotRadius) then
 				table.insert(World.BlueRobotsInExchangeArea, robot)
 			else
 				table.insert(World.BlueRobots, robot)
