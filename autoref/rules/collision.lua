@@ -68,8 +68,8 @@ function Collision:occuring()
 
 	Collision.ignore = false
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
-		for _, offRobot in ipairs(self.World[offense.."Robots"]) do
-			for _, defRobot in ipairs(self.World[defense.."Robots"]) do
+		for _, offRobot in ipairs(self.World[offense.."RobotsVisible"]) do
+			for _, defRobot in ipairs(self.World[defense.."RobotsVisible"]) do
 				local speedDiff = offRobot.speed - defRobot.speed
 				local projectedSpeed = (offRobot.pos + speedDiff):orthogonalProjection(offRobot.pos,
 					defRobot.pos):distanceTo(offRobot.pos) - self.assumedBreakSpeedDiff

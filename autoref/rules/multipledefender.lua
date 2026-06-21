@@ -38,6 +38,7 @@ function MultipleDefender:occuring()
 	if self.World.Ball.pos.y > 0 then -- on blue side of field
 		defense = "Blue"
 	end
+	-- only check Robots on field, because the robots in the exchange area cannot be in the defense area
 	for _, robot in ipairs(self.World[defense.."Robots"]) do
 		local distThreshold = -robot.radius
 		if robot ~= self.World[defense.."Keeper"]

@@ -45,7 +45,7 @@ function FreekickDistance:occuring()
 		KickoffYellow = "Blue"
 	}
 	local defense = defenseTeamMap[World.RefereeState]
-	for _, robot in ipairs(World[defense.."Robots"]) do
+	for _, robot in ipairs(World[defense.."RobotsVisible"]) do
 		local d = robot.pos:distanceTo(World.Ball.pos) - robot.shootRadius - World.Ball.radius
 		if d < STOP_BALL_DISTANCE then
 			local event = Event.freeKickDistance(robot.isYellow, robot.id, robot.pos, d)

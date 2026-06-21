@@ -47,6 +47,7 @@ function AttackerDefAreaDist:occuring()
 	end
 
 	for offense, defense in pairs({Blue = "Yellow", Yellow = "Blue"}) do
+		-- only check Robots on field, because the robots in the exchange area cannot be close to the opponent defense area
 		for _, robot in ipairs(self.World[offense.."Robots"]) do
 			local distance = Field["distanceTo"..defense.."DefenseArea"](robot.pos, robot.radius)
 			if distance <= 0.2 and not self.closeRobotsInThisState[robot] then

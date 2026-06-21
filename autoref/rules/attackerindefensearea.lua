@@ -36,6 +36,7 @@ end
 function AttackerInDefenseArea:occuring()
 	for offense, defense in pairs({Yellow = "Blue", Blue = "Yellow"}) do
 		if Field["isIn"..defense.."DefenseArea"](self.World.Ball.pos, self.World.Ball.radius) then
+			-- only check Robots on field, because the robots in the exchange area cannot be close to the opponent defense area
 			for _, robot in ipairs(self.World[offense.."Robots"]) do
 				-- attacker touches ball while the ball is in the defense area
 				if self:ballTouchesRobot(robot) then

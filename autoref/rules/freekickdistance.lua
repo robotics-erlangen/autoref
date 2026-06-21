@@ -52,7 +52,7 @@ function FreekickDistance:occuring()
 	if World.Ball.speed:length() > 1 then
 		return
 	end
-	for _, robot in ipairs(World[defense.."Robots"]) do
+	for _, robot in ipairs(World[defense.."RobotsVisible"]) do
 		local d = robot.pos:distanceTo(self.stopBallPos)-robot.shootRadius
 		local isCurrentlyTooClose = false
 		if World.Ball:isPositionValid() then

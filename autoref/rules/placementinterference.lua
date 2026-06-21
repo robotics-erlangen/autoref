@@ -45,7 +45,7 @@ end
 function BallPlacementInterference:occuring()
 	if self.World.BallPlacementPos then
 		local opponent = self.World.RefereeState == "BallPlacementBlue" and "Yellow" or "Blue"
-		for _, robot in ipairs(self.World[opponent.."Robots"]) do
+		for _, robot in ipairs(self.World[opponent.."RobotsVisible"]) do
 			local dist = robot.pos:distanceToLineSegment(self.World.Ball.pos, self.World.BallPlacementPos)
 			if dist < 0.5 + robot.radius then
 				if not self.inRangeStartTimes[robot] then
