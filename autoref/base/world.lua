@@ -72,12 +72,14 @@ World.Ball = Ball()
 World.YellowRobots = {}
 World.YellowInvisibleRobots = {}
 World.YellowRobotsInExchangeArea = {}
+World.YellowRobotsVisible = {}
 World.YellowRobotsById = {}
 World.YellowKeeper = nil
 World.YellowColorStr = "<font color=\"#C9C60D\">yellow</font>"
 World.BlueRobots = {}
 World.BlueRobotsById = {}
 World.BlueRobotsInExchangeArea = {}
+World.BlueRobotsVisible = {}
 World.BlueKeeper = nil
 World.BlueColorStr = "<font color=\"blue\">blue</font>"
 World.Robots = {}
@@ -267,6 +269,7 @@ function World._updateWorld(state)
 		-- only keep robots that are still existent
 		local opponentRobotsById = World.BlueRobotsById
 		World.BlueRobots = {}
+		World.BlueRobotsInExchangeArea = {}
 		World.BlueRobotsById = {}
 		-- just update every opponent robot
 		-- robots that are invisible for more than one second are dropped by amun
