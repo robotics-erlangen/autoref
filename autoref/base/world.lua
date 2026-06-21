@@ -36,12 +36,14 @@ local Robot = require "base/robot"
 -- @field YellowRobots Robot[] - List of yellow robots, that are on the field and *not* in the exchange area, in an arbitary order
 -- @field YellowInvisibleRobots Robot[] - Yellow robots which currently aren't tracked
 -- @field YellowRobotsInExchangeArea Robot[] - List of yellow robots which currently are in the exchange area
+-- @field YellowRobotsVisible Robot[] - List of yellow robots on the field or in the exchange area
 -- @field YellowRobotsById Robot[] - List of yellow robots with robot id as index
 -- @field YellowKeeper Robot - Yellow keeper if on field or nil
 -- @field YellowRobotsNumberAllowed number - number of yellow robots that are allowed on the field
 -- @field BlueRobots Robot[] - List of blue robots, that are on the field and *not* in the exchange area, in an arbitary order
 -- @field BlueRobotsById Robot[] - List of blue robots with robot id as index
 -- @field BlueRobotsInExchangeArea Robot[] - List of blue robots which currently are in the exchange area
+-- @field BlueRobotsVisible Robot[] - List of blue robots on the field or in the exchange area
 -- @field BlueKeeper Robot - Blue keeper if on field or nil
 -- @field BlueRobotsNumberAllowed number - number of blue robots that are allowed on the field
 -- @field Robots Robot[] - Every visible robot in an arbitary order
@@ -289,10 +291,14 @@ function World._updateWorld(state)
 		end
 	end
 
-	World.Robots = table.copy(World.YellowRobots)
-	table.append(World.Robots, World.BlueRobots)
-	table.append(World.Robots, World.YellowRobotsInExchangeArea)
-	table.append(World.Robots, World.BlueRobotsInExchangeArea)
+	World.YellowRobotsVisible = table.copy(World.YellowRobots)
+	table.append(World.YellowRobotsVisible, World.YellowRobotsInExchangeArea)
+
+	World.BlueRobotsVisible = table.copy(World.BlueRobots)
+	table.append(World.BlueRobotsVisible, World.BlueRobotsInExchangeArea)
+
+	World.Robots = table.copy(World.YellowRobotsVisible)
+	table.append(World.Robots, World.BlueRobotsVisible)
 
 	-- no vision data only if the parameter is false
 	return state.has_vision_data ~= false
