@@ -33,16 +33,16 @@ local Robot = require "base/robot"
 -- @class table
 -- @name World
 -- @field Ball Ball - current Ball
--- @field YellowRobots Robot[] - List of own robots in an arbitary order
--- @field YellowInvisibleRobots Robot[] - Own robots which currently aren't tracked
+-- @field YellowRobots Robot[] - List of yellow robots, that are on the field and *not* in the exchange area, in an arbitary order
+-- @field YellowInvisibleRobots Robot[] - Yellow robots which currently aren't tracked
 -- @field YellowRobotsInExchangeArea Robot[] - List of yellow robots which currently are in the exchange area
--- @field YellowRobotsById Robot[] - List of own robots with robot id as index
--- @field YellowKeeper Robot - Own keeper if on field or nil
+-- @field YellowRobotsById Robot[] - List of yellow robots with robot id as index
+-- @field YellowKeeper Robot - Yellow keeper if on field or nil
 -- @field YellowRobotsNumberAllowed number - number of yellow robots that are allowed on the field
--- @field BlueRobots Robot[] - List of opponent robots in an arbitary order
--- @field BlueRobotsById Robot[] - List of opponent robots with robot id as index
+-- @field BlueRobots Robot[] - List of blue robots, that are on the field and *not* in the exchange area, in an arbitary order
+-- @field BlueRobotsById Robot[] - List of blue robots with robot id as index
 -- @field BlueRobotsInExchangeArea Robot[] - List of blue robots which currently are in the exchange area
--- @field BlueKeeper Robot - Opponent keeper if on field or nil
+-- @field BlueKeeper Robot - Blue keeper if on field or nil
 -- @field BlueRobotsNumberAllowed number - number of blue robots that are allowed on the field
 -- @field Robots Robot[] - Every visible robot in an arbitary order
 -- @field TeamIsBlue bool - True if we are the blue team, otherwise we're yellow
