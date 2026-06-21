@@ -31,14 +31,18 @@ local vis = require "base/vis"
 -- @class table
 -- @name World
 -- @field Ball Ball - current Ball
--- @field YellowRobots Robot[] - List of own robots in an arbitary order
--- @field YellowInvisibleRobots Robot[] - Own robots which currently aren't tracked
--- @field YellowRobotsById Robot[] - List of own robots with robot id as index
--- @field YellowKeeper Robot - Own keeper if on field or nil
+-- @field YellowRobots Robot[] - List of yellow robots, that are on the field and *not* in the exchange area, in an arbitary order
+-- @field YellowInvisibleRobots Robot[] - Yellow robots which currently aren't tracked
+-- @field YellowRobotsInExchangeArea Robot[] - List of yellow robots which currently are in the exchange area
+-- @field YellowRobotsVisible Robot[] - List of yellow robots on the field or in the exchange area
+-- @field YellowRobotsById Robot[] - List of yellow robots with robot id as index
+-- @field YellowKeeper Robot - Yellow keeper if on field or nil
 -- @field YellowRobotsNumberAllowed number - number of yellow robots that are allowed on the field
--- @field BlueRobots Robot[] - List of opponent robots in an arbitary order
--- @field BlueRobotsById Robot[] - List of opponent robots with robot id as index
--- @field BlueKeeper Robot - Opponent keeper if on field or nil
+-- @field BlueRobots Robot[] - List of blue robots, that are on the field and *not* in the exchange area, in an arbitary order
+-- @field BlueRobotsById Robot[] - List of blue robots with robot id as index
+-- @field BlueRobotsInExchangeArea Robot[] - List of blue robots which currently are in the exchange area
+-- @field BlueRobotsVisible Robot[] - List of blue robots on the field or in the exchange area
+-- @field BlueKeeper Robot - Blue keeper if on field or nil
 -- @field BlueRobotsNumberAllowed number - number of blue robots that are allowed on the field
 -- @field Robots Robot[] - Every visible robot in an arbitary order
 -- @field TeamIsBlue bool - True if we are the blue team, otherwise we're yellow
@@ -65,10 +69,14 @@ local World = {}
 World.Ball = Ball()
 World.YellowRobots = {}
 World.YellowInvisibleRobots = {}
+World.YellowRobotsInExchangeArea = {}
+World.YellowRobotsVisible = {}
 World.YellowRobotsById = {}
 World.YellowKeeper = nil
 World.YellowColorStr = "<font color=\"#C9C60D\">yellow</font>"
 World.BlueRobots = {}
+World.BlueRobotsInExchangeArea = {}
+World.BlueRobotsVisible = {}
 World.BlueRobotsById = {}
 World.BlueKeeper = nil
 World.BlueColorStr = "<font color=\"blue\">blue</font>"
@@ -114,7 +122,9 @@ World.Geometry = {}
 -- @field BlueGoal Vector - Center point of the goal on the line
 -- @field BlueGoalLeft Vector
 -- @field BlueGoalRight Vector
--- @field BoundaryWidth number - Free distance around the playing field
+-- @field BoundaryWidthTouchLine number - Free distance from the touch line to the wall
+-- @field BoundaryWidthGoalLine number - Free distance from the goal line to the wall
+-- @field GoalSubstitutionAreaPosY number - Y position that marks the border to the substitution area
 -- @field RefereeWidth number - Width of area reserved for referee
 
 -- initializes Team and Geometry data
@@ -190,8 +200,17 @@ function World._updateGeometry(geom)
 	wgeom.BlueGoalLeft = Vector(- wgeom.GoalWidth / 2, wgeom.BlueGoal.y)
 	wgeom.BlueGoalRight = Vector(wgeom.GoalWidth / 2, wgeom.BlueGoal.y)
 
-	wgeom.BoundaryWidth = geom.boundary_width
+	wgeom.BoundaryWidthTouchLine = geom.boundary_width
+	wgeom.BoundaryWidthGoalLine = geom.boundary_width_goal_line or geom.boundary_width
+
+	wgeom.GoalSubstitutionAreaPosY = nil
+	if geom.goal_substitution_area_width ~= nil and geom.goal_substitution_area_width ~= 0.0 then
+		wgeom.GoalSubstitutionAreaPosY = -(wgeom.FieldHeightHalf + wgeom.BoundaryWidthGoalLine - geom.goal_substitution_area_width)
+	end
+
 	wgeom.RefereeWidth = geom.referee_width
+
+	World.Geometry = table.readonlytable(World.Geometry)
 
 	World.IsLargeField = wgeom.FieldWidth > 5 and wgeom.FieldHeight > 7
 end
@@ -232,13 +251,16 @@ function World._updateWorld(state)
 		-- Update data of every own robot
 		World.YellowRobots = {}
 		World.YellowInvisibleRobots = {}
+		World.YellowRobotsInExchangeArea = {}
 		for _, robot in pairs(World.YellowRobotsById) do
-			robot:_updateFromTrueState(dataById[robot.id], World.Time)
+			robot:_update(dataById[robot.id], World.Time)
 			-- sort robot into visible / not visible
-			if robot.isVisible then
-				table.insert(World.YellowRobots, robot)
-			else
+			if not robot.isVisible then
 				table.insert(World.YellowInvisibleRobots, robot)
+			elseif World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y < World.Geometry.GoalSubstitutionAreaPosY - Constants.maxRobotRadius then
+				table.insert(World.YellowRobotsInExchangeArea, robot)
+			else
+				table.insert(World.YellowRobots, robot)
 			end
 		end
 	end
@@ -248,6 +270,7 @@ function World._updateWorld(state)
 		-- only keep robots that are still existent
 		local opponentRobotsById = World.BlueRobotsById
 		World.BlueRobots = {}
+		World.BlueRobotsInExchangeArea = {}
 		World.BlueRobotsById = {}
 		-- just update every opponent robot
 		-- robots that are invisible for more than one second are dropped by amun
@@ -257,8 +280,13 @@ function World._updateWorld(state)
 			if not robot then
 				robot = Robot(rdata.id, false)
 			end
-			robot:_updateFromTrueState(rdata, World.Time)
-			table.insert(World.BlueRobots, robot)
+			robot:_update(rdata, World.Time)
+			-- don't add robots that are in the blue goal substitution area to the BlueRobots
+			if World.Geometry.GoalSubstitutionAreaPosY ~= nil and robot.pos.y > -(World.Geometry.GoalSubstitutionAreaPosY - Constants.maxRobotRadius) then
+				table.insert(World.BlueRobotsInExchangeArea, robot)
+			else
+				table.insert(World.BlueRobots, robot)
+			end
 			World.BlueRobotsById[rdata.id] = robot
 		end
 		-- mark dropped robots as invisible
@@ -267,8 +295,14 @@ function World._updateWorld(state)
 		end
 	end
 
-	World.Robots = table.copy(World.YellowRobots)
-	table.append(World.Robots, World.BlueRobots)
+	World.YellowRobotsVisible = table.copy(World.YellowRobots)
+	table.append(World.YellowRobotsVisible, World.YellowRobotsInExchangeArea)
+
+	World.BlueRobotsVisible = table.copy(World.BlueRobots)
+	table.append(World.BlueRobotsVisible, World.BlueRobotsInExchangeArea)
+
+	World.Robots = table.copy(World.YellowRobotsVisible)
+	table.append(World.Robots, World.BlueRobotsVisible)
 
 	-- no vision data only if the parameter is false
 	return true
